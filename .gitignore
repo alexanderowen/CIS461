@@ -1,3 +1,6 @@
+# Repo-owner defined ignore files
+scanner
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
