@@ -17,6 +17,8 @@
 <comment>\n  ;
 <comment>"*"+"/"        {BEGIN(INITIAL);}
 
+\/\/.*  {;}
+
 \"{3}[^\"{3}]*\"{3} {return 274;}
 
 [ \n\t\r\v\f] {;}
@@ -39,7 +41,7 @@ not      {return 271;}
 
 [(){}/*+\-!:;,\.=]      {return yytext[0];}
 [a-zA-Z_][a-zA-Z0-9_]*       {return 272;}
-["](([\\][0btnrf"\\])|[^"\\])*["]   {return 274;}
+["](([\\][0btnrf"\\])|[^"\\n])*["]   {return 274;}
 ["](([\\].)|[^"\\])*["]  {printf("%d Illegal escape code; only \\\\, \\0, \\t, \\n, \\r, \\n are permitted (at '%s')\n",yylineno, yytext); return 274;}
 
 <<EOF>>  {return EOF;}
