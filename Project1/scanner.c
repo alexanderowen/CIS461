@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "toknames.h"   /* Extracted from quack.tab.h */ 
+#include "toknames.h"
 #include "lex.yy.h"
 
 extern void yyrestart(FILE *f);
@@ -35,7 +35,8 @@ static char* lookup_token(int token)
     for (int i=0; i < num_named_tokens; ++i) 
     {
         // printf("Comparing %d to %d\n", token, token_name_table[i].num);
-        if (token == token_name_table[i].num) {
+        if (token == token_name_table[i].num) 
+        {
             return token_name_table[i].name;
         }
     }
