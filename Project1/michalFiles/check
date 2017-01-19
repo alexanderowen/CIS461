@@ -1,0 +1,10 @@
+#! /bin/bash
+#
+# Usage: "./check"
+#
+
+for src in `ls expect/*`; do
+   srcname=`basename ${src}`
+   echo "Diff'ing ${src}"
+   $diff ${src} actual/${src}
+done
