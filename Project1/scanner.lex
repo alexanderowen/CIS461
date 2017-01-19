@@ -40,10 +40,10 @@ not      {return 271;}
 [0-9]+   {return 273;}
 
 [(){}/*+\-!:;,\.=]      {return yytext[0];}
+["](([\\][0btnrf"\\])|[^"\n])*["]   {return 274;}
+["](([\\].)|[^"\\])*["]  {fprintf(stderr, "%d: Illegal escape code; only \\\\, \\0, \\t, \\n, \\r, \\n are permitted (at '%s')\n",yylineno, yytext); return 274;}
+["][^\n]*[\n] {fprintf(stderr, "%d: Unclosed string?  Encountered newline in quoted string. (at'%s')\n", yylineno, yytext ); return 274;}
 [a-zA-Z_][a-zA-Z0-9_]*       {return 272;}
-["](([\\][0btnrf"\\])|[^"\\n])*["]   {return 274;}
-["](([\\].)|[^"\\])*["]  {printf("%d Illegal escape code; only \\\\, \\0, \\t, \\n, \\r, \\n are permitted (at '%s')\n",yylineno, yytext); return 274;}
-
 <<EOF>>  {return EOF;}
 
 %%
