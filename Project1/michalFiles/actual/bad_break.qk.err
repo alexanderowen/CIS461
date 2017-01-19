@@ -1,3 +1,0 @@
-5 Illegal escape code; only \\, \0, \t, \n, \r, \n are permitted (at '"I seem to have forgotten to close this quote; 
-    def foo(y: Int) {
-       w = "')

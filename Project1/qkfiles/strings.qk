@@ -1,7 +1,1 @@
-a = "hello";
-b = " world ";
-c = "how \t are";
-d = "you? \n I'm";
-FAIL = "this is
-        not ok";
-empty = "";
+s = "this is good";

@@ -1,5 +1,7 @@
 # Repo-owner defined ignore files
 scanner
+*.out
+*.err
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -5,6 +5,6 @@
 
 for src in `ls expect/*`; do
    srcname=`basename ${src}`
-   echo "Diff'ing ${src}"
-   $diff ${src} actual/${src}
+   echo "Diff'ing expect/${srcname} and actual/${srcname}"
+   diff expect/${srcname} actual/${srcname}
 done
