@@ -3,8 +3,59 @@
 # Usage: "./check"
 #
 
-for src in `ls expect/*`; do
-   srcname=`basename ${src}`
-   echo "Diff'ing expect/${srcname} and actual/${srcname}"
-   diff expect/${srcname} actual/${srcname}
-done
+echo "diff actual/GoodWalk.qk.err expect/GoodWalk.qk.err"
+diff actual/GoodWalk.qk.err expect/GoodWalk.qk.err
+echo "diff actual/GoodWalk.qk.out expect/GoodWalk.qk.out"
+diff actual/GoodWalk.qk.out expect/GoodWalk.qk.out
+echo "diff actual/LexChallenge.qk.err expect/LexChallenge.qk.err"
+diff actual/LexChallenge.qk.err expect/LexChallenge.qk.err
+echo "diff actual/LexChallenge.qk.out expect/LexChallenge.qk.out"
+diff actual/LexChallenge.qk.out expect/LexChallenge.qk.out
+echo "diff actual/Pt.qk.err expect/Pt.qk.er"
+diff actual/Pt.qk.err expect/Pt.qk.err
+echo "diff actual/Pt.qk.out expect/Pt.qk.ou"
+diff actual/Pt.qk.out expect/Pt.qk.out
+echo "diff actual/Sqr.qk.err expect/Sqr.qk.er"
+diff actual/Sqr.qk.err expect/Sqr.qk.err
+echo "diff actual/Sqr.qk.out expect/Sqr.qk.ou"
+diff actual/Sqr.qk.out expect/Sqr.qk.out
+echo "diff actual/SqrDecl.qk.err expect/SqrDecl.qk"
+diff actual/SqrDecl.qk.err expect/SqrDecl.qk.err
+echo "diff actual/SqrDecl.qk.out expect/SqrDecl.qk.ou"
+diff actual/SqrDecl.qk.out expect/SqrDecl.qk.out
+echo "diff actual/TypeWalk.qk.err expect/TypeWalk.qk.err"
+diff actual/TypeWalk.qk.err expect/TypeWalk.qk.err
+echo "diff actual/TypeWalk.qk.out expect/TypeWalk.qk.out"
+diff actual/TypeWalk.qk.out expect/TypeWalk.qk.out
+echo "diff actual/bad_break.qk.err expect/bad_break.qk.err"
+diff actual/bad_break.qk.err expect/bad_break.qk.err
+echo "diff actual/bad_break.qk.out expect/bad_break.qk.out"
+diff actual/bad_break.qk.out expect/bad_break.qk.out
+echo "diff actual/bad_escape.qk.err expect/bad_escape.qk.err"
+diff actual/bad_escape.qk.err expect/bad_escape.qk.err
+echo "diff actual/bad_escape.qk.out expect/bad_escape.qk.out"
+diff actual/bad_escape.qk.out expect/bad_escape.qk.out
+echo "diff actual/bad_init.qk.err expect/bad_init.qk.err"
+diff actual/bad_init.qk.err expect/bad_init.qk.err
+echo "diff actual/bad_init.qk.out expect/bad_init.qk.out"
+diff actual/bad_init.qk.out expect/bad_init.qk.out
+echo "diff actual/hands.qk.err expect/hands.qk.err"
+diff actual/hands.qk.err expect/hands.qk.err
+echo "diff actual/hands.qk.out expect/hands.qk.out"
+diff actual/hands.qk.out expect/hands.qk.out
+echo "diff actual/not_a_duck.qk.err expect/not_a_duck.qk.err"
+diff actual/not_a_duck.qk.err expect/not_a_duck.qk.err
+echo "diff actual/not_a_duck.qk.out expect/not_a_duck.qk.out"
+diff actual/not_a_duck.qk.out expect/not_a_duck.qk.out
+echo "diff actual/robot.qk.err expect/robot.qk.err"
+diff actual/robot.qk.err expect/robot.qk.err
+echo "diff actual/robot.qk.out expect/robot.qk.out"
+diff actual/robot.qk.out expect/robot.qk.out
+echo "diff actual/schroedinger.qk.err expect/schroedinger.qk.err"
+diff actual/schroedinger.qk.err expect/schroedinger.qk.err
+echo "diff actual/schroedinger.qk.out expect/schroedinger.qk.out"
+diff actual/schroedinger.qk.out expect/schroedinger.qk.out
+echo "diff actual/schroedinger2.qk.err expect/schroedinger2.qk.err"
+diff actual/schroedinger2.qk.err expect/schroedinger2.qk.err
+echo "diff actual/schroedinger2.qk.out expect/schroedinger2.qk.out"
+diff actual/schroedinger2.qk.out expect/schroedinger2.qk.out
