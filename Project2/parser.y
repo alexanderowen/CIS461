@@ -13,21 +13,68 @@ void yyerror(const char *s);
 %token CLASS DEF EXTENDS IF ELIF ELSE WHILE RETURN ATLEAST ATMOST EQUALS 
 %token AND OR NOT IDENT INT_LIT STRING_LIT
 
+%left AND OR NOT
+%left '<' '>' '=' ATMOST ATLEAST EQUALS 
+%left '+' '-'
+%left '*' '/'
+%left '.'
+
 %%
 // this is the actual grammar that bison will parse, but for right now it's just
 // something silly to echo to the screen what bison gets from flex.  We'll
 // make a real one shortly:
 program:
-       statements
-
-statements:
-          statement
-        | statements statement
+        statement_plus
         ;
+
+statement_plus:
+          statement
+        | statement_plus statement
+        ;
+
+statement_star:
+        | statement_star statement
+        ;
+
+statement_block:
+                '{' statement_star  '}'
+                ;
 
 statement:
-          l_expr '=' r_expr ';' {printf("evaluated statement\n");}
+          if_block
+        | while_statement 
+        | l_expr '=' r_expr ';' {printf("evaluated statement\n");}
+        | l_expr ':' IDENT '=' r_expr ';'
         ;
+
+if_block:
+        if_statement elif_statement_star else_statement_optional
+        ;
+
+if_statement:
+            IF expr statement_block
+            ;
+
+elif_statement_star:
+                | elif_statement_star elif_statement
+                ;
+                
+elif_statement:
+              ELIF expr statement_block
+            ;
+
+else_statement_optional:
+            | ELSE statement_block
+            ;
+
+while_statement:
+               WHILE expr statement_block
+            ;
+
+expr:
+     r_expr
+    ;
+
 
 l_expr:
       IDENT
@@ -37,6 +84,20 @@ l_expr:
 r_expr:
       STRING_LIT
     | INT_LIT
+    | l_expr
+    | r_expr '+' r_expr
+    | r_expr '-' r_expr
+    | r_expr '*' r_expr
+    | r_expr '/' r_expr
+    | '(' r_expr ')'
+    | r_expr EQUALS r_expr
+    | r_expr ATMOST r_expr
+    | r_expr '<' r_expr
+    | r_expr ATLEAST r_expr
+    | r_expr '>' r_expr
+    | r_expr AND r_expr
+    | r_expr OR r_expr
+    | NOT r_expr
     ;
 
 %%
