@@ -18,21 +18,58 @@ void yyerror(const char *s);
 %left '+' '-'
 %left '*' '/'
 %left '.'
+// might be incorrect to say '.' is left associative
 
 %%
 // this is the actual grammar that bison will parse, but for right now it's just
 // something silly to echo to the screen what bison gets from flex.  We'll
 // make a real one shortly:
 program:
-        statement_plus
+        class_star statement_plus
         ;
+
+class_star: 
+            /* epsilon */
+          | class_star class
+          ;
+
+class:
+     class_signature class_body
+    ;
+
+class_signature:
+               CLASS IDENT '(' formal_args ')' 
+             | CLASS IDENT '(' formal_args ')' EXTENDS IDENT
+             ;
+
+formal_args: 
+             /* epsilon */
+           | formal_arg formal_args_star 
+           ;
+
+formal_arg:
+          IDENT ':' IDENT
+        ;
+
+formal_args_star: 
+                  /* epsilon */
+                | ',' IDENT ':' IDENT formal_args_star 
+                ;
+
+class_body:
+          '{' statement_star method_star '}'
+
+method_star:
+           DEF IDENT '(' formal_args ')' statement_block
+         | DEF IDENT '(' formal_args ')' ':' IDENT statement_block  
 
 statement_plus:
           statement
         | statement_plus statement
         ;
 
-statement_star:
+statement_star: 
+          /* epsilon */
         | statement_star statement
         ;
 
@@ -55,7 +92,8 @@ if_statement:
             IF expr statement_block
             ;
 
-elif_statement_star:
+elif_statement_star: 
+                  /* epsilon */
                 | elif_statement_star elif_statement
                 ;
                 
@@ -63,7 +101,8 @@ elif_statement:
               ELIF expr statement_block
             ;
 
-else_statement_optional:
+else_statement_optional: 
+              /* epsilon */
             | ELSE statement_block
             ;
 
@@ -74,7 +113,6 @@ while_statement:
 expr:
      r_expr
     ;
-
 
 l_expr:
       IDENT
