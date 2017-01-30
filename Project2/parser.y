@@ -25,7 +25,7 @@ void yyerror(const char *s);
 // something silly to echo to the screen what bison gets from flex.  We'll
 // make a real one shortly:
 program:
-        class_star statement_plus
+        class_star statement_star
         ;
 
 class_star: 
@@ -38,35 +38,45 @@ class:
     ;
 
 class_signature:
-               CLASS IDENT '(' formal_args ')' 
-             | CLASS IDENT '(' formal_args ')' EXTENDS IDENT
+               CLASS IDENT '(' formal_args ')' extends_option 
              ;
+
+extends_option:
+              /* epsilon */
+            | EXTENDS IDENT
+            ;
 
 formal_args: 
              /* epsilon */
-           | formal_arg formal_args_star 
+           | formal_arg extra_formal_args_star 
            ;
 
 formal_arg:
           IDENT ':' IDENT
         ;
 
-formal_args_star: 
+extra_formal_args_star: 
                   /* epsilon */
-                | ',' IDENT ':' IDENT formal_args_star 
+                | extra_formal_args_star ',' IDENT ':' IDENT 
                 ;
 
 class_body:
           '{' statement_star method_star '}'
 
-method_star:
-           DEF IDENT '(' formal_args ')' statement_block
-         | DEF IDENT '(' formal_args ')' ':' IDENT statement_block  
+method:
+       DEF IDENT '(' formal_args ')' ident_option statement_block
+     ;
 
-statement_plus:
-          statement
-        | statement_plus statement
+ident_option:
+          /* epsilon */
+        | ':' IDENT
         ;
+
+method_star:
+          /* epsilon */
+        | method_star method
+        ;
+
 
 statement_star: 
           /* epsilon */
@@ -80,16 +90,17 @@ statement_block:
 statement:
           if_block
         | while_statement 
-        | l_expr '=' r_expr ';' {printf("evaluated statement\n");}
-        | l_expr ':' IDENT '=' r_expr ';'
+        | l_expr ident_option '=' r_expr ';'
+        | RETURN r_expr_option ';'
+        | r_expr ';'
         ;
 
 if_block:
-        if_statement elif_statement_star else_statement_optional
+        if_statement elif_statement_star else_statement_option
         ;
 
 if_statement:
-            IF expr statement_block
+            IF r_expr statement_block
             ;
 
 elif_statement_star: 
@@ -98,21 +109,17 @@ elif_statement_star:
                 ;
                 
 elif_statement:
-              ELIF expr statement_block
+              ELIF r_expr statement_block
             ;
 
-else_statement_optional: 
+else_statement_option: 
               /* epsilon */
             | ELSE statement_block
             ;
 
 while_statement:
-               WHILE expr statement_block
+               WHILE r_expr statement_block
             ;
-
-expr:
-     r_expr
-    ;
 
 l_expr:
       IDENT
@@ -136,30 +143,45 @@ r_expr:
     | r_expr AND r_expr
     | r_expr OR r_expr
     | NOT r_expr
+    | r_expr '.' IDENT '(' actual_args ')'
+    | IDENT '(' actual_args ')'
     ;
 
+r_expr_option:
+              /* epsilon */
+            | r_expr
+            ;
+
+actual_args:
+           /* epsilon */
+        |  r_expr extra_actual_args
+        ;
+
+extra_actual_args:
+                  /* epsilon */
+                | extra_actual_args ',' r_expr
 %%
 
 int main(int argc, char* argv[]) {
-    // open a file handle to a particular file:
     FILE *myfile = fopen(argv[1], "r");
-    // make sure it is valid:
-    if (!myfile) {
+    if (!myfile) 
+    {
         fprintf(stderr, "I can't open file!\n");
         return -1;
     }
-    // set flex to read from it instead of defaulting to STDIN:
+
+    fprintf(stderr, "Beginning parse of %s\n", argv[1]);
     yyin = myfile;
-    
-    // parse through the input until there is no more:
     do {
         yyparse();
     } while (!feof(yyin));
-    
+
+    fprintf(stderr, "Finished parse with result 0\n");
+    return 0;
 }
 
-void yyerror(const char *s) {
+void yyerror(const char *s) 
+{
     fprintf(stderr, "parse error! Message: %s\n", s);
-    // might as well halt now:
     exit(-1);
 }
