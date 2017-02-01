@@ -1,13 +1,13 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include "lex.yy.h"
 
-// stuff from flex that bison needs to know about:
-int yylex();
-int yyparse();
-FILE *yyin;
- 
-void yyerror(const char *s);
+extern int yylex();
+extern int yyparse();
+extern FILE *yyin;
+
+void yyerror(const char *msg);
 %}
 
 %token CLASS DEF EXTENDS IF ELIF ELSE WHILE RETURN ATLEAST ATMOST EQUALS 
@@ -18,12 +18,8 @@ void yyerror(const char *s);
 %left '+' '-'
 %left '*' '/'
 %left '.'
-// might be incorrect to say '.' is left associative
 
 %%
-// this is the actual grammar that bison will parse, but for right now it's just
-// something silly to echo to the screen what bison gets from flex.  We'll
-// make a real one shortly:
 program:
         class_star statement_star
         ;
@@ -162,26 +158,4 @@ extra_actual_args:
                 | extra_actual_args ',' r_expr
 %%
 
-int main(int argc, char* argv[]) {
-    FILE *myfile = fopen(argv[1], "r");
-    if (!myfile) 
-    {
-        fprintf(stderr, "I can't open file!\n");
-        return -1;
-    }
 
-    fprintf(stderr, "Beginning parse of %s\n", argv[1]);
-    yyin = myfile;
-    do {
-        yyparse();
-    } while (!feof(yyin));
-
-    fprintf(stderr, "Finished parse with result 0\n");
-    return 0;
-}
-
-void yyerror(const char *s) 
-{
-    fprintf(stderr, "parse error! Message: %s\n", s);
-    exit(-1);
-}

@@ -5,6 +5,16 @@
 %{
 #include <stdio.h>
 #include "parser.tab.h"
+
+void yyerror(const char *msg)
+{
+    fprintf(stderr, "%d: %s (at '%s')\n", yylineno, msg, yytext);
+}
+
+const char* BAD_ESC_MSG =                                                                              
+  "Illegal escape code; only \\\\, \\0, \\t, \\n, \\r, \\n are permitted";                             
+const char* BAD_NL_STR =                                                                               
+  "Unclosed string?  Encountered newline in quoted string.";
 %}
 
 %x comment
@@ -40,12 +50,15 @@ or       {return OR;}
 not      {return NOT;}
 [0-9]+   {return INT_LIT;}
 
-[(){}/*+\-!:;,\.=<>]      {return yytext[0];}
+[(){}/*+\-!:;,\.=<>]                {return yytext[0];}
 ["](([\\][0btnrf"\\])|[^"\n\0\b\t\n\r\f\"\\])*["]   {return STRING_LIT;}
-["](([\\][^0btnrf"\\])|[^"\n])*["]  {fprintf(stderr, "%d: Illegal escape code; only \\\\, \\0, \\t, \\n, \\r, \\n are permitted (at '%s')\n",yylineno, yytext); return STRING_LIT;}
-["][^"\n]*[\n] {fprintf(stderr, "%d: Unclosed string?  Encountered newline in quoted string. (at '%s')\n", yylineno, yytext ); return STRING_LIT;}
-[a-zA-Z_][a-zA-Z0-9_]*       {return IDENT;}
+["](([\\][^0btnrf"\\])|[^"\n])*["]  {yyerror(BAD_ESC_MSG); return STRING_LIT;}
+["][^"\n]*[\n]                      {yyerror(BAD_NL_STR); return STRING_LIT;}
+[a-zA-Z_][a-zA-Z0-9_]*              {return IDENT;}
 <<EOF>>  {return EOF;}
+
+.  { fprintf(stderr, "*** %d: Unexpected character %d (%c)\n",                                      
+                    yylineno, (int) yytext[0], yytext[0]); }  
 
 %%
 
