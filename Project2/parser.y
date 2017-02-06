@@ -20,8 +20,10 @@ Program *root;
     char *id;
     list<Statement *> *stmts;
     list<Class *>     *clsss; 
+    list<RExpr *> *rexprs;
     Statement *stmt;
     RExpr *rexpr;
+    LExpr *lexpr;
     Program *pgm;
 
 }
@@ -41,7 +43,9 @@ Program *root;
 %type <stmt> statement
 %type <stmts> statement_star
 %type <rexpr> r_expr
+%type <lexpr> l_expr
 %type <clsss> class_star 
+%type <rexprs> actual_args extra_actual_args
 %%
 program:
         class_star statement_star {$$ = new Program($1, $2); root = $$;}
@@ -143,30 +147,29 @@ while_statement:
             ;
 
 l_expr:
-      IDENT
-    | r_expr '.' IDENT
+      IDENT            {$$ = new IdentNode($1);}
+    | r_expr '.' IDENT {$$ = new ObjectFieldLExpr($1, $3);}
     ;
 
 r_expr:
       STRING_LIT {$$ = new StringNode($1);}
     | INT_LIT    {$$ = new IntNode($1);}
-/*    | l_expr
-    | r_expr '+' r_expr
-    | r_expr '-' r_expr
-    | r_expr '*' r_expr
-    | r_expr '/' r_expr
-    | '(' r_expr ')'
-    | r_expr EQUALS r_expr
-    | r_expr ATMOST r_expr
-    | r_expr '<' r_expr
-    | r_expr ATLEAST r_expr
-    | r_expr '>' r_expr
-    | r_expr AND r_expr
-    | r_expr OR r_expr
-    | NOT r_expr
-    | r_expr '.' IDENT '(' actual_args ')'
-    | IDENT '(' actual_args ')'
-*/
+    | l_expr     {$$ = new RExprToLExpr($1);} 
+    | r_expr '+' r_expr {$$ = new PlusNode($1, $3);}
+    | r_expr '-' r_expr {$$ = new MinusNode($1, $3);}
+    | r_expr '*' r_expr {$$ = new TimesNode($1, $3);}
+    | r_expr '/' r_expr {$$ = new DivideNode($1, $3);}
+    | '(' r_expr ')'    {$$ = $2;} /*TODO: Make sure this works properly*/
+    | r_expr EQUALS r_expr  {$$ = new EqualsNode($1, $3);}
+    | r_expr ATMOST r_expr  {$$ = new AtMostNode($1, $3);}
+    | r_expr '<' r_expr     {$$ = new LessThanNode($1, $3);}
+    | r_expr ATLEAST r_expr {$$ = new AtLeastNode($1, $3);}
+    | r_expr '>' r_expr     {$$ = new GreaterThanNode($1, $3);}
+    | r_expr AND r_expr     {$$ = new AndNode($1, $3);}
+    | r_expr OR r_expr      {$$ = new OrNode($1, $3);}
+    | NOT r_expr            {$$ = new NotNode($2);}
+    | r_expr '.' IDENT '(' actual_args ')' {$$ = new DotRExpr($1, $3, $5);}
+    | IDENT '(' actual_args ')' {$$ = new ConstructorRExpr($1, $3);}
     ;
 
 r_expr_option:
@@ -175,13 +178,13 @@ r_expr_option:
             ;
 
 actual_args:
-           /* epsilon */
-        |  r_expr extra_actual_args
+           /* epsilon */            {$$ = new list<RExpr *>();}
+        |  r_expr extra_actual_args {$$ = new list<RExpr *>(); $$->push_back($1); $$->merge(*($2));}
         ;
 
 extra_actual_args:
-                  /* epsilon */
-                | extra_actual_args ',' r_expr
+                  /* epsilon */                {$$ = new list<RExpr *>();}
+                | extra_actual_args ',' r_expr {$$ = $1; $1->push_back($3);}
 %%
 
 
