@@ -20,9 +20,19 @@ class ExtraFormalArgsStar {};
 class ClassBody {};
 
 class Method {};
+*/
+FalseIdentOption::FalseIdentOption() {}
+void FalseIdentOption::print()
+{
+    fprintf(stdout, "Found FalseIdentOption\n");
+}
 
-class IdentOption {};
-
+TrueIdentOption::TrueIdentOption(char *i) : id(i) {}
+void TrueIdentOption::print()
+{
+    fprintf(stdout, "Foudn TrueIdentOption\n")
+}
+/*
 class StatementBlock {};
 */
 
@@ -30,6 +40,12 @@ class StatementBlock {};
 /*****************
  * RExpr classes *
  *****************/
+EmptyRExpr::EmptyRExpr() {}
+void EmptyRExpr::print()
+{
+    fprintf(stdout, "Found EmptyRExpr\n");
+}
+
 DotRExpr::DotRExpr(RExpr *r, char *i, list<RExpr *> *a) : rexpr(r), id(i), args(a) {}
 void DotRExpr::print()
 {
@@ -139,23 +155,67 @@ void OrNode::print()
     fprintf(stdout, "Found OrNode\n");
 }
 
-RExprStatement::RExprStatement(RExpr *R) : r(R) {}
+/*********
+ * Statement classes
+ * *******/
+
+RExprStatement::RExprStatement(RExpr *r) : rexpr(r) {}
 void RExprStatement::print()
 {
     fprintf(stdout, "Found RExprStatement\n");
 }
 
+ReturnStatement::ReturnStatement(RExpr *r) : rexpr(r) {}
+void ReturnStatement::print()
+{
+    fprintf(stdout, "Found ReturnStatement\n");
+}
+
+AssignmentStatement::AssignmentStatement(LExpr *l, IdentOption *i, RExpr *r) : lexpr(l), ident(i), rexpr(r) {}
+void AssignmentStatement::print()
+{
+    fprintf(stdout, "Found AssignmentStatement\n");
+}
+
 /*
 class IfBlock {};
-
-class IfStatement {};
-
-class ElifStatement {};
-
-class ElifStatementOption {};
-
-class WhileStatement {};
 */
+IfClause::IfClause(RExpr *r, list<Statement *> *s) : rexpr(r), stmts(s) {}
+void IfClause::print()
+{
+    fprintf(stdout, "Found IfClause\n");
+}
+
+ElifClause::ElifClause(RExpr *r, list<Statement *> *s) : rexpr(r), stmts(s) {}
+void ElifClause::print()
+{
+    fprintf(stdout, "Found ElifClause\n");
+}
+
+FalseElseOption::FalseElseOption() {}
+void FalseElseOption::print()
+{
+    fprintf(stdout, "Found FalseElseOption\n");
+}
+
+TrueElseOption::TrueElseOption(list<Statements *> *s) : stmts(s) {}
+void TrueElseOption::print()
+{
+    fprintf(stdout, "Found TrueElseOption\n");
+}
+
+IfBlock::IfBlock(IfClause *i, list<ElifClause *> *ei, ElseOption *el) : _if(i), _elifs(ei), _else(el) {}
+void IfBlock::print()
+{
+    fprintf(stdout, "Found IfBlock\n");
+}
+
+WhileStatement::WhileStatement(RExpr *r, list<Statement *> *s) : rexpr(r), stmts(s) {}
+void WhileStatement::print()
+{
+    fprintf(stdout, "Found a WhileStatement\n");
+}
+
 IdentNode::IdentNode(char *i) : id(i) {}
 void IdentNode::print()
 {

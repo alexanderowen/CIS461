@@ -26,7 +26,29 @@ class ClassBody {};
 
 class Method {};
 
-class IdentOption {};
+class IdentOption //ABC 
+{
+    public:
+        virtual void print() = 0;
+};
+
+class FalseIdentOption : public IdentOption
+{
+    public:
+        FalseIdentOption();
+        virtual void print();
+};
+
+class TrueIdentOption : public IdentOption
+{
+    protected:
+        char *id;
+    public:
+        TrueIdentOption(char *i);
+        virtual void print();
+};
+
+class 
 
 class StatementBlock {};
 
@@ -41,6 +63,13 @@ class RExpr  //ABC
 {
     public:
         virtual void print() = 0;
+};
+
+class EmptyRExpr : public RExpr
+{
+    public:
+        EmptyRExpr();
+        virtual void print();
 };
 
 class DotRExpr : public RExpr
@@ -189,6 +218,9 @@ class OrNode : public BinaryOperatorNode
 };
 // END RExpr
 
+/**********
+ * Statement classes
+ * ********/
 class Statement //ABC 
 {
     public:
@@ -198,21 +230,98 @@ class Statement //ABC
 class RExprStatement : public Statement 
 {
     protected:
-        RExpr* r;
+        RExpr *rexpr;
     public:
-        RExprStatement(RExpr* R);
+        RExprStatement(RExpr* r);
         virtual void print(); 
 };
 
+class ReturnStatement : public Statement
+{
+    protected:
+        RExpr *rexpr;
+    public:
+        ReturnStatement(RExpr *r);
+        virtual void print();
+};
+
+class AssignmentStatement : public Statement
+{
+    proteected:
+        LExpr       *lexpr;
+        IdentOption *ident;
+        RExpr       *rexpr;
+    public:
+        AssignmentStatement(LExpr *l, IdentOption *i, RExpr *r);
+        virtual void print();
+};
+
+class WhileStatement : public Statement 
+{
+    protected:
+        RExpr *rexpr;
+        list<Statement *> *stmts;
+    public:
+        WhiteStatement(RExpr *r, list<Statement *> *s);
+        virtual void print();
+}; 
+
 class IfBlock {};
 
-class IfStatement {};
 
-class ElifStatement {};
+class IfClause //Decided not to make this an ABC despite being production and rule
+{
+    protected:
+        RExpr *rexpr;
+        list<Statement *> *stmts;
+    public:
+        IfClause(RExpr *r, list<Statement *> *stmts);
+        virtual void print();
+};
 
-class ElifStatementOption {};
+class ElifClause
+{
+    protected:
+        RExpr *rexpr;
+        list<Statement *> *stmts;
+    public:
+        ElifClause(RExpr *r, list<Statement *> *stmts);
+        virtual void print();
 
-class WhileStatement {};
+};
+
+class ElseOption //ABC
+{
+    public:
+        virtual void print() = 0;
+};
+
+class FalseElseOption : public ElseOption
+{
+    public:
+        FalseElseOption();
+        virtual void print();
+};
+
+class TrueElseOption : public ElseOption
+{
+    protected:
+        list<Statement *> *stmts;
+    public:
+        TrueElseOption(list<Statement *> *s);
+        virtual void print();
+};
+
+class IfBlock //Not an ABC because 1-1 rule production 
+{
+    protected:
+        IfClause *_if;
+        list<ElifClause *> *_elifs;
+        ElseOption *_else;
+    public:
+        IfBlock(IfClause *i, list<ElifClause *> *ei, ElseOption *el);
+        virtual void print();
+}
 
 /***************
  * LExpr classes

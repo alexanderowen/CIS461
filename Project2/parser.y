@@ -21,7 +21,13 @@ Program *root;
     list<Statement *> *stmts;
     list<Class *>     *clsss; 
     list<RExpr *> *rexprs;
+    list<ElifClause *> *elifs;
     Statement *stmt;
+    IfClause *_if;
+    ElifClause *_elif;
+    ElseOption *_else;
+    IfBlock *ifblock;
+    IdentOption *idop;
     RExpr *rexpr;
     LExpr *lexpr;
     Program *pgm;
@@ -42,9 +48,17 @@ Program *root;
 %type <pgm> program
 %type <stmt> statement
 %type <stmts> statement_star
+%type <stmts> statement_block
+%type <_if> if_clause
+%type <_elif> elif_clause
+%type <_else> else_option
+%type <elifs> elif_star
+%type <ifblock> if_block
 %type <rexpr> r_expr
+%type <rexpr> r_expr_option
 %type <lexpr> l_expr
 %type <clsss> class_star 
+%type <idop> ident_option
 %type <rexprs> actual_args extra_actual_args
 %%
 program:
@@ -91,8 +105,8 @@ method:
      ;
 
 ident_option:
-          /* epsilon */
-        | ':' IDENT
+          /* epsilon */ {$$ = new FalseIdentOption();}
+        | ':' IDENT     {$$ = new TrueIdentOption($2);}
         ;
 
 method_star:
@@ -107,43 +121,38 @@ statement_star:
         ;
 
 statement_block:
-                '{' statement_star  '}'
+                '{' statement_star  '}' {$$ = $2;}
                 ;
 
 statement:
 /*          if_block
-        | while_statement 
-        | l_expr ident_option '=' r_expr ';'
-        | RETURN r_expr_option ';'
-        | r_expr ';' {$$ = new RExprStatement($1);}
 */
-        r_expr ';' {$$ = new RExprStatement($1);}
+         WHILE r_expr statement_block {$$ = new WhileStatement($2, $3);}
+        | l_expr ident_option '=' r_expr ';' {$$ = new AssignmentStatement($1, $2, $4);}
+        | RETURN r_expr_option ';' {$$ = new ReturnStatement($2);}
+        | r_expr ';' {$$ = new RExprStatement($1);}
         ;
 
 if_block:
-        if_statement elif_statement_star else_statement_option
+        if_clause elif_star else_option {$$ = new IfBlock($1, $2, $3);}
         ;
 
-if_statement:
-            IF r_expr statement_block
-            ;
+if_clause:
+    IF r_expr statement_block {$$ = new IfClause($2, $3);}
+    ;
 
-elif_statement_star: 
-                  /* epsilon */
-                | elif_statement_star elif_statement
-                ;
+elif_star: 
+          /* epsilon */         {$$ = new list<ElifClause *>();}
+        | elif_star elif_clause {$$ = $1; $1->push_back($2);}
+        ;
                 
-elif_statement:
-              ELIF r_expr statement_block
-            ;
+elif_clause:
+          ELIF r_expr statement_block {$$ = new ElifClause($2, $3);}
+        ;
 
-else_statement_option: 
-              /* epsilon */
-            | ELSE statement_block
-            ;
-
-while_statement:
-               WHILE r_expr statement_block
+else_option: 
+              /* epsilon */        {$$ = new FalseElseOption();}
+            | ELSE statement_block {$$ = new TrueElseOption($2);}
             ;
 
 l_expr:
@@ -173,8 +182,8 @@ r_expr:
     ;
 
 r_expr_option:
-              /* epsilon */
-            | r_expr
+              /* epsilon */ {$$ = new EmptyRExpr();}
+            | r_expr        {$$ = $1}
             ;
 
 actual_args:
