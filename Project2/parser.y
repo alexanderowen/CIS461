@@ -1,17 +1,32 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <list>
 #include "lex.yy.h"
+#include "node.h"
 
 extern int yylex();
 extern int yyparse();
 extern FILE *yyin;
-
 void yyerror(const char *msg);
+
+Program *root;
 %}
 
-%token CLASS DEF EXTENDS IF ELIF ELSE WHILE RETURN ATLEAST ATMOST EQUALS 
-%token AND OR NOT IDENT INT_LIT STRING_LIT
+%union {
+    int integer;
+    char *id;
+    list<Statement *> stmts;
+    Statement *stmt;
+    RExpr *rexpr;
+    Program *pgm;
+
+}
+
+%token <integer> INT_LIT
+%token <id>      STRING_LIT IDENT
+%token CLASS DEF EXTENDS IF ELIF ELSE WHILE RETURN 
+%token ATLEAST ATMOST EQUALS AND OR NOT 
 
 %left AND OR NOT
 %left '<' '>' '=' ATMOST ATLEAST EQUALS 
@@ -19,9 +34,13 @@ void yyerror(const char *msg);
 %left '*' '/'
 %left '.'
 
+%type <pgm> program
+%type <stmt> statement
+%type <stmts> statement_star
+%type <rexpr> r_expr
 %%
 program:
-        class_star statement_star
+        class_star statement_star {$$ = new Program($1, $2); root = $$;}
         ;
 
 class_star: 
@@ -75,8 +94,8 @@ method_star:
 
 
 statement_star: 
-          /* epsilon */
-        | statement_star statement
+          /* epsilon */            {$$ = new list<Statement *>();}
+        | statement_star statement {$$ = $1; $1->push_back($2)} 
         ;
 
 statement_block:
@@ -88,7 +107,7 @@ statement:
         | while_statement 
         | l_expr ident_option '=' r_expr ';'
         | RETURN r_expr_option ';'
-        | r_expr ';'
+        | r_expr ';' {$$ = new RExprStatement($1);}
         ;
 
 if_block:
@@ -123,8 +142,8 @@ l_expr:
     ;
 
 r_expr:
-      STRING_LIT
-    | INT_LIT
+      STRING_LIT {$$ = new StringNode($1);}
+    | INT_LIT    {$$ = new IntNode($1);}
     | l_expr
     | r_expr '+' r_expr
     | r_expr '-' r_expr

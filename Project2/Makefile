@@ -1,16 +1,19 @@
-parser: parser.o lex.yy.o parser.tab.o
-	gcc parser.o lex.yy.o parser.tab.o -o parser
+parser: parser.o lex.yy.o parser.tab.o node.o
+	g++ parser.o lex.yy.o parser.tab.o node.o -o parser
 
-lex.yy.o: lex.yy.c
-parser.tab.o: parser.tab.c
-parser.o: parser.c
-	gcc -c -o parser.o parser.c
+node.o: node.cpp node.h
+	g++ -c node.cpp
 
-parser.tab.c parser.tab.h: parser.y
-	bison -d parser.y
-
-lex.yy.c: parser.lex parser.tab.h
+lex.yy.o: parser.lex 
 	flex parser.lex
+	g++ -c lex.yy.c
+
+parser.tab.o: parser.y
+	bison -d parser.y
+	g++ -c parser.tab.c
+
+parser.o: parser.c
+	g++ -c parser.c
 
 clean:
 	rm *.o

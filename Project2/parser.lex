@@ -5,6 +5,7 @@
 %{
 #include <stdio.h>
 #include "parser.tab.h"
+#include "node.h"
 
 void yyerror(const char *msg)
 {
@@ -25,12 +26,12 @@ const char* BAD_NL_STR =
 "/*"         {BEGIN(comment);}
 <comment>[^*\n]*         ;
 <comment>"*"+[^*/\n]*    ;
-<comment>\n  ;
+<comment>\n              ;
 <comment>"*"+"/"        {BEGIN(INITIAL);}
 
 \/\/.*  {;}
 
-\"{3}[^\"{3}]*\"{3} {return STRING_LIT;}
+\"{3}[^\"{3}]*\"{3} {yylval.id = strdup(yytext); return STRING_LIT;}
 
 [ \n\t\r\v\f] {;}
 
@@ -48,13 +49,13 @@ return   {return RETURN;}
 and      {return AND;}
 or       {return OR;}
 not      {return NOT;}
-[0-9]+   {return INT_LIT;}
+[0-9]+   {yylval.integer = atof(yytext); return INT_LIT;}
 
 [(){}/*+\-!:;,\.=<>]                {return yytext[0];}
-["](([\\][0btnrf"\\])|[^"\n\0\b\t\n\r\f\"\\])*["]   {return STRING_LIT;}
-["](([\\][^0btnrf"\\])|[^"\n])*["]  {yyerror(BAD_ESC_MSG); return STRING_LIT;}
-["][^"\n]*[\n]                      {yyerror(BAD_NL_STR); return STRING_LIT;}
-[a-zA-Z_][a-zA-Z0-9_]*              {return IDENT;}
+["](([\\][0btnrf"\\])|[^"\n\0\b\t\n\r\f\"\\])*["]   {yylval.id = strdup(yytext);       return STRING_LIT;}
+["](([\\][^0btnrf"\\])|[^"\n])*["]  {yylval.id = strdup(yytext); yyerror(BAD_ESC_MSG); return STRING_LIT;}
+["][^"\n]*[\n]                      {yylval.id = strdup(yytext); yyerror(BAD_NL_STR);  return STRING_LIT;}
+[a-zA-Z_][a-zA-Z0-9_]*              {yylval.id = strdup(yytext); return IDENT;}
 <<EOF>>  {return EOF;}
 
 .  { fprintf(stderr, "*** %d: Unexpected character %d (%c)\n",                                      
