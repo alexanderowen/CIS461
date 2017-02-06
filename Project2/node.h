@@ -4,7 +4,13 @@
 #include <list>
 #include <stdio.h>
 
-class Class {};
+using std::list;
+
+class Class //ABC
+{
+    public:
+        Class() {} //TODO: Remove this. Make this an ABC
+};
 
 class ClassSignature {};
 
@@ -24,10 +30,37 @@ class IdentOption {};
 
 class StatementBlock {};
 
+/*****************
+ * RExpr classes *
+ *****************/
+class RExpr  //ABC
+{
+    public:
+        virtual void print() = 0;
+};
+
+class StringNode : public RExpr
+{
+    protected:
+        char *id;
+    public:
+        StringNode(char *i);
+        virtual void print(); 
+};
+
+class IntNode : public RExpr
+{
+    protected:
+        int value;
+    public:
+        IntNode(int i);
+        virtual void print(); 
+};
+
 class Statement //ABC 
 {
     public:
-        void print() = 0;
+        virtual void print() = 0;
 };
 
 class RExprStatement : public Statement 
@@ -36,7 +69,7 @@ class RExprStatement : public Statement
         RExpr* r;
     public:
         RExprStatement(RExpr* R);
-        void print(); 
+        virtual void print(); 
 };
 
 class IfBlock {};
@@ -52,32 +85,6 @@ class WhileStatement {};
 class LExpr {};
 
 
-/*****************
- * RExpr classes *
- *****************/
-class RExpr  //ABC
-{
-    public:
-        void print() = 0;
-};
-
-class StringNode : RExpr
-{
-    protected:
-        char *id;
-    public:
-        StringNode(char *i);
-        void print(); 
-};
-
-class IntNode : RExpr
-{
-    protected:
-        int value;
-    public:
-        IntNode(int i);
-        void print(); 
-};
 
 class RExprOption {};
 
@@ -88,10 +95,10 @@ class ExtraActualArgs {};
 class Program 
 {
     protected:
-        list<Statement *> statements;
-        list<Class *>     classes;
+        list<Statement *> *statements;
+        list<Class *>     *classes;
     public:
-        Program(list<Statement *> s, list<Class *> c);
+        Program(list<Class *> *c, list<Statement *> *s);
 };
 
 #endif

@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include "node.h"
 
+using std::list;
+
 /*
 class Class {};
 
@@ -68,4 +70,4 @@ class ActualArgs {};
 class ExtraActualArgs {};
 */
 
-Program::Program(list<Statement *> s, list<Class *> c) : statements(s), classes(c) {}
+Program::Program(list<Class *> *c, list<Statement *> *s) : classes(c), statements(s) {}

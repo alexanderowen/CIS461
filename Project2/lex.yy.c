@@ -581,6 +581,7 @@ char *yytext;
 #line 1 "parser.lex"
 #line 6 "parser.lex"
 #include <stdio.h>
+#include "node.h"
 #include "parser.tab.h"
 
 void yyerror(const char *msg)
@@ -594,7 +595,7 @@ const char* BAD_NL_STR =
   "Unclosed string?  Encountered newline in quoted string.";
 
 
-#line 598 "lex.yy.c"
+#line 599 "lex.yy.c"
 
 #define INITIAL 0
 #define comment 1
@@ -778,10 +779,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 23 "parser.lex"
+#line 24 "parser.lex"
 
 
-#line 785 "lex.yy.c"
+#line 786 "lex.yy.c"
 
 	if ( !(yy_init) )
 		{
@@ -876,167 +877,167 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 25 "parser.lex"
+#line 26 "parser.lex"
 {BEGIN(comment);}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 26 "parser.lex"
+#line 27 "parser.lex"
 ;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 27 "parser.lex"
+#line 28 "parser.lex"
 ;
 	YY_BREAK
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 28 "parser.lex"
+#line 29 "parser.lex"
 ;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 29 "parser.lex"
+#line 30 "parser.lex"
 {BEGIN(INITIAL);}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 31 "parser.lex"
+#line 32 "parser.lex"
 {;}
 	YY_BREAK
 case 7:
 /* rule 7 can match eol */
 YY_RULE_SETUP
-#line 33 "parser.lex"
-{return STRING_LIT;}
+#line 34 "parser.lex"
+{yylval.id = strdup(yytext); return STRING_LIT;}
 	YY_BREAK
 case 8:
 /* rule 8 can match eol */
 YY_RULE_SETUP
-#line 35 "parser.lex"
+#line 36 "parser.lex"
 {;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 37 "parser.lex"
+#line 38 "parser.lex"
 {return CLASS;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 38 "parser.lex"
+#line 39 "parser.lex"
 {return DEF;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 39 "parser.lex"
+#line 40 "parser.lex"
 {return EXTENDS;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 40 "parser.lex"
+#line 41 "parser.lex"
 {return IF;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 41 "parser.lex"
+#line 42 "parser.lex"
 {return ELIF;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 42 "parser.lex"
+#line 43 "parser.lex"
 {return ELSE;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 43 "parser.lex"
+#line 44 "parser.lex"
 {return WHILE;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 44 "parser.lex"
+#line 45 "parser.lex"
 {return RETURN;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 45 "parser.lex"
+#line 46 "parser.lex"
 {return ATLEAST;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 46 "parser.lex"
+#line 47 "parser.lex"
 {return ATMOST;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 47 "parser.lex"
+#line 48 "parser.lex"
 {return EQUALS;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 48 "parser.lex"
+#line 49 "parser.lex"
 {return AND;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 49 "parser.lex"
+#line 50 "parser.lex"
 {return OR;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 50 "parser.lex"
+#line 51 "parser.lex"
 {return NOT;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 51 "parser.lex"
-{return INT_LIT;}
+#line 52 "parser.lex"
+{yylval.integer = atof(yytext); return INT_LIT;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 53 "parser.lex"
+#line 54 "parser.lex"
 {return yytext[0];}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 54 "parser.lex"
-{return STRING_LIT;}
+#line 55 "parser.lex"
+{yylval.id = strdup(yytext);       return STRING_LIT;}
 	YY_BREAK
 case 26:
 /* rule 26 can match eol */
 YY_RULE_SETUP
-#line 55 "parser.lex"
-{yyerror(BAD_ESC_MSG); return STRING_LIT;}
+#line 56 "parser.lex"
+{yylval.id = strdup(yytext); yyerror(BAD_ESC_MSG); return STRING_LIT;}
 	YY_BREAK
 case 27:
 /* rule 27 can match eol */
 YY_RULE_SETUP
-#line 56 "parser.lex"
-{yyerror(BAD_NL_STR); return STRING_LIT;}
+#line 57 "parser.lex"
+{yylval.id = strdup(yytext); yyerror(BAD_NL_STR);  return STRING_LIT;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 57 "parser.lex"
-{return IDENT;}
+#line 58 "parser.lex"
+{yylval.id = strdup(yytext); return IDENT;}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(comment):
 case YY_STATE_EOF(triplequotes):
-#line 58 "parser.lex"
+#line 59 "parser.lex"
 {return EOF;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 60 "parser.lex"
+#line 61 "parser.lex"
 { fprintf(stderr, "*** %d: Unexpected character %d (%c)\n",                                      
                     yylineno, (int) yytext[0], yytext[0]); }  
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 63 "parser.lex"
+#line 64 "parser.lex"
 ECHO;
 	YY_BREAK
-#line 1040 "lex.yy.c"
+#line 1041 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2043,7 +2044,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 63 "parser.lex"
+#line 64 "parser.lex"
 
 
 

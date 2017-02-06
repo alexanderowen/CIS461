@@ -4,8 +4,8 @@
 
 %{
 #include <stdio.h>
-#include "parser.tab.h"
 #include "node.h"
+#include "parser.tab.h"
 
 void yyerror(const char *msg)
 {

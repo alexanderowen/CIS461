@@ -5,6 +5,8 @@
 #include "lex.yy.h"
 #include "node.h"
 
+using namespace std;
+
 extern int yylex();
 extern int yyparse();
 extern FILE *yyin;
@@ -16,7 +18,8 @@ Program *root;
 %union {
     int integer;
     char *id;
-    list<Statement *> stmts;
+    list<Statement *> *stmts;
+    list<Class *>     *clsss; 
     Statement *stmt;
     RExpr *rexpr;
     Program *pgm;
@@ -38,14 +41,15 @@ Program *root;
 %type <stmt> statement
 %type <stmts> statement_star
 %type <rexpr> r_expr
+%type <clsss> class_star 
 %%
 program:
         class_star statement_star {$$ = new Program($1, $2); root = $$;}
         ;
 
 class_star: 
-            /* epsilon */
-          | class_star class
+            /* epsilon */ {$$ = new list<Class *>();}
+      /*    | class_star class */
           ;
 
 class:
@@ -95,7 +99,7 @@ method_star:
 
 statement_star: 
           /* epsilon */            {$$ = new list<Statement *>();}
-        | statement_star statement {$$ = $1; $1->push_back($2)} 
+        | statement_star statement {$$ = $1; $1->push_back($2);} 
         ;
 
 statement_block:
@@ -103,11 +107,13 @@ statement_block:
                 ;
 
 statement:
-          if_block
+/*          if_block
         | while_statement 
         | l_expr ident_option '=' r_expr ';'
         | RETURN r_expr_option ';'
         | r_expr ';' {$$ = new RExprStatement($1);}
+*/
+        r_expr ';' {$$ = new RExprStatement($1);}
         ;
 
 if_block:
@@ -144,7 +150,7 @@ l_expr:
 r_expr:
       STRING_LIT {$$ = new StringNode($1);}
     | INT_LIT    {$$ = new IntNode($1);}
-    | l_expr
+/*    | l_expr
     | r_expr '+' r_expr
     | r_expr '-' r_expr
     | r_expr '*' r_expr
@@ -160,6 +166,7 @@ r_expr:
     | NOT r_expr
     | r_expr '.' IDENT '(' actual_args ')'
     | IDENT '(' actual_args ')'
+*/
     ;
 
 r_expr_option:
@@ -178,3 +185,27 @@ extra_actual_args:
 %%
 
 
+int main(int argc, char* argv[])
+{
+    if (argc != 2)
+    {
+        fprintf(stderr, "Usage: %s filename\n", argv[0]);
+        return -1;
+    }
+
+    FILE *myfile = fopen(argv[1], "r");
+    if (!myfile) 
+    {
+        fprintf(stderr, "I can't open file!\n");
+        return -1;
+    }
+
+    int condition;
+    yyin = myfile;
+    fprintf(stderr, "Beginning parse of %s\n", argv[1]);
+    condition = yyparse();
+    if (condition == 0)
+        fprintf(stderr, "Finished parse with no errors\n"); 
+
+    return 0;
+}

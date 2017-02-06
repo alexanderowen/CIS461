@@ -39,49 +39,63 @@
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     CLASS = 258,
-     DEF = 259,
-     EXTENDS = 260,
-     IF = 261,
-     ELIF = 262,
-     ELSE = 263,
-     WHILE = 264,
-     RETURN = 265,
-     ATLEAST = 266,
-     ATMOST = 267,
-     EQUALS = 268,
-     AND = 269,
-     OR = 270,
-     NOT = 271,
-     IDENT = 272,
-     INT_LIT = 273,
-     STRING_LIT = 274
+     INT_LIT = 258,
+     STRING_LIT = 259,
+     IDENT = 260,
+     CLASS = 261,
+     DEF = 262,
+     EXTENDS = 263,
+     IF = 264,
+     ELIF = 265,
+     ELSE = 266,
+     WHILE = 267,
+     RETURN = 268,
+     ATLEAST = 269,
+     ATMOST = 270,
+     EQUALS = 271,
+     AND = 272,
+     OR = 273,
+     NOT = 274
    };
 #endif
 /* Tokens.  */
-#define CLASS 258
-#define DEF 259
-#define EXTENDS 260
-#define IF 261
-#define ELIF 262
-#define ELSE 263
-#define WHILE 264
-#define RETURN 265
-#define ATLEAST 266
-#define ATMOST 267
-#define EQUALS 268
-#define AND 269
-#define OR 270
-#define NOT 271
-#define IDENT 272
-#define INT_LIT 273
-#define STRING_LIT 274
+#define INT_LIT 258
+#define STRING_LIT 259
+#define IDENT 260
+#define CLASS 261
+#define DEF 262
+#define EXTENDS 263
+#define IF 264
+#define ELIF 265
+#define ELSE 266
+#define WHILE 267
+#define RETURN 268
+#define ATLEAST 269
+#define ATMOST 270
+#define EQUALS 271
+#define AND 272
+#define OR 273
+#define NOT 274
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+typedef union YYSTYPE
+#line 18 "parser.y"
+{
+    int integer;
+    char *id;
+    list<Statement *> *stmts;
+    list<Class *>     *clsss; 
+    Statement *stmt;
+    RExpr *rexpr;
+    Program *pgm;
+
+}
+/* Line 1529 of yacc.c.  */
+#line 98 "parser.tab.h"
+	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
