@@ -48,7 +48,6 @@ class TrueIdentOption : public IdentOption
         virtual void print();
 };
 
-class 
 
 class StatementBlock {};
 
@@ -247,7 +246,7 @@ class ReturnStatement : public Statement
 
 class AssignmentStatement : public Statement
 {
-    proteected:
+    protected:
         LExpr       *lexpr;
         IdentOption *ident;
         RExpr       *rexpr;
@@ -262,12 +261,24 @@ class WhileStatement : public Statement
         RExpr *rexpr;
         list<Statement *> *stmts;
     public:
-        WhiteStatement(RExpr *r, list<Statement *> *s);
+        WhileStatement(RExpr *r, list<Statement *> *s);
         virtual void print();
 }; 
 
-class IfBlock {};
+class IfClause;
+class ElifClause;
+class ElseOption;
 
+class IfBlock : public Statement 
+{
+    protected:
+        IfClause *_if;
+        list<ElifClause *> *_elifs;
+        ElseOption *_else;
+    public:
+        IfBlock(IfClause *i, list<ElifClause *> *ei, ElseOption *el);
+        virtual void print();
+};
 
 class IfClause //Decided not to make this an ABC despite being production and rule
 {
@@ -312,16 +323,6 @@ class TrueElseOption : public ElseOption
         virtual void print();
 };
 
-class IfBlock //Not an ABC because 1-1 rule production 
-{
-    protected:
-        IfClause *_if;
-        list<ElifClause *> *_elifs;
-        ElseOption *_else;
-    public:
-        IfBlock(IfClause *i, list<ElifClause *> *ei, ElseOption *el);
-        virtual void print();
-}
 
 /***************
  * LExpr classes

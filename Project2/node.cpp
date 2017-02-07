@@ -30,7 +30,7 @@ void FalseIdentOption::print()
 TrueIdentOption::TrueIdentOption(char *i) : id(i) {}
 void TrueIdentOption::print()
 {
-    fprintf(stdout, "Foudn TrueIdentOption\n")
+    fprintf(stdout, "Foudn TrueIdentOption\n");
 }
 /*
 class StatementBlock {};
@@ -198,7 +198,7 @@ void FalseElseOption::print()
     fprintf(stdout, "Found FalseElseOption\n");
 }
 
-TrueElseOption::TrueElseOption(list<Statements *> *s) : stmts(s) {}
+TrueElseOption::TrueElseOption(list<Statement *> *s) : stmts(s) {}
 void TrueElseOption::print()
 {
     fprintf(stdout, "Found TrueElseOption\n");

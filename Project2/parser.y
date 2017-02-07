@@ -26,7 +26,6 @@ Program *root;
     IfClause *_if;
     ElifClause *_elif;
     ElseOption *_else;
-    IfBlock *ifblock;
     IdentOption *idop;
     RExpr *rexpr;
     LExpr *lexpr;
@@ -53,7 +52,6 @@ Program *root;
 %type <_elif> elif_clause
 %type <_else> else_option
 %type <elifs> elif_star
-%type <ifblock> if_block
 %type <rexpr> r_expr
 %type <rexpr> r_expr_option
 %type <lexpr> l_expr
@@ -125,16 +123,11 @@ statement_block:
                 ;
 
 statement:
-/*          if_block
-*/
-         WHILE r_expr statement_block {$$ = new WhileStatement($2, $3);}
+          if_clause elif_star else_option    {$$ = new IfBlock($1, $2, $3);}
+        | WHILE r_expr statement_block       {$$ = new WhileStatement($2, $3);}
         | l_expr ident_option '=' r_expr ';' {$$ = new AssignmentStatement($1, $2, $4);}
-        | RETURN r_expr_option ';' {$$ = new ReturnStatement($2);}
-        | r_expr ';' {$$ = new RExprStatement($1);}
-        ;
-
-if_block:
-        if_clause elif_star else_option {$$ = new IfBlock($1, $2, $3);}
+        | RETURN r_expr_option ';'           {$$ = new ReturnStatement($2);}
+        | r_expr ';'                         {$$ = new RExprStatement($1);}
         ;
 
 if_clause:

@@ -89,14 +89,19 @@ typedef union YYSTYPE
     list<Statement *> *stmts;
     list<Class *>     *clsss; 
     list<RExpr *> *rexprs;
+    list<ElifClause *> *elifs;
     Statement *stmt;
+    IfClause *_if;
+    ElifClause *_elif;
+    ElseOption *_else;
+    IdentOption *idop;
     RExpr *rexpr;
     LExpr *lexpr;
     Program *pgm;
 
 }
 /* Line 1529 of yacc.c.  */
-#line 100 "parser.tab.h"
+#line 105 "parser.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
