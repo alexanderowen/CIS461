@@ -90,18 +90,26 @@ typedef union YYSTYPE
     list<Class *>     *clsss; 
     list<RExpr *> *rexprs;
     list<ElifClause *> *elifs;
+    list<FormalArg *> *fargs;
+    list<Method *> *meths;
+    Class *cls;
+    ClassBody *clsbdy;
+    ClassSignature *clssig;
     Statement *stmt;
+    Method *meth;
     IfClause *_if;
     ElifClause *_elif;
     ElseOption *_else;
     IdentOption *idop;
+    ExtendsOption *exop;
+    FormalArg *farg;
     RExpr *rexpr;
     LExpr *lexpr;
     Program *pgm;
 
 }
 /* Line 1529 of yacc.c.  */
-#line 105 "parser.tab.h"
+#line 113 "parser.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

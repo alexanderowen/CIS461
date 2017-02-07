@@ -6,25 +6,78 @@
 
 using std::list;
 
-class Class //ABC
+class ClassSignature;
+class ClassBody;
+
+class Class 
 {
+    protected:
+        ClassSignature *clssig;
+        ClassBody *clsbdy;
     public:
-        Class() {} //TODO: Remove this. Make this an ABC
+        Class(ClassSignature *cs, ClassBody *cb);
+        virtual void print();
 };
 
-class ClassSignature {};
+class FormalArgs;
 
-class ExtendsOption {};
+class ExtendsOption //ABC
+{
+    public:
+        virtual void print() = 0;
+};
 
-class FormalArgs {};
+class FalseExtendsOption : public ExtendsOption
+{
+    public:
+        FalseExtendsOption();
+        virtual void print();
+};
 
-class FormalArg {};
 
-class ExtraFormalArgsStar {};
+class TrueExtendsOption : public ExtendsOption
+{
+    protected:
+        char *id;
+    public:
+        TrueExtendsOption(char *i);
+        virtual void print();
+};
 
-class ClassBody {};
+class FormalArg 
+{
+    protected:
+        char *id;
+        char *type;
+    public:
+        FormalArg(char *i, char *t);
+        virtual void print();
+};
 
-class Method {};
+class ClassSignature 
+{
+    protected:
+        char *id;
+        list<FormalArg *> *fargs;
+        ExtendsOption *exop;
+    public:
+        ClassSignature(char *i, list<FormalArg *> *f, ExtendsOption *e);
+        virtual void print();
+};
+
+
+
+class Statement;
+class Method;
+class ClassBody 
+{
+    protected:
+        list<Statement *> *stmts;
+        list<Method *> *meths;
+    public:
+        ClassBody(list<Statement *> *s, list<Method *> *m);
+        virtual void print();
+};
 
 class IdentOption //ABC 
 {
@@ -47,9 +100,19 @@ class TrueIdentOption : public IdentOption
         TrueIdentOption(char *i);
         virtual void print();
 };
+class Method 
+{
+    protected:
+        char *id;
+        list<FormalArg *> *fargs;
+        IdentOption *ident;
+        list<Statement *> *stmts;
+    public:
+        Method(char *, list<FormalArg *> *, IdentOption *, list<Statement *> *);
+        virtual void print(); 
+};
 
 
-class StatementBlock {};
 
 /*****************
  * RExpr classes *

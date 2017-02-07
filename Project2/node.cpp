@@ -4,23 +4,55 @@
 
 using std::list;
 
+Class::Class(ClassSignature *cs, ClassBody *cb) : clssig(cs), clsbdy(cb) {}
+void Class::print()
+{
+    fprintf(stdout, "Found Class\n");
+}
+
+ClassSignature::ClassSignature(char *i, list<FormalArg *> *f, ExtendsOption *e) 
+    : id(i), fargs(f), exop(e) {}
+void ClassSignature::print()
+{
+    fprintf(stdout, "Found ClassSignature\n");
+}
+
+
+FalseExtendsOption::FalseExtendsOption() {}
+void FalseExtendsOption::print()
+{
+    fprintf(stdout, "Found FalseExtendsOption\n");
+}
+
+TrueExtendsOption::TrueExtendsOption(char *i) : id(i) {}
+void TrueExtendsOption::print()
+{
+    fprintf(stdout, "Found TrueExtendsOption\n");
+}
+
+
+FormalArg::FormalArg(char *i, char *t) : id(i), type(t) {}
+void FormalArg::print()
+{
+    fprintf(stdout, "Found FormalArg\n");
+}
 /*
-class Class {};
-
-class ClassSignature {};
-
-class ExtendsOption {};
-
-class FormalArgs {};
-
-class FormalArg {};
-
 class ExtraFormalArgsStar {};
-
-class ClassBody {};
-
-class Method {};
 */
+
+ClassBody::ClassBody(list<Statement *> *s, list<Method *> *m) : stmts(s), meths(m) {}
+void ClassBody::print()
+{
+    fprintf(stdout, "Found ClassBody\n");
+}
+
+Method::Method(char *i, list<FormalArg *> *f, IdentOption *io, list<Statement *> *s) 
+    : id(i), fargs(f), ident(io), stmts(s) {}
+void Method::print()
+{
+    fprintf(stdout, "Found Method\n");
+}
+
 FalseIdentOption::FalseIdentOption() {}
 void FalseIdentOption::print()
 {
