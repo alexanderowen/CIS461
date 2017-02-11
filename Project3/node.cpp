@@ -1,5 +1,6 @@
 #include <list>
 #include <stdio.h>
+#include <string.h>
 #include "node.h"
 
 using std::list;
@@ -9,12 +10,28 @@ void Class::print()
 {
     fprintf(stdout, "Found Class\n");
 }
+char *Class::getID() 
+{
+    return clssig->getID();
+}
+char *Class::getExtends()
+{
+    return clssig->getExtends();
+}
 
 ClassSignature::ClassSignature(char *i, list<FormalArg *> *f, ExtendsOption *e) 
     : id(i), fargs(f), exop(e) {}
 void ClassSignature::print()
 {
     fprintf(stdout, "Found ClassSignature\n");
+}
+char *ClassSignature::getID()
+{
+    return id;
+}
+char *ClassSignature::getExtends()
+{
+    return exop->getID();
 }
 
 
@@ -23,13 +40,20 @@ void FalseExtendsOption::print()
 {
     fprintf(stdout, "Found FalseExtendsOption\n");
 }
+char * FalseExtendsOption::getID()
+{
+    return (char *)"";
+}
 
 TrueExtendsOption::TrueExtendsOption(char *i) : id(i) {}
 void TrueExtendsOption::print()
 {
     fprintf(stdout, "Found TrueExtendsOption\n");
 }
-
+char *TrueExtendsOption::getID()
+{
+    return id;
+}
 
 FormalArg::FormalArg(char *i, char *t) : id(i), type(t) {}
 void FormalArg::print()
@@ -260,21 +284,60 @@ void ObjectFieldLExpr::print()
     fprintf(stdout, "Found a ObjectFieldLExpr\n");
 }
 
-/*
-class RExprOption {};
-*/
-
-/* might not be necessary
-ActualArgs::ActualArgs(RExpr *r, ExtraActualArgs *a) : rexpr(r), args(a) {}
-ActualArgs::ActualArgs() : rexpr(NULL), args(NULL) {}
-void ActualArgs::print()
+bool withinList(list<char *> *l, char *c)
 {
-    fprintf(stdout, "Found ActualArgs\n");
+    for (list<char *>::const_iterator it = l->begin(); it != l->end(); ++it)
+    {
+        if (strcmp(*it, c) == 0)
+            return true;
+    }
+    return false;
 }
-*/
 
-/*
-class ExtraActualArgs {};
-*/
+int findWithinList(list<char *> *l, char *c)
+{
+    int i = 0;
+    for (list<char *>::const_iterator it = l->begin(); it != l->end(); ++it)
+    {
+        if (strcmp(*it, c) == 0)
+            return i;
+        i++;
+    }
+    return -1;
+
+}
 
 Program::Program(list<Class *> *c, list<Statement *> *s) : classes(c), statements(s) {}
+bool Program::checkClassHierarchy()
+{
+    list<char *> def;     // defined by Quack
+    def.push_back((char *)"Obj");
+    def.push_back((char *)"Int");
+    def.push_back((char *)"String");
+    def.push_back((char *)"Nothing");
+    list<char *> userDef; // defined by user
+    list<char *> toBeDef; // to be defined by user
+    for (list<Class *>::const_iterator it = classes->begin(); it != classes->end(); ++it)
+    {
+        char *id = (*it)->getID();
+        char *extend = (*it)->getExtends();
+        if (withinList(&toBeDef, (*it)->getID()) && withinList(&userDef, (*it)->getExtends()))
+            return false;
+        userDef.push_back((*it)->getID());
+        if (withinList(&toBeDef, (*it)->getID()))
+        {
+            int i = findWithinList(&toBeDef, (*it)->getID()); 
+            list<char *>::iterator iter = toBeDef.begin();
+            advance(iter, i);
+            toBeDef.erase(iter);
+        }
+        if (!withinList(&userDef, extend) && !withinList(&def, extend))
+        {
+            toBeDef.push_back(extend);
+        }
+    }
+
+    if (toBeDef.size() > 0)
+        return false;
+    return true;
+}

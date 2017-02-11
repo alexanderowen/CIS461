@@ -17,6 +17,8 @@ class Class
     public:
         Class(ClassSignature *cs, ClassBody *cb);
         virtual void print();
+        char *getID();
+        char *getExtends();
 };
 
 class FormalArgs;
@@ -25,6 +27,7 @@ class ExtendsOption //ABC
 {
     public:
         virtual void print() = 0;
+        virtual char *getID() = 0;
 };
 
 class FalseExtendsOption : public ExtendsOption
@@ -32,6 +35,7 @@ class FalseExtendsOption : public ExtendsOption
     public:
         FalseExtendsOption();
         virtual void print();
+        virtual char *getID();
 };
 
 
@@ -42,6 +46,7 @@ class TrueExtendsOption : public ExtendsOption
     public:
         TrueExtendsOption(char *i);
         virtual void print();
+        virtual char *getID();
 };
 
 class FormalArg 
@@ -63,6 +68,8 @@ class ClassSignature
     public:
         ClassSignature(char *i, list<FormalArg *> *f, ExtendsOption *e);
         virtual void print();
+        char *getID();
+        char *getExtends();
 };
 
 
@@ -416,19 +423,6 @@ class ObjectFieldLExpr : public LExpr
 };
 
 class RExprOption {};
-/*
-class ExtraActualArgs; //forward decl.
-class ActualArgs 
-{
-    protected:
-        RExpr *rexpr;
-        list<RExpr *> 
-    public:
-        ActualArgs(RExpr *r, ExtraActualArgs *a);
-        ActualArgs();
-        virtual void print();
-};
-*/
 
 class Program 
 {
@@ -437,6 +431,7 @@ class Program
         list<Class *>     *classes;
     public:
         Program(list<Class *> *c, list<Statement *> *s);
+        bool checkClassHierarchy();
 };
 
 #endif

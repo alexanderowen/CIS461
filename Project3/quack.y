@@ -224,7 +224,13 @@ int main(int argc, char* argv[])
     int condition;
     yyin = myfile;
     fprintf(stderr, "Beginning parse of %s\n", argv[1]);
+    
     condition = yyparse();
+    if (!root->checkClassHierarchy())
+    {
+        fprintf(stderr, "Class hierarchy is malformed\n");
+        return 0;
+    }
     if (condition == 0)
         fprintf(stderr, "Finished parse with no errors\n"); 
 
