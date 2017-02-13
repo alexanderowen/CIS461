@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <list>
 #include "lex.yy.h"
+#include "visitor.h"
 #include "node.h"
 
 using namespace std;

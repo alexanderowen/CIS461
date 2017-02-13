@@ -1,7 +1,9 @@
 #include <list>
 #include <stdio.h>
 #include <string.h>
+#include "visitor.h"
 #include "node.h"
+#include "util.h"
 
 using std::list;
 
@@ -9,6 +11,10 @@ Class::Class(ClassSignature *cs, ClassBody *cb) : clssig(cs), clsbdy(cb) {}
 void Class::print()
 {
     fprintf(stdout, "Found Class\n");
+}
+void Class::accept(Visitor *v)
+{
+    v->visitClass(this);
 }
 char *Class::getID() 
 {
@@ -25,6 +31,10 @@ void ClassSignature::print()
 {
     fprintf(stdout, "Found ClassSignature\n");
 }
+void ClassSignature::accept(Visitor *v)
+{
+    v->visitClassSignature(this);
+}
 char *ClassSignature::getID()
 {
     return id;
@@ -40,6 +50,10 @@ void FalseExtendsOption::print()
 {
     fprintf(stdout, "Found FalseExtendsOption\n");
 }
+void FalseExtendsOption::accept(Visitor *v)
+{
+    v->visitFalseExtendsOption(this);
+}
 char * FalseExtendsOption::getID()
 {
     return (char *)"";
@@ -49,6 +63,10 @@ TrueExtendsOption::TrueExtendsOption(char *i) : id(i) {}
 void TrueExtendsOption::print()
 {
     fprintf(stdout, "Found TrueExtendsOption\n");
+}
+void TrueExtendsOption::accept(Visitor *v)
+{
+    v->visitTrueExtendsOption(this);
 }
 char *TrueExtendsOption::getID()
 {
@@ -60,14 +78,19 @@ void FormalArg::print()
 {
     fprintf(stdout, "Found FormalArg\n");
 }
-/*
-class ExtraFormalArgsStar {};
-*/
+void FormalArg::accept(Visitor *v)
+{
+    v->visitFormalArg(this);
+}
 
 ClassBody::ClassBody(list<Statement *> *s, list<Method *> *m) : stmts(s), meths(m) {}
 void ClassBody::print()
 {
     fprintf(stdout, "Found ClassBody\n");
+}
+void ClassBody::accept(Visitor *v)
+{
+    v->visitClassBody(this);
 }
 
 Method::Method(char *i, list<FormalArg *> *f, IdentOption *io, list<Statement *> *s) 
@@ -76,11 +99,19 @@ void Method::print()
 {
     fprintf(stdout, "Found Method\n");
 }
+void Method::accept(Visitor *v)
+{
+    v->visitMethod(this);
+}
 
 FalseIdentOption::FalseIdentOption() {}
 void FalseIdentOption::print()
 {
     fprintf(stdout, "Found FalseIdentOption\n");
+}
+void FalseIdentOption::accept(Visitor *v)
+{
+    v->visitFalseIdentOption(this);
 }
 
 TrueIdentOption::TrueIdentOption(char *i) : id(i) {}
@@ -88,9 +119,10 @@ void TrueIdentOption::print()
 {
     fprintf(stdout, "Foudn TrueIdentOption\n");
 }
-/*
-class StatementBlock {};
-*/
+void TrueIdentOption::accept(Visitor *v)
+{
+    v->visitTrueIdentOption(this);
+}
 
 
 /*****************
@@ -101,11 +133,19 @@ void EmptyRExpr::print()
 {
     fprintf(stdout, "Found EmptyRExpr\n");
 }
+void EmptyRExpr::accept(Visitor *v)
+{
+    v->visitEmptyRExpr(this);
+}
 
 DotRExpr::DotRExpr(RExpr *r, char *i, list<RExpr *> *a) : rexpr(r), id(i), args(a) {}
 void DotRExpr::print()
 {
     fprintf(stdout, "Found DotRExpr\n");
+}
+void DotRExpr::accept(Visitor *v)
+{
+    v->visitDotRExpr(this);
 }
 
 ConstructorRExpr::ConstructorRExpr(char *i, list<RExpr *> *a) : id(i), args(a) {}
@@ -113,11 +153,19 @@ void ConstructorRExpr::print()
 {
     fprintf(stdout, "Found ConstructorRExpr\n");
 }
+void ConstructorRExpr::accept(Visitor *v)
+{
+    v->visitConstructorRExpr(this);
+}
 
 RExprToLExpr::RExprToLExpr(LExpr *l) : lexpr(l) {}
 void RExprToLExpr::print()
 {
     fprintf(stdout, "Found RExprToLExpr\n");
+}
+void RExprToLExpr::accept(Visitor *v)
+{
+    v->visitRExprToLExpr(this);
 }
 
 StringNode::StringNode(char *i) : id(i) {}
@@ -125,11 +173,19 @@ void StringNode::print()
 {
     fprintf(stdout, "Found StringNode\n");
 }
+void StringNode::accept(Visitor *v)
+{
+    v->visitStringNode(this);
+}
 
 IntNode::IntNode(int i) : value(i) {}
 void IntNode::print()
 {
     fprintf(stdout, "Found IntNode\n");
+}
+void IntNode::accept(Visitor *v)
+{
+    v->visitIntNode(this);
 }
 
 NotNode::NotNode(RExpr *v) : value(v) {}
@@ -137,11 +193,19 @@ void NotNode::print()
 {
     fprintf(stdout, "Found NotNode\n");
 }
+void NotNode::accept(Visitor *v)
+{
+    v->visitNotNode(this);
+}
 
 BinaryOperatorNode::BinaryOperatorNode(RExpr *r, RExpr *l)
 {
     right = r;
     left  = l;
+}
+void BinaryOperatorNode::accept(Visitor *v)
+{
+    v->visitBinaryOperatorNode(this);
 }
 
 PlusNode::PlusNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r) {} 
@@ -220,11 +284,19 @@ void RExprStatement::print()
 {
     fprintf(stdout, "Found RExprStatement\n");
 }
+void RExprStatement::accept(Visitor *v)
+{
+    v->visitRExprStatement(this);
+}
 
 ReturnStatement::ReturnStatement(RExpr *r) : rexpr(r) {}
 void ReturnStatement::print()
 {
     fprintf(stdout, "Found ReturnStatement\n");
+}
+void ReturnStatement::accept(Visitor *v)
+{
+    v->visitReturnStatement(this);
 }
 
 AssignmentStatement::AssignmentStatement(LExpr *l, IdentOption *i, RExpr *r) : lexpr(l), ident(i), rexpr(r) {}
@@ -232,14 +304,19 @@ void AssignmentStatement::print()
 {
     fprintf(stdout, "Found AssignmentStatement\n");
 }
+void AssignmentStatement::accept(Visitor *v)
+{
+    v->visitAssignmentStatement(this);
+}
 
-/*
-class IfBlock {};
-*/
 IfClause::IfClause(RExpr *r, list<Statement *> *s) : rexpr(r), stmts(s) {}
 void IfClause::print()
 {
     fprintf(stdout, "Found IfClause\n");
+}
+void IfClause::accept(Visitor *v)
+{
+    v->visitIfClause(this);
 }
 
 ElifClause::ElifClause(RExpr *r, list<Statement *> *s) : rexpr(r), stmts(s) {}
@@ -247,11 +324,19 @@ void ElifClause::print()
 {
     fprintf(stdout, "Found ElifClause\n");
 }
+void ElifClause::accept(Visitor *v)
+{
+    v->visitElifClause(this);
+}
 
 FalseElseOption::FalseElseOption() {}
 void FalseElseOption::print()
 {
     fprintf(stdout, "Found FalseElseOption\n");
+}
+void FalseElseOption::accept(Visitor *v)
+{
+    v->visitFalseElseOption(this);
 }
 
 TrueElseOption::TrueElseOption(list<Statement *> *s) : stmts(s) {}
@@ -259,11 +344,19 @@ void TrueElseOption::print()
 {
     fprintf(stdout, "Found TrueElseOption\n");
 }
+void TrueElseOption::accept(Visitor *v)
+{
+    v->visitTrueElseOption(this);
+}
 
 IfBlock::IfBlock(IfClause *i, list<ElifClause *> *ei, ElseOption *el) : _if(i), _elifs(ei), _else(el) {}
 void IfBlock::print()
 {
     fprintf(stdout, "Found IfBlock\n");
+}
+void IfBlock::accept(Visitor *v)
+{
+    v->visitIfBlock(this);
 }
 
 WhileStatement::WhileStatement(RExpr *r, list<Statement *> *s) : rexpr(r), stmts(s) {}
@@ -271,11 +364,19 @@ void WhileStatement::print()
 {
     fprintf(stdout, "Found a WhileStatement\n");
 }
+void WhileStatement::accept(Visitor *v)
+{
+    v->visitWhileStatement(this);
+}
 
 IdentNode::IdentNode(char *i) : id(i) {}
 void IdentNode::print()
 {
     fprintf(stdout, "Found a LExpr\n");
+}
+void IdentNode::accept(Visitor *v)
+{
+    v->visitIdentNode(this);
 }
 
 ObjectFieldLExpr::ObjectFieldLExpr(RExpr *r, char *i) : rexpr(r), id(i) {}
@@ -283,31 +384,17 @@ void ObjectFieldLExpr::print()
 {
     fprintf(stdout, "Found a ObjectFieldLExpr\n");
 }
-
-bool withinList(list<char *> *l, char *c)
+void ObjectFieldLExpr::accept(Visitor *v)
 {
-    for (list<char *>::const_iterator it = l->begin(); it != l->end(); ++it)
-    {
-        if (strcmp(*it, c) == 0)
-            return true;
-    }
-    return false;
+    v->visitObjectFieldLExpr(this);
 }
 
-int findWithinList(list<char *> *l, char *c)
-{
-    int i = 0;
-    for (list<char *>::const_iterator it = l->begin(); it != l->end(); ++it)
-    {
-        if (strcmp(*it, c) == 0)
-            return i;
-        i++;
-    }
-    return -1;
-
-}
 
 Program::Program(list<Class *> *c, list<Statement *> *s) : classes(c), statements(s) {}
+void Program::accept(Visitor *v)
+{
+    v->visitProgram(this);
+}
 bool Program::checkClassHierarchy()
 {
     list<char *> def;     // defined by Quack

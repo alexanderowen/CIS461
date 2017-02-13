@@ -3,6 +3,7 @@
 
 #include <list>
 #include <stdio.h>
+class Visitor;
 
 using std::list;
 
@@ -11,12 +12,13 @@ class ClassBody;
 
 class Class 
 {
-    protected:
+    public:
         ClassSignature *clssig;
         ClassBody *clsbdy;
     public:
         Class(ClassSignature *cs, ClassBody *cb);
         virtual void print();
+        virtual void accept(Visitor *v);
         char *getID();
         char *getExtends();
 };
@@ -28,6 +30,7 @@ class ExtendsOption //ABC
     public:
         virtual void print() = 0;
         virtual char *getID() = 0;
+        virtual void accept(Visitor *v) = 0;
 };
 
 class FalseExtendsOption : public ExtendsOption
@@ -36,38 +39,42 @@ class FalseExtendsOption : public ExtendsOption
         FalseExtendsOption();
         virtual void print();
         virtual char *getID();
+        virtual void accept(Visitor *v);
 };
 
 
 class TrueExtendsOption : public ExtendsOption
 {
-    protected:
+    public:
         char *id;
     public:
         TrueExtendsOption(char *i);
         virtual void print();
+        virtual void accept(Visitor *v);
         virtual char *getID();
 };
 
 class FormalArg 
 {
-    protected:
+    public:
         char *id;
         char *type;
     public:
         FormalArg(char *i, char *t);
         virtual void print();
+        virtual void accept(Visitor *v);
 };
 
 class ClassSignature 
 {
-    protected:
+    public:
         char *id;
         list<FormalArg *> *fargs;
         ExtendsOption *exop;
     public:
         ClassSignature(char *i, list<FormalArg *> *f, ExtendsOption *e);
         virtual void print();
+        virtual void accept(Visitor *v);
         char *getID();
         char *getExtends();
 };
@@ -78,18 +85,20 @@ class Statement;
 class Method;
 class ClassBody 
 {
-    protected:
+    public:
         list<Statement *> *stmts;
         list<Method *> *meths;
     public:
         ClassBody(list<Statement *> *s, list<Method *> *m);
         virtual void print();
+        virtual void accept(Visitor *v);
 };
 
 class IdentOption //ABC 
 {
     public:
         virtual void print() = 0;
+        virtual void accept(Visitor *v) = 0;
 };
 
 class FalseIdentOption : public IdentOption
@@ -97,19 +106,21 @@ class FalseIdentOption : public IdentOption
     public:
         FalseIdentOption();
         virtual void print();
+        virtual void accept(Visitor *v);
 };
 
 class TrueIdentOption : public IdentOption
 {
-    protected:
+    public:
         char *id;
     public:
         TrueIdentOption(char *i);
         virtual void print();
+        virtual void accept(Visitor *v);
 };
 class Method 
 {
-    protected:
+    public:
         char *id;
         list<FormalArg *> *fargs;
         IdentOption *ident;
@@ -117,6 +128,7 @@ class Method
     public:
         Method(char *, list<FormalArg *> *, IdentOption *, list<Statement *> *);
         virtual void print(); 
+        virtual void accept(Visitor *v);
 };
 
 
@@ -132,6 +144,7 @@ class RExpr  //ABC
 {
     public:
         virtual void print() = 0;
+        virtual void accept(Visitor *v) = 0;
 };
 
 class EmptyRExpr : public RExpr
@@ -139,74 +152,82 @@ class EmptyRExpr : public RExpr
     public:
         EmptyRExpr();
         virtual void print();
+        virtual void accept(Visitor *v);
 };
 
 class DotRExpr : public RExpr
 {
-    protected:
+    public:
         RExpr      *rexpr;
         char       *id;
         list<RExpr *> *args;
     public:
         DotRExpr(RExpr *r, char *i, list<RExpr *> *a);
         virtual void print();
+        virtual void accept(Visitor *v);
 };
 
 class ConstructorRExpr : public RExpr
 {
-    protected:
+    public:
         char *id;
         list<RExpr *> *args;
     public:
         ConstructorRExpr(char *i, list<RExpr *> *a);
         virtual void print();
+        virtual void accept(Visitor *v);
 };
 
 class RExprToLExpr : public RExpr
 {
-    protected:
+    public:
         LExpr *lexpr;
     public:
         RExprToLExpr(LExpr *l);
         virtual void print();
+        virtual void accept(Visitor *v);
 };
 
 class StringNode : public RExpr
 {
-    protected:
+    public:
         char *id;
     public:
         StringNode(char *i);
         virtual void print(); 
+        virtual void accept(Visitor *v);
 };
 
 class IntNode : public RExpr
 {
-    protected:
+    public:
         int value;
     public:
         IntNode(int i);
         virtual void print(); 
+        virtual void accept(Visitor *v);
 };
 
 class NotNode : public RExpr
 {
-    protected:
+    public:
         RExpr *value;
     public:
         NotNode(RExpr* v);
         void print();
+        virtual void accept(Visitor *v);
 };
 
 
 
 class BinaryOperatorNode : public RExpr
 {
-    protected:
+    public:
         RExpr *left;
         RExpr *right;
     public:
         BinaryOperatorNode(RExpr *l, RExpr *r);
+        virtual void accept(Visitor *v);
 };
 
 class PlusNode : public BinaryOperatorNode
@@ -294,45 +315,50 @@ class Statement //ABC
 {
     public:
         virtual void print() = 0;
+        virtual void accept(Visitor *v) = 0;
 };
 
 class RExprStatement : public Statement 
 {
-    protected:
+    public:
         RExpr *rexpr;
     public:
         RExprStatement(RExpr* r);
         virtual void print(); 
+        virtual void accept(Visitor *v);
 };
 
 class ReturnStatement : public Statement
 {
-    protected:
+    public:
         RExpr *rexpr;
     public:
         ReturnStatement(RExpr *r);
         virtual void print();
+        virtual void accept(Visitor *v);
 };
 
 class AssignmentStatement : public Statement
 {
-    protected:
+    public:
         LExpr       *lexpr;
         IdentOption *ident;
         RExpr       *rexpr;
     public:
         AssignmentStatement(LExpr *l, IdentOption *i, RExpr *r);
         virtual void print();
+        virtual void accept(Visitor *v);
 };
 
 class WhileStatement : public Statement 
 {
-    protected:
+    public:
         RExpr *rexpr;
         list<Statement *> *stmts;
     public:
         WhileStatement(RExpr *r, list<Statement *> *s);
         virtual void print();
+        virtual void accept(Visitor *v);
 }; 
 
 class IfClause;
@@ -341,33 +367,36 @@ class ElseOption;
 
 class IfBlock : public Statement 
 {
-    protected:
+    public:
         IfClause *_if;
         list<ElifClause *> *_elifs;
         ElseOption *_else;
     public:
         IfBlock(IfClause *i, list<ElifClause *> *ei, ElseOption *el);
         virtual void print();
+        virtual void accept(Visitor *v);
 };
 
 class IfClause //Decided not to make this an ABC despite being production and rule
 {
-    protected:
+    public:
         RExpr *rexpr;
         list<Statement *> *stmts;
     public:
         IfClause(RExpr *r, list<Statement *> *stmts);
         virtual void print();
+        virtual void accept(Visitor *v);
 };
 
 class ElifClause
 {
-    protected:
+    public:
         RExpr *rexpr;
         list<Statement *> *stmts;
     public:
         ElifClause(RExpr *r, list<Statement *> *stmts);
         virtual void print();
+        virtual void accept(Visitor *v);
 
 };
 
@@ -375,6 +404,7 @@ class ElseOption //ABC
 {
     public:
         virtual void print() = 0;
+        virtual void accept(Visitor *v) = 0;
 };
 
 class FalseElseOption : public ElseOption
@@ -382,15 +412,17 @@ class FalseElseOption : public ElseOption
     public:
         FalseElseOption();
         virtual void print();
+        virtual void accept(Visitor *v);
 };
 
 class TrueElseOption : public ElseOption
 {
-    protected:
+    public:
         list<Statement *> *stmts;
     public:
         TrueElseOption(list<Statement *> *s);
         virtual void print();
+        virtual void accept(Visitor *v);
 };
 
 
@@ -401,37 +433,41 @@ class LExpr // ABC
 {
     public:
         virtual void print() = 0;
+        virtual void accept(Visitor *v) = 0;
 };
 
 class IdentNode : public LExpr
 {
-    protected:
+    public:
         char *id;
     public:
         IdentNode(char *i);
         virtual void print();
+        virtual void accept(Visitor *v);
 };
 
 class ObjectFieldLExpr : public LExpr
 {
-    protected:
+    public:
         RExpr *rexpr;
         char  *id;
     public:
         ObjectFieldLExpr(RExpr *r, char *i);
         virtual void print();
+        virtual void accept(Visitor *v);
 };
 
 class RExprOption {};
 
 class Program 
 {
-    protected:
+    public:
         list<Statement *> *statements;
         list<Class *>     *classes;
     public:
         Program(list<Class *> *c, list<Statement *> *s);
         bool checkClassHierarchy();
+        virtual void accept(Visitor *v);
 };
 
 #endif
