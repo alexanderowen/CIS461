@@ -1,6 +1,7 @@
 # Repo-owner defined ignore files
 scanner
 parser
+quack
 actual/*.out
 actual/*.err
 
