@@ -1,6 +1,7 @@
 #include <list>
 #include <stdio.h>
 #include <string.h>
+
 #include "visitor.h"
 #include "node.h"
 #include "util.h"
@@ -56,7 +57,7 @@ void FalseExtendsOption::accept(Visitor *v)
 }
 char * FalseExtendsOption::getID()
 {
-    return (char *)"";
+    return (char *)"Obj";
 }
 
 TrueExtendsOption::TrueExtendsOption(char *i) : id(i) {}
@@ -408,6 +409,8 @@ bool Program::checkClassHierarchy()
     {
         char *id = (*it)->getID();
         char *extend = (*it)->getExtends();
+        //fprintf(stderr, "Extends: '%s'\n", extend);
+        
         if (withinList(&toBeDef, (*it)->getID()) && withinList(&userDef, (*it)->getExtends()))
             return false;
         userDef.push_back((*it)->getID());

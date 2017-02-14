@@ -2022,16 +2022,20 @@ int main(int argc, char* argv[])
 
     if (!root->checkClassHierarchy())
     {
-        fprintf(stderr, "Syntax error: Class hierarchy is malformed\n");
+        fprintf(stderr, "Error: Class hierarchy is malformed\n");
         return 0;
     } 
-/*
+
     ConstructorVisitor cv;
     root->accept(&cv);
-    cv.print();
+    //cv.print();
+    if (!cv.checkStructure())
+    {
+        fprintf(stderr, "Error: Call to constructor that is not defined\n");
+        return 0;
+    }
 
     std::cout << "\n" << std::endl;
-*/  
     if (condition == 0)
         fprintf(stderr, "Finished parse with no errors\n"); 
 

@@ -179,7 +179,14 @@ void Visitor::visitObjectFieldLExpr(ObjectFieldLExpr *o)
 
 
 
-ConstructorVisitor::ConstructorVisitor() {}
+ConstructorVisitor::ConstructorVisitor() 
+{
+    classes.push_back((char *)"Obj");
+    classes.push_back((char *)"Int");
+    classes.push_back((char *)"String");
+    classes.push_back((char *)"Nothing");
+}
+
 ConstructorVisitor::~ConstructorVisitor() {}
 void ConstructorVisitor::visitConstructorRExpr(ConstructorRExpr *c)
 {
