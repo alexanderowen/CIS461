@@ -82,7 +82,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 19 "quack.y"
+#line 21 "quack.y"
 {
     int integer;
     char *id;

@@ -1,6 +1,10 @@
 
 #include <list>
 #include <stdio.h>
+#include <iostream>
+#include <algorithm>
+#include <iterator>
+
 #include "visitor.h"
 #include "node.h"
 #include "util.h"
@@ -176,6 +180,7 @@ void Visitor::visitObjectFieldLExpr(ObjectFieldLExpr *o)
 
 
 ConstructorVisitor::ConstructorVisitor() {}
+ConstructorVisitor::~ConstructorVisitor() {}
 void ConstructorVisitor::visitConstructorRExpr(ConstructorRExpr *c)
 {
     if (!withinList(&constructors, c->id))
@@ -203,4 +208,13 @@ bool ConstructorVisitor::checkStructure()
             return false;
     }
     return true;
+}
+void ConstructorVisitor::print()
+{
+    std::cout << "Constructors: "; 
+    std::copy(std::begin(constructors), std::end(constructors), std::ostream_iterator<char *>(std::cout, " "));
+    std::cout << "\n" << std::endl;
+    std::cout << "Classes: ";
+    std::copy(std::begin(classes), std::end(classes), std::ostream_iterator<char *>(std::cout, " "));
+    std::cout << "\n" << std::endl;
 }

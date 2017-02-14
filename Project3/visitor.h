@@ -48,9 +48,11 @@ class ConstructorVisitor : public Visitor
         list<char *> classes;
     public:
         ConstructorVisitor();
+        ~ConstructorVisitor();
         virtual void visitConstructorRExpr(ConstructorRExpr *c);
         virtual void visitClassSignature(ClassSignature *cs);
         bool checkStructure();
+        void print();
 };
 
 #endif

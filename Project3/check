@@ -2,6 +2,6 @@
 for src in `ls samples`; do
     echo "Running on samples/${src}"
     srcname=`basename ${src}`
-    ./parser samples/${src}
+    ./quack samples/${src}
     echo "------"
 done

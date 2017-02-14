@@ -3,6 +3,7 @@
 
 #include <list>
 #include <stdio.h>
+
 class Visitor;
 
 using std::list;

@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <list>
+#include <iostream>
+
 #include "lex.yy.h"
 #include "visitor.h"
 #include "node.h"
@@ -227,11 +229,21 @@ int main(int argc, char* argv[])
     fprintf(stderr, "Beginning parse of %s\n", argv[1]);
     
     condition = yyparse();
+    if (condition != 0)
+        return -1;
+
     if (!root->checkClassHierarchy())
     {
-        fprintf(stderr, "Class hierarchy is malformed\n");
+        fprintf(stderr, "Syntax error: Class hierarchy is malformed\n");
         return 0;
-    }
+    } 
+/*
+    ConstructorVisitor cv;
+    root->accept(&cv);
+    cv.print();
+
+    std::cout << "\n" << std::endl;
+*/  
     if (condition == 0)
         fprintf(stderr, "Finished parse with no errors\n"); 
 
