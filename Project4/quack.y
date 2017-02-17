@@ -17,6 +17,7 @@ void yyerror(const char *msg);
 
 Program *root;
 %}
+%locations
 
 %union {
     int integer;
@@ -80,7 +81,7 @@ Program *root;
 %type <rexprs> actual_args extra_actual_args
 %%
 program:
-        class_star statement_star {$$ = new Program($1, $2); root = $$;}
+        class_star statement_star {$$ = new Program($1, $2, @$.first_line); $$->setLineno(@$.first_line); root = $$;}
         ;
 
 class_star: 
@@ -89,16 +90,16 @@ class_star:
           ;
 
 class:
-     class_signature class_body {$$ = new Class($1, $2);}
+     class_signature class_body {$$ = new Class($1, $2); $$->setLineno(@$.first_line);}
     ;
 
 class_signature:
-               CLASS IDENT '(' formal_args ')' extends_option  {$$ = new ClassSignature($2, $4, $6);}
+               CLASS IDENT '(' formal_args ')' extends_option  {$$ = new ClassSignature($2, $4, $6); $$->setLineno(@$.first_line);}
              ;
 
 extends_option:
-              /* epsilon */ {$$ = new FalseExtendsOption();}
-            | EXTENDS IDENT {$$ = new TrueExtendsOption($2);}
+              /* epsilon */ {$$ = new FalseExtendsOption(); $$->setLineno(@$.first_line);}
+            | EXTENDS IDENT {$$ = new TrueExtendsOption($2); $$->setLineno(@$.first_line);}
             ;
 
 formal_args: 
@@ -107,7 +108,7 @@ formal_args:
            ;
 
 formal_arg:
-          IDENT ':' IDENT {$$ = new FormalArg($1, $3);}
+          IDENT ':' IDENT {$$ = new FormalArg($1, $3); $$->setLineno(@$.first_line);}
         ;
 
 extra_formal_args_star: 
@@ -116,10 +117,10 @@ extra_formal_args_star:
                 ;
 
 class_body:
-          '{' statement_star method_star '}' {$$ = new ClassBody($2, $3);}
+          '{' statement_star method_star '}' {$$ = new ClassBody($2, $3); $$->setLineno(@$.first_line);}
 
 method:
-       DEF IDENT '(' formal_args ')' ident_option statement_block {$$ = new Method($2, $4, $6, $7);}
+       DEF IDENT '(' formal_args ')' ident_option statement_block {$$ = new Method($2, $4, $6, $7); $$->setLineno(@$.first_line);}
      ;
 
 method_star:
@@ -128,8 +129,8 @@ method_star:
         ;
 
 ident_option:
-          /* epsilon */ {$$ = new FalseIdentOption();}
-        | ':' IDENT     {$$ = new TrueIdentOption($2);}
+          /* epsilon */ {$$ = new FalseIdentOption(); $$->setLineno(@$.first_line);}
+        | ':' IDENT     {$$ = new TrueIdentOption($2); $$->setLineno(@$.first_line);}
         ;
 
 statement_star: 
@@ -142,15 +143,15 @@ statement_block:
                 ;
 
 statement:
-          if_clause elif_star else_option    {$$ = new IfBlock($1, $2, $3);}
-        | WHILE r_expr statement_block       {$$ = new WhileStatement($2, $3);}
-        | l_expr ident_option '=' r_expr ';' {$$ = new AssignmentStatement($1, $2, $4);}
-        | RETURN r_expr_option ';'           {$$ = new ReturnStatement($2);}
-        | r_expr ';'                         {$$ = new RExprStatement($1);}
+          if_clause elif_star else_option    {$$ = new IfBlock($1, $2, $3); $$->setLineno(@$.first_line);}
+        | WHILE r_expr statement_block       {$$ = new WhileStatement($2, $3); $$->setLineno(@$.first_line);}
+        | l_expr ident_option '=' r_expr ';' {$$ = new AssignmentStatement($1, $2, $4); $$->setLineno(@$.first_line);}
+        | RETURN r_expr_option ';'           {$$ = new ReturnStatement($2); $$->setLineno(@$.first_line);}
+        | r_expr ';'                         {$$ = new RExprStatement($1); $$->setLineno(@$.first_line);}
         ;
 
 if_clause:
-    IF r_expr statement_block {$$ = new IfClause($2, $3);}
+    IF r_expr statement_block {$$ = new IfClause($2, $3); $$->setLineno(@$.first_line);}
     ;
 
 elif_star: 
@@ -159,42 +160,42 @@ elif_star:
         ;
                 
 elif_clause:
-          ELIF r_expr statement_block {$$ = new ElifClause($2, $3);}
+          ELIF r_expr statement_block {$$ = new ElifClause($2, $3); $$->setLineno(@$.first_line);}
         ;
 
 else_option: 
-              /* epsilon */        {$$ = new FalseElseOption();}
-            | ELSE statement_block {$$ = new TrueElseOption($2);}
+              /* epsilon */        {$$ = new FalseElseOption(); $$->setLineno(@$.first_line);}
+            | ELSE statement_block {$$ = new TrueElseOption($2); $$->setLineno(@$.first_line);}
             ;
 
 l_expr:
-      IDENT            {$$ = new IdentNode($1);}
-    | r_expr '.' IDENT {$$ = new ObjectFieldLExpr($1, $3);}
+      IDENT            {$$ = new IdentNode($1); $$->setLineno(@$.first_line);}
+    | r_expr '.' IDENT {$$ = new ObjectFieldLExpr($1, $3); $$->setLineno(@$.first_line);}
     ;
 
 r_expr:
-      STRING_LIT {$$ = new StringNode($1);}
-    | INT_LIT    {$$ = new IntNode($1);}
-    | l_expr     {$$ = new RExprToLExpr($1);} 
-    | r_expr '+' r_expr {$$ = new PlusNode($1, $3);}
-    | r_expr '-' r_expr {$$ = new MinusNode($1, $3);}
-    | r_expr '*' r_expr {$$ = new TimesNode($1, $3);}
-    | r_expr '/' r_expr {$$ = new DivideNode($1, $3);}
+      STRING_LIT {$$ = new StringNode($1); $$->setLineno(@$.first_line);}
+    | INT_LIT    {$$ = new IntNode($1); $$->setLineno(@$.first_line);}
+    | l_expr     {$$ = new RExprToLExpr($1); $$->setLineno(@$.first_line);} 
+    | r_expr '+' r_expr {$$ = new PlusNode($1, $3); $$->setLineno(@$.first_line);}
+    | r_expr '-' r_expr {$$ = new MinusNode($1, $3); $$->setLineno(@$.first_line);}
+    | r_expr '*' r_expr {$$ = new TimesNode($1, $3); $$->setLineno(@$.first_line);}
+    | r_expr '/' r_expr {$$ = new DivideNode($1, $3); $$->setLineno(@$.first_line);}
     | '(' r_expr ')'    {$$ = $2;} /*TODO: Make sure this works properly*/
-    | r_expr EQUALS r_expr  {$$ = new EqualsNode($1, $3);}
-    | r_expr ATMOST r_expr  {$$ = new AtMostNode($1, $3);}
-    | r_expr '<' r_expr     {$$ = new LessThanNode($1, $3);}
-    | r_expr ATLEAST r_expr {$$ = new AtLeastNode($1, $3);}
-    | r_expr '>' r_expr     {$$ = new GreaterThanNode($1, $3);}
-    | r_expr AND r_expr     {$$ = new AndNode($1, $3);}
-    | r_expr OR r_expr      {$$ = new OrNode($1, $3);}
-    | NOT r_expr            {$$ = new NotNode($2);}
-    | r_expr '.' IDENT '(' actual_args ')' {$$ = new DotRExpr($1, $3, $5);}
-    | IDENT '(' actual_args ')' {$$ = new ConstructorRExpr($1, $3);}
+    | r_expr EQUALS r_expr  {$$ = new EqualsNode($1, $3); $$->setLineno(@$.first_line);}
+    | r_expr ATMOST r_expr  {$$ = new AtMostNode($1, $3); $$->setLineno(@$.first_line);}
+    | r_expr '<' r_expr     {$$ = new LessThanNode($1, $3); $$->setLineno(@$.first_line);}
+    | r_expr ATLEAST r_expr {$$ = new AtLeastNode($1, $3); $$->setLineno(@$.first_line);}
+    | r_expr '>' r_expr     {$$ = new GreaterThanNode($1, $3); $$->setLineno(@$.first_line);}
+    | r_expr AND r_expr     {$$ = new AndNode($1, $3); $$->setLineno(@$.first_line);}
+    | r_expr OR r_expr      {$$ = new OrNode($1, $3); $$->setLineno(@$.first_line);}
+    | NOT r_expr            {$$ = new NotNode($2); $$->setLineno(@$.first_line);}
+    | r_expr '.' IDENT '(' actual_args ')' {$$ = new DotRExpr($1, $3, $5); $$->setLineno(@$.first_line);}
+    | IDENT '(' actual_args ')' {$$ = new ConstructorRExpr($1, $3); $$->setLineno(@$.first_line);}
     ;
 
 r_expr_option:
-              /* epsilon */ {$$ = new EmptyRExpr();}
+              /* epsilon */ {$$ = new EmptyRExpr(); $$->setLineno(@$.first_line);}
             | r_expr        {$$ = $1}
             ;
 
@@ -232,6 +233,7 @@ int main(int argc, char* argv[])
     if (condition != 0)
         return -1;
 
+    fprintf(stderr, "Program lineno: %d", root->lineno);
     if (!root->checkClassHierarchy())
     {
         fprintf(stderr, "Error: Class hierarchy is malformed\n");

@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include "node.h"
 #include "quack.tab.h"
+#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;
 
 void yyerror(const char *msg)
 {

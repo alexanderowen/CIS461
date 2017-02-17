@@ -56,7 +56,7 @@
 #define YYPURE 0
 
 /* Using locations.  */
-#define YYLSP_NEEDED 0
+#define YYLSP_NEEDED 1
 
 
 
@@ -149,7 +149,7 @@ Program *root;
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 21 "quack.y"
+#line 22 "quack.y"
 {
     int integer;
     char *id;
@@ -183,13 +183,25 @@ typedef union YYSTYPE
 # define YYSTYPE_IS_TRIVIAL 1
 #endif
 
+#if ! defined YYLTYPE && ! defined YYLTYPE_IS_DECLARED
+typedef struct YYLTYPE
+{
+  int first_line;
+  int first_column;
+  int last_line;
+  int last_column;
+} YYLTYPE;
+# define yyltype YYLTYPE /* obsolescent; will be withdrawn */
+# define YYLTYPE_IS_DECLARED 1
+# define YYLTYPE_IS_TRIVIAL 1
+#endif
 
 
 /* Copy the second part of user declarations.  */
 
 
 /* Line 216 of yacc.c.  */
-#line 193 "quack.tab.c"
+#line 205 "quack.tab.c"
 
 #ifdef short
 # undef short
@@ -347,14 +359,16 @@ void free (void *); /* INFRINGES ON USER NAME SPACE */
 
 #if (! defined yyoverflow \
      && (! defined __cplusplus \
-	 || (defined YYSTYPE_IS_TRIVIAL && YYSTYPE_IS_TRIVIAL)))
+	 || (defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL \
+	     && defined YYSTYPE_IS_TRIVIAL && YYSTYPE_IS_TRIVIAL)))
 
 /* A type that is properly aligned for any stack member.  */
 union yyalloc
 {
   yytype_int16 yyss;
   YYSTYPE yyvs;
-  };
+    YYLTYPE yyls;
+};
 
 /* The size of the maximum gap between one aligned stack and the next.  */
 # define YYSTACK_GAP_MAXIMUM (sizeof (union yyalloc) - 1)
@@ -362,8 +376,8 @@ union yyalloc
 /* The size of an array large to enough to hold all stacks, each with
    N elements.  */
 # define YYSTACK_BYTES(N) \
-     ((N) * (sizeof (yytype_int16) + sizeof (YYSTYPE)) \
-      + YYSTACK_GAP_MAXIMUM)
+     ((N) * (sizeof (yytype_int16) + sizeof (YYSTYPE) + sizeof (YYLTYPE)) \
+      + 2 * YYSTACK_GAP_MAXIMUM)
 
 /* Copy COUNT objects from FROM to TO.  The source and destination do
    not overlap.  */
@@ -495,12 +509,12 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    83,    83,    87,    88,    92,    96,   100,   101,   105,
-     106,   110,   114,   115,   119,   122,   126,   127,   131,   132,
-     136,   137,   141,   145,   146,   147,   148,   149,   153,   157,
-     158,   162,   166,   167,   171,   172,   176,   177,   178,   179,
-     180,   181,   182,   183,   184,   185,   186,   187,   188,   189,
-     190,   191,   192,   193,   197,   198,   202,   203,   207,   208
+       0,    84,    84,    88,    89,    93,    97,   101,   102,   106,
+     107,   111,   115,   116,   120,   123,   127,   128,   132,   133,
+     137,   138,   142,   146,   147,   148,   149,   150,   154,   158,
+     159,   163,   167,   168,   172,   173,   177,   178,   179,   180,
+     181,   182,   183,   184,   185,   186,   187,   188,   189,   190,
+     191,   192,   193,   194,   198,   199,   203,   204,   208,   209
 };
 #endif
 
@@ -786,7 +800,7 @@ do {									  \
     {									  \
       YYFPRINTF (stderr, "%s ", Title);					  \
       yy_symbol_print (stderr,						  \
-		  Type, Value); \
+		  Type, Value, Location); \
       YYFPRINTF (stderr, "\n");						  \
     }									  \
 } while (YYID (0))
@@ -800,17 +814,19 @@ do {									  \
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep)
+yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, YYLTYPE const * const yylocationp)
 #else
 static void
-yy_symbol_value_print (yyoutput, yytype, yyvaluep)
+yy_symbol_value_print (yyoutput, yytype, yyvaluep, yylocationp)
     FILE *yyoutput;
     int yytype;
     YYSTYPE const * const yyvaluep;
+    YYLTYPE const * const yylocationp;
 #endif
 {
   if (!yyvaluep)
     return;
+  YYUSE (yylocationp);
 # ifdef YYPRINT
   if (yytype < YYNTOKENS)
     YYPRINT (yyoutput, yytoknum[yytype], *yyvaluep);
@@ -832,13 +848,14 @@ yy_symbol_value_print (yyoutput, yytype, yyvaluep)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep)
+yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, YYLTYPE const * const yylocationp)
 #else
 static void
-yy_symbol_print (yyoutput, yytype, yyvaluep)
+yy_symbol_print (yyoutput, yytype, yyvaluep, yylocationp)
     FILE *yyoutput;
     int yytype;
     YYSTYPE const * const yyvaluep;
+    YYLTYPE const * const yylocationp;
 #endif
 {
   if (yytype < YYNTOKENS)
@@ -846,7 +863,9 @@ yy_symbol_print (yyoutput, yytype, yyvaluep)
   else
     YYFPRINTF (yyoutput, "nterm %s (", yytname[yytype]);
 
-  yy_symbol_value_print (yyoutput, yytype, yyvaluep);
+  YY_LOCATION_PRINT (yyoutput, *yylocationp);
+  YYFPRINTF (yyoutput, ": ");
+  yy_symbol_value_print (yyoutput, yytype, yyvaluep, yylocationp);
   YYFPRINTF (yyoutput, ")");
 }
 
@@ -886,11 +905,12 @@ do {								\
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_reduce_print (YYSTYPE *yyvsp, int yyrule)
+yy_reduce_print (YYSTYPE *yyvsp, YYLTYPE *yylsp, int yyrule)
 #else
 static void
-yy_reduce_print (yyvsp, yyrule)
+yy_reduce_print (yyvsp, yylsp, yyrule)
     YYSTYPE *yyvsp;
+    YYLTYPE *yylsp;
     int yyrule;
 #endif
 {
@@ -905,7 +925,7 @@ yy_reduce_print (yyvsp, yyrule)
       fprintf (stderr, "   $%d = ", yyi + 1);
       yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
 		       &(yyvsp[(yyi + 1) - (yynrhs)])
-		       		       );
+		       , &(yylsp[(yyi + 1) - (yynrhs)])		       );
       fprintf (stderr, "\n");
     }
 }
@@ -913,7 +933,7 @@ yy_reduce_print (yyvsp, yyrule)
 # define YY_REDUCE_PRINT(Rule)		\
 do {					\
   if (yydebug)				\
-    yy_reduce_print (yyvsp, Rule); \
+    yy_reduce_print (yyvsp, yylsp, Rule); \
 } while (YYID (0))
 
 /* Nonzero means print parse trace.  It is left uninitialized so that
@@ -1164,16 +1184,18 @@ yysyntax_error (char *yyresult, int yystate, int yychar)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep)
+yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, YYLTYPE *yylocationp)
 #else
 static void
-yydestruct (yymsg, yytype, yyvaluep)
+yydestruct (yymsg, yytype, yyvaluep, yylocationp)
     const char *yymsg;
     int yytype;
     YYSTYPE *yyvaluep;
+    YYLTYPE *yylocationp;
 #endif
 {
   YYUSE (yyvaluep);
+  YYUSE (yylocationp);
 
   if (!yymsg)
     yymsg = "Deleting";
@@ -1214,6 +1236,8 @@ YYSTYPE yylval;
 
 /* Number of syntax errors so far.  */
 int yynerrs;
+/* Location data for the look-ahead symbol.  */
+YYLTYPE yylloc;
 
 
 
@@ -1276,16 +1300,21 @@ yyparse ()
   YYSTYPE *yyvs = yyvsa;
   YYSTYPE *yyvsp;
 
+  /* The location stack.  */
+  YYLTYPE yylsa[YYINITDEPTH];
+  YYLTYPE *yyls = yylsa;
+  YYLTYPE *yylsp;
+  /* The locations where the error started and ended.  */
+  YYLTYPE yyerror_range[2];
 
-
-#define YYPOPSTACK(N)   (yyvsp -= (N), yyssp -= (N))
+#define YYPOPSTACK(N)   (yyvsp -= (N), yyssp -= (N), yylsp -= (N))
 
   YYSIZE_T yystacksize = YYINITDEPTH;
 
   /* The variables used to return semantic value and location from the
      action routines.  */
   YYSTYPE yyval;
-
+  YYLTYPE yyloc;
 
   /* The number of symbols on the RHS of the reduced rule.
      Keep to zero when no symbol should be popped.  */
@@ -1305,6 +1334,12 @@ yyparse ()
 
   yyssp = yyss;
   yyvsp = yyvs;
+  yylsp = yyls;
+#if defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL
+  /* Initialize the default location before parsing starts.  */
+  yylloc.first_line   = yylloc.last_line   = 1;
+  yylloc.first_column = yylloc.last_column = 0;
+#endif
 
   goto yysetstate;
 
@@ -1331,7 +1366,7 @@ yyparse ()
 	   memory.  */
 	YYSTYPE *yyvs1 = yyvs;
 	yytype_int16 *yyss1 = yyss;
-
+	YYLTYPE *yyls1 = yyls;
 
 	/* Each stack pointer address is followed by the size of the
 	   data in use in that stack, in bytes.  This used to be a
@@ -1340,9 +1375,9 @@ yyparse ()
 	yyoverflow (YY_("memory exhausted"),
 		    &yyss1, yysize * sizeof (*yyssp),
 		    &yyvs1, yysize * sizeof (*yyvsp),
-
+		    &yyls1, yysize * sizeof (*yylsp),
 		    &yystacksize);
-
+	yyls = yyls1;
 	yyss = yyss1;
 	yyvs = yyvs1;
       }
@@ -1365,7 +1400,7 @@ yyparse ()
 	  goto yyexhaustedlab;
 	YYSTACK_RELOCATE (yyss);
 	YYSTACK_RELOCATE (yyvs);
-
+	YYSTACK_RELOCATE (yyls);
 #  undef YYSTACK_RELOCATE
 	if (yyss1 != yyssa)
 	  YYSTACK_FREE (yyss1);
@@ -1375,7 +1410,7 @@ yyparse ()
 
       yyssp = yyss + yysize - 1;
       yyvsp = yyvs + yysize - 1;
-
+      yylsp = yyls + yysize - 1;
 
       YYDPRINTF ((stderr, "Stack size increased to %lu\n",
 		  (unsigned long int) yystacksize));
@@ -1452,7 +1487,7 @@ yybackup:
 
   yystate = yyn;
   *++yyvsp = yylval;
-
+  *++yylsp = yylloc;
   goto yynewstate;
 
 
@@ -1483,303 +1518,304 @@ yyreduce:
      GCC warning that YYVAL may be used uninitialized.  */
   yyval = yyvsp[1-yylen];
 
-
+  /* Default location.  */
+  YYLLOC_DEFAULT (yyloc, (yylsp - yylen), yylen);
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
         case 2:
-#line 83 "quack.y"
-    {(yyval.pgm) = new Program((yyvsp[(1) - (2)].clsss), (yyvsp[(2) - (2)].stmts)); root = (yyval.pgm);;}
+#line 84 "quack.y"
+    {(yyval.pgm) = new Program((yyvsp[(1) - (2)].clsss), (yyvsp[(2) - (2)].stmts), (yyloc).first_line); (yyval.pgm)->setLineno((yyloc).first_line); root = (yyval.pgm);;}
     break;
 
   case 3:
-#line 87 "quack.y"
+#line 88 "quack.y"
     {(yyval.clsss) = new list<Class *>();;}
     break;
 
   case 4:
-#line 88 "quack.y"
+#line 89 "quack.y"
     {(yyval.clsss) = (yyvsp[(1) - (2)].clsss); (yyvsp[(1) - (2)].clsss)->push_back((yyvsp[(2) - (2)].cls));;}
     break;
 
   case 5:
-#line 92 "quack.y"
-    {(yyval.cls) = new Class((yyvsp[(1) - (2)].clssig), (yyvsp[(2) - (2)].clsbdy));;}
+#line 93 "quack.y"
+    {(yyval.cls) = new Class((yyvsp[(1) - (2)].clssig), (yyvsp[(2) - (2)].clsbdy)); (yyval.cls)->setLineno((yyloc).first_line);;}
     break;
 
   case 6:
-#line 96 "quack.y"
-    {(yyval.clssig) = new ClassSignature((yyvsp[(2) - (6)].id), (yyvsp[(4) - (6)].fargs), (yyvsp[(6) - (6)].exop));;}
+#line 97 "quack.y"
+    {(yyval.clssig) = new ClassSignature((yyvsp[(2) - (6)].id), (yyvsp[(4) - (6)].fargs), (yyvsp[(6) - (6)].exop)); (yyval.clssig)->setLineno((yyloc).first_line);;}
     break;
 
   case 7:
-#line 100 "quack.y"
-    {(yyval.exop) = new FalseExtendsOption();;}
+#line 101 "quack.y"
+    {(yyval.exop) = new FalseExtendsOption(); (yyval.exop)->setLineno((yyloc).first_line);;}
     break;
 
   case 8:
-#line 101 "quack.y"
-    {(yyval.exop) = new TrueExtendsOption((yyvsp[(2) - (2)].id));;}
+#line 102 "quack.y"
+    {(yyval.exop) = new TrueExtendsOption((yyvsp[(2) - (2)].id)); (yyval.exop)->setLineno((yyloc).first_line);;}
     break;
 
   case 9:
-#line 105 "quack.y"
+#line 106 "quack.y"
     {(yyval.fargs) = new list<FormalArg *>();;}
     break;
 
   case 10:
-#line 106 "quack.y"
+#line 107 "quack.y"
     {(yyval.fargs) = (yyvsp[(2) - (2)].fargs); (yyvsp[(2) - (2)].fargs)->push_front((yyvsp[(1) - (2)].farg));;}
     break;
 
   case 11:
-#line 110 "quack.y"
-    {(yyval.farg) = new FormalArg((yyvsp[(1) - (3)].id), (yyvsp[(3) - (3)].id));;}
+#line 111 "quack.y"
+    {(yyval.farg) = new FormalArg((yyvsp[(1) - (3)].id), (yyvsp[(3) - (3)].id)); (yyval.farg)->setLineno((yyloc).first_line);;}
     break;
 
   case 12:
-#line 114 "quack.y"
+#line 115 "quack.y"
     {(yyval.fargs) = new list<FormalArg *>();;}
     break;
 
   case 13:
-#line 115 "quack.y"
+#line 116 "quack.y"
     {(yyval.fargs) = (yyvsp[(1) - (3)].fargs); (yyvsp[(1) - (3)].fargs)->push_back((yyvsp[(3) - (3)].farg));;}
     break;
 
   case 14:
-#line 119 "quack.y"
-    {(yyval.clsbdy) = new ClassBody((yyvsp[(2) - (4)].stmts), (yyvsp[(3) - (4)].meths));;}
+#line 120 "quack.y"
+    {(yyval.clsbdy) = new ClassBody((yyvsp[(2) - (4)].stmts), (yyvsp[(3) - (4)].meths)); (yyval.clsbdy)->setLineno((yyloc).first_line);;}
     break;
 
   case 15:
-#line 122 "quack.y"
-    {(yyval.meth) = new Method((yyvsp[(2) - (7)].id), (yyvsp[(4) - (7)].fargs), (yyvsp[(6) - (7)].idop), (yyvsp[(7) - (7)].stmts));;}
+#line 123 "quack.y"
+    {(yyval.meth) = new Method((yyvsp[(2) - (7)].id), (yyvsp[(4) - (7)].fargs), (yyvsp[(6) - (7)].idop), (yyvsp[(7) - (7)].stmts)); (yyval.meth)->setLineno((yyloc).first_line);;}
     break;
 
   case 16:
-#line 126 "quack.y"
+#line 127 "quack.y"
     {(yyval.meths) = new list<Method *>();;}
     break;
 
   case 17:
-#line 127 "quack.y"
+#line 128 "quack.y"
     {(yyval.meths) = (yyvsp[(1) - (2)].meths); (yyvsp[(1) - (2)].meths)->push_back((yyvsp[(2) - (2)].meth));;}
     break;
 
   case 18:
-#line 131 "quack.y"
-    {(yyval.idop) = new FalseIdentOption();;}
+#line 132 "quack.y"
+    {(yyval.idop) = new FalseIdentOption(); (yyval.idop)->setLineno((yyloc).first_line);;}
     break;
 
   case 19:
-#line 132 "quack.y"
-    {(yyval.idop) = new TrueIdentOption((yyvsp[(2) - (2)].id));;}
+#line 133 "quack.y"
+    {(yyval.idop) = new TrueIdentOption((yyvsp[(2) - (2)].id)); (yyval.idop)->setLineno((yyloc).first_line);;}
     break;
 
   case 20:
-#line 136 "quack.y"
+#line 137 "quack.y"
     {(yyval.stmts) = new list<Statement *>();;}
     break;
 
   case 21:
-#line 137 "quack.y"
+#line 138 "quack.y"
     {(yyval.stmts) = (yyvsp[(1) - (2)].stmts); (yyvsp[(1) - (2)].stmts)->push_back((yyvsp[(2) - (2)].stmt));;}
     break;
 
   case 22:
-#line 141 "quack.y"
+#line 142 "quack.y"
     {(yyval.stmts) = (yyvsp[(2) - (3)].stmts);;}
     break;
 
   case 23:
-#line 145 "quack.y"
-    {(yyval.stmt) = new IfBlock((yyvsp[(1) - (3)]._if), (yyvsp[(2) - (3)].elifs), (yyvsp[(3) - (3)]._else));;}
+#line 146 "quack.y"
+    {(yyval.stmt) = new IfBlock((yyvsp[(1) - (3)]._if), (yyvsp[(2) - (3)].elifs), (yyvsp[(3) - (3)]._else)); (yyval.stmt)->setLineno((yyloc).first_line);;}
     break;
 
   case 24:
-#line 146 "quack.y"
-    {(yyval.stmt) = new WhileStatement((yyvsp[(2) - (3)].rexpr), (yyvsp[(3) - (3)].stmts));;}
+#line 147 "quack.y"
+    {(yyval.stmt) = new WhileStatement((yyvsp[(2) - (3)].rexpr), (yyvsp[(3) - (3)].stmts)); (yyval.stmt)->setLineno((yyloc).first_line);;}
     break;
 
   case 25:
-#line 147 "quack.y"
-    {(yyval.stmt) = new AssignmentStatement((yyvsp[(1) - (5)].lexpr), (yyvsp[(2) - (5)].idop), (yyvsp[(4) - (5)].rexpr));;}
+#line 148 "quack.y"
+    {(yyval.stmt) = new AssignmentStatement((yyvsp[(1) - (5)].lexpr), (yyvsp[(2) - (5)].idop), (yyvsp[(4) - (5)].rexpr)); (yyval.stmt)->setLineno((yyloc).first_line);;}
     break;
 
   case 26:
-#line 148 "quack.y"
-    {(yyval.stmt) = new ReturnStatement((yyvsp[(2) - (3)].rexpr));;}
+#line 149 "quack.y"
+    {(yyval.stmt) = new ReturnStatement((yyvsp[(2) - (3)].rexpr)); (yyval.stmt)->setLineno((yyloc).first_line);;}
     break;
 
   case 27:
-#line 149 "quack.y"
-    {(yyval.stmt) = new RExprStatement((yyvsp[(1) - (2)].rexpr));;}
+#line 150 "quack.y"
+    {(yyval.stmt) = new RExprStatement((yyvsp[(1) - (2)].rexpr)); (yyval.stmt)->setLineno((yyloc).first_line);;}
     break;
 
   case 28:
-#line 153 "quack.y"
-    {(yyval._if) = new IfClause((yyvsp[(2) - (3)].rexpr), (yyvsp[(3) - (3)].stmts));;}
+#line 154 "quack.y"
+    {(yyval._if) = new IfClause((yyvsp[(2) - (3)].rexpr), (yyvsp[(3) - (3)].stmts)); (yyval._if)->setLineno((yyloc).first_line);;}
     break;
 
   case 29:
-#line 157 "quack.y"
+#line 158 "quack.y"
     {(yyval.elifs) = new list<ElifClause *>();;}
     break;
 
   case 30:
-#line 158 "quack.y"
+#line 159 "quack.y"
     {(yyval.elifs) = (yyvsp[(1) - (2)].elifs); (yyvsp[(1) - (2)].elifs)->push_back((yyvsp[(2) - (2)]._elif));;}
     break;
 
   case 31:
-#line 162 "quack.y"
-    {(yyval._elif) = new ElifClause((yyvsp[(2) - (3)].rexpr), (yyvsp[(3) - (3)].stmts));;}
+#line 163 "quack.y"
+    {(yyval._elif) = new ElifClause((yyvsp[(2) - (3)].rexpr), (yyvsp[(3) - (3)].stmts)); (yyval._elif)->setLineno((yyloc).first_line);;}
     break;
 
   case 32:
-#line 166 "quack.y"
-    {(yyval._else) = new FalseElseOption();;}
+#line 167 "quack.y"
+    {(yyval._else) = new FalseElseOption(); (yyval._else)->setLineno((yyloc).first_line);;}
     break;
 
   case 33:
-#line 167 "quack.y"
-    {(yyval._else) = new TrueElseOption((yyvsp[(2) - (2)].stmts));;}
+#line 168 "quack.y"
+    {(yyval._else) = new TrueElseOption((yyvsp[(2) - (2)].stmts)); (yyval._else)->setLineno((yyloc).first_line);;}
     break;
 
   case 34:
-#line 171 "quack.y"
-    {(yyval.lexpr) = new IdentNode((yyvsp[(1) - (1)].id));;}
+#line 172 "quack.y"
+    {(yyval.lexpr) = new IdentNode((yyvsp[(1) - (1)].id)); (yyval.lexpr)->setLineno((yyloc).first_line);;}
     break;
 
   case 35:
-#line 172 "quack.y"
-    {(yyval.lexpr) = new ObjectFieldLExpr((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].id));;}
+#line 173 "quack.y"
+    {(yyval.lexpr) = new ObjectFieldLExpr((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].id)); (yyval.lexpr)->setLineno((yyloc).first_line);;}
     break;
 
   case 36:
-#line 176 "quack.y"
-    {(yyval.rexpr) = new StringNode((yyvsp[(1) - (1)].id));;}
+#line 177 "quack.y"
+    {(yyval.rexpr) = new StringNode((yyvsp[(1) - (1)].id)); (yyval.rexpr)->setLineno((yyloc).first_line);;}
     break;
 
   case 37:
-#line 177 "quack.y"
-    {(yyval.rexpr) = new IntNode((yyvsp[(1) - (1)].integer));;}
+#line 178 "quack.y"
+    {(yyval.rexpr) = new IntNode((yyvsp[(1) - (1)].integer)); (yyval.rexpr)->setLineno((yyloc).first_line);;}
     break;
 
   case 38:
-#line 178 "quack.y"
-    {(yyval.rexpr) = new RExprToLExpr((yyvsp[(1) - (1)].lexpr));;}
+#line 179 "quack.y"
+    {(yyval.rexpr) = new RExprToLExpr((yyvsp[(1) - (1)].lexpr)); (yyval.rexpr)->setLineno((yyloc).first_line);;}
     break;
 
   case 39:
-#line 179 "quack.y"
-    {(yyval.rexpr) = new PlusNode((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].rexpr));;}
+#line 180 "quack.y"
+    {(yyval.rexpr) = new PlusNode((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].rexpr)); (yyval.rexpr)->setLineno((yyloc).first_line);;}
     break;
 
   case 40:
-#line 180 "quack.y"
-    {(yyval.rexpr) = new MinusNode((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].rexpr));;}
+#line 181 "quack.y"
+    {(yyval.rexpr) = new MinusNode((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].rexpr)); (yyval.rexpr)->setLineno((yyloc).first_line);;}
     break;
 
   case 41:
-#line 181 "quack.y"
-    {(yyval.rexpr) = new TimesNode((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].rexpr));;}
+#line 182 "quack.y"
+    {(yyval.rexpr) = new TimesNode((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].rexpr)); (yyval.rexpr)->setLineno((yyloc).first_line);;}
     break;
 
   case 42:
-#line 182 "quack.y"
-    {(yyval.rexpr) = new DivideNode((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].rexpr));;}
+#line 183 "quack.y"
+    {(yyval.rexpr) = new DivideNode((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].rexpr)); (yyval.rexpr)->setLineno((yyloc).first_line);;}
     break;
 
   case 43:
-#line 183 "quack.y"
+#line 184 "quack.y"
     {(yyval.rexpr) = (yyvsp[(2) - (3)].rexpr);;}
     break;
 
   case 44:
-#line 184 "quack.y"
-    {(yyval.rexpr) = new EqualsNode((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].rexpr));;}
+#line 185 "quack.y"
+    {(yyval.rexpr) = new EqualsNode((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].rexpr)); (yyval.rexpr)->setLineno((yyloc).first_line);;}
     break;
 
   case 45:
-#line 185 "quack.y"
-    {(yyval.rexpr) = new AtMostNode((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].rexpr));;}
+#line 186 "quack.y"
+    {(yyval.rexpr) = new AtMostNode((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].rexpr)); (yyval.rexpr)->setLineno((yyloc).first_line);;}
     break;
 
   case 46:
-#line 186 "quack.y"
-    {(yyval.rexpr) = new LessThanNode((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].rexpr));;}
+#line 187 "quack.y"
+    {(yyval.rexpr) = new LessThanNode((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].rexpr)); (yyval.rexpr)->setLineno((yyloc).first_line);;}
     break;
 
   case 47:
-#line 187 "quack.y"
-    {(yyval.rexpr) = new AtLeastNode((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].rexpr));;}
+#line 188 "quack.y"
+    {(yyval.rexpr) = new AtLeastNode((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].rexpr)); (yyval.rexpr)->setLineno((yyloc).first_line);;}
     break;
 
   case 48:
-#line 188 "quack.y"
-    {(yyval.rexpr) = new GreaterThanNode((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].rexpr));;}
+#line 189 "quack.y"
+    {(yyval.rexpr) = new GreaterThanNode((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].rexpr)); (yyval.rexpr)->setLineno((yyloc).first_line);;}
     break;
 
   case 49:
-#line 189 "quack.y"
-    {(yyval.rexpr) = new AndNode((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].rexpr));;}
+#line 190 "quack.y"
+    {(yyval.rexpr) = new AndNode((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].rexpr)); (yyval.rexpr)->setLineno((yyloc).first_line);;}
     break;
 
   case 50:
-#line 190 "quack.y"
-    {(yyval.rexpr) = new OrNode((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].rexpr));;}
+#line 191 "quack.y"
+    {(yyval.rexpr) = new OrNode((yyvsp[(1) - (3)].rexpr), (yyvsp[(3) - (3)].rexpr)); (yyval.rexpr)->setLineno((yyloc).first_line);;}
     break;
 
   case 51:
-#line 191 "quack.y"
-    {(yyval.rexpr) = new NotNode((yyvsp[(2) - (2)].rexpr));;}
+#line 192 "quack.y"
+    {(yyval.rexpr) = new NotNode((yyvsp[(2) - (2)].rexpr)); (yyval.rexpr)->setLineno((yyloc).first_line);;}
     break;
 
   case 52:
-#line 192 "quack.y"
-    {(yyval.rexpr) = new DotRExpr((yyvsp[(1) - (6)].rexpr), (yyvsp[(3) - (6)].id), (yyvsp[(5) - (6)].rexprs));;}
+#line 193 "quack.y"
+    {(yyval.rexpr) = new DotRExpr((yyvsp[(1) - (6)].rexpr), (yyvsp[(3) - (6)].id), (yyvsp[(5) - (6)].rexprs)); (yyval.rexpr)->setLineno((yyloc).first_line);;}
     break;
 
   case 53:
-#line 193 "quack.y"
-    {(yyval.rexpr) = new ConstructorRExpr((yyvsp[(1) - (4)].id), (yyvsp[(3) - (4)].rexprs));;}
+#line 194 "quack.y"
+    {(yyval.rexpr) = new ConstructorRExpr((yyvsp[(1) - (4)].id), (yyvsp[(3) - (4)].rexprs)); (yyval.rexpr)->setLineno((yyloc).first_line);;}
     break;
 
   case 54:
-#line 197 "quack.y"
-    {(yyval.rexpr) = new EmptyRExpr();;}
+#line 198 "quack.y"
+    {(yyval.rexpr) = new EmptyRExpr(); (yyval.rexpr)->setLineno((yyloc).first_line);;}
     break;
 
   case 55:
-#line 198 "quack.y"
+#line 199 "quack.y"
     {(yyval.rexpr) = (yyvsp[(1) - (1)].rexpr);}
     break;
 
   case 56:
-#line 202 "quack.y"
+#line 203 "quack.y"
     {(yyval.rexprs) = new list<RExpr *>();;}
     break;
 
   case 57:
-#line 203 "quack.y"
+#line 204 "quack.y"
     {(yyval.rexprs) = new list<RExpr *>(); (yyval.rexprs)->push_back((yyvsp[(1) - (2)].rexpr)); (yyval.rexprs)->merge(*((yyvsp[(2) - (2)].rexprs)));;}
     break;
 
   case 58:
-#line 207 "quack.y"
+#line 208 "quack.y"
     {(yyval.rexprs) = new list<RExpr *>();;}
     break;
 
   case 59:
-#line 208 "quack.y"
+#line 209 "quack.y"
     {(yyval.rexprs) = (yyvsp[(1) - (3)].rexprs); (yyvsp[(1) - (3)].rexprs)->push_back((yyvsp[(3) - (3)].rexpr));;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1783 "quack.tab.c"
+#line 1819 "quack.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1789,7 +1825,7 @@ yyreduce:
   YY_STACK_PRINT (yyss, yyssp);
 
   *++yyvsp = yyval;
-
+  *++yylsp = yyloc;
 
   /* Now `shift' the result of the reduction.  Determine what state
      that goes to, based on the state we popped back to and the rule
@@ -1851,7 +1887,7 @@ yyerrlab:
 #endif
     }
 
-
+  yyerror_range[0] = yylloc;
 
   if (yyerrstatus == 3)
     {
@@ -1867,7 +1903,7 @@ yyerrlab:
       else
 	{
 	  yydestruct ("Error: discarding",
-		      yytoken, &yylval);
+		      yytoken, &yylval, &yylloc);
 	  yychar = YYEMPTY;
 	}
     }
@@ -1888,6 +1924,7 @@ yyerrorlab:
   if (/*CONSTCOND*/ 0)
      goto yyerrorlab;
 
+  yyerror_range[0] = yylsp[1-yylen];
   /* Do not reclaim the symbols of the rule which action triggered
      this YYERROR.  */
   YYPOPSTACK (yylen);
@@ -1921,9 +1958,9 @@ yyerrlab1:
       if (yyssp == yyss)
 	YYABORT;
 
-
+      yyerror_range[0] = *yylsp;
       yydestruct ("Error: popping",
-		  yystos[yystate], yyvsp);
+		  yystos[yystate], yyvsp, yylsp);
       YYPOPSTACK (1);
       yystate = *yyssp;
       YY_STACK_PRINT (yyss, yyssp);
@@ -1934,6 +1971,11 @@ yyerrlab1:
 
   *++yyvsp = yylval;
 
+  yyerror_range[1] = yylloc;
+  /* Using YYLLOC is tempting, but would change the location of
+     the look-ahead.  YYLOC is available though.  */
+  YYLLOC_DEFAULT (yyloc, (yyerror_range - 1), 2);
+  *++yylsp = yyloc;
 
   /* Shift the error token.  */
   YY_SYMBOL_PRINT ("Shifting", yystos[yyn], yyvsp, yylsp);
@@ -1969,7 +2011,7 @@ yyexhaustedlab:
 yyreturn:
   if (yychar != YYEOF && yychar != YYEMPTY)
      yydestruct ("Cleanup: discarding lookahead",
-		 yytoken, &yylval);
+		 yytoken, &yylval, &yylloc);
   /* Do not reclaim the symbols of the rule which action triggered
      this YYABORT or YYACCEPT.  */
   YYPOPSTACK (yylen);
@@ -1977,7 +2019,7 @@ yyreturn:
   while (yyssp != yyss)
     {
       yydestruct ("Cleanup: popping",
-		  yystos[*yyssp], yyvsp);
+		  yystos[*yyssp], yyvsp, yylsp);
       YYPOPSTACK (1);
     }
 #ifndef yyoverflow
@@ -1993,7 +2035,7 @@ yyreturn:
 }
 
 
-#line 209 "quack.y"
+#line 210 "quack.y"
 
 
 
@@ -2020,6 +2062,7 @@ int main(int argc, char* argv[])
     if (condition != 0)
         return -1;
 
+    fprintf(stderr, "Program lineno: %d", root->lineno);
     if (!root->checkClassHierarchy())
     {
         fprintf(stderr, "Error: Class hierarchy is malformed\n");

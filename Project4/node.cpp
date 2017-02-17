@@ -8,6 +8,12 @@
 
 using std::list;
 
+Node::Node(int l) : lineno(l) {}
+void Node::setLineno(int l)
+{
+    lineno = l;
+}
+
 Class::Class(ClassSignature *cs, ClassBody *cb) : clssig(cs), clsbdy(cb) {}
 void Class::print()
 {
@@ -391,7 +397,8 @@ void ObjectFieldLExpr::accept(Visitor *v)
 }
 
 
-Program::Program(list<Class *> *c, list<Statement *> *s) : classes(c), statements(s) {}
+Program::Program(list<Class *> *c, list<Statement *> *s, int l) : classes(c), statements(s), Node(l) {}
+//Program::Program(list<Class *> *c, list<Statement *> *s) : classes(c), statements(s) {}
 void Program::accept(Visitor *v)
 {
     v->visitProgram(this);

@@ -583,6 +583,7 @@ char *yytext;
 #include <stdio.h>
 #include "node.h"
 #include "quack.tab.h"
+#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;
 
 void yyerror(const char *msg)
 {
@@ -595,7 +596,7 @@ const char* BAD_NL_STR =
   "Unclosed string?  Encountered newline in quoted string.";
 
 
-#line 599 "lex.yy.c"
+#line 600 "lex.yy.c"
 
 #define INITIAL 0
 #define comment 1
@@ -779,10 +780,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 24 "quack.lex"
+#line 25 "quack.lex"
 
 
-#line 786 "lex.yy.c"
+#line 787 "lex.yy.c"
 
 	if ( !(yy_init) )
 		{
@@ -877,167 +878,167 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 26 "quack.lex"
+#line 27 "quack.lex"
 {BEGIN(comment);}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 27 "quack.lex"
+#line 28 "quack.lex"
 ;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 28 "quack.lex"
+#line 29 "quack.lex"
 ;
 	YY_BREAK
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 29 "quack.lex"
+#line 30 "quack.lex"
 ;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 30 "quack.lex"
+#line 31 "quack.lex"
 {BEGIN(INITIAL);}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 32 "quack.lex"
+#line 33 "quack.lex"
 {;}
 	YY_BREAK
 case 7:
 /* rule 7 can match eol */
 YY_RULE_SETUP
-#line 34 "quack.lex"
+#line 35 "quack.lex"
 {yylval.id = strdup(yytext); return STRING_LIT;}
 	YY_BREAK
 case 8:
 /* rule 8 can match eol */
 YY_RULE_SETUP
-#line 36 "quack.lex"
+#line 37 "quack.lex"
 {;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 38 "quack.lex"
+#line 39 "quack.lex"
 {return CLASS;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 39 "quack.lex"
+#line 40 "quack.lex"
 {return DEF;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 40 "quack.lex"
+#line 41 "quack.lex"
 {return EXTENDS;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 41 "quack.lex"
+#line 42 "quack.lex"
 {return IF;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 42 "quack.lex"
+#line 43 "quack.lex"
 {return ELIF;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 43 "quack.lex"
+#line 44 "quack.lex"
 {return ELSE;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 44 "quack.lex"
+#line 45 "quack.lex"
 {return WHILE;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 45 "quack.lex"
+#line 46 "quack.lex"
 {return RETURN;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 46 "quack.lex"
+#line 47 "quack.lex"
 {return ATLEAST;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 47 "quack.lex"
+#line 48 "quack.lex"
 {return ATMOST;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 48 "quack.lex"
+#line 49 "quack.lex"
 {return EQUALS;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 49 "quack.lex"
+#line 50 "quack.lex"
 {return AND;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 50 "quack.lex"
+#line 51 "quack.lex"
 {return OR;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 51 "quack.lex"
+#line 52 "quack.lex"
 {return NOT;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 52 "quack.lex"
+#line 53 "quack.lex"
 {yylval.integer = atof(yytext); return INT_LIT;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 54 "quack.lex"
+#line 55 "quack.lex"
 {return yytext[0];}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 55 "quack.lex"
+#line 56 "quack.lex"
 {yylval.id = strdup(yytext);       return STRING_LIT;}
 	YY_BREAK
 case 26:
 /* rule 26 can match eol */
 YY_RULE_SETUP
-#line 56 "quack.lex"
+#line 57 "quack.lex"
 {yylval.id = strdup(yytext); yyerror(BAD_ESC_MSG); return STRING_LIT;}
 	YY_BREAK
 case 27:
 /* rule 27 can match eol */
 YY_RULE_SETUP
-#line 57 "quack.lex"
+#line 58 "quack.lex"
 {yylval.id = strdup(yytext); yyerror(BAD_NL_STR);  return STRING_LIT;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 58 "quack.lex"
+#line 59 "quack.lex"
 {yylval.id = strdup(yytext); return IDENT;}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(comment):
 case YY_STATE_EOF(triplequotes):
-#line 59 "quack.lex"
+#line 60 "quack.lex"
 {return EOF;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 61 "quack.lex"
+#line 62 "quack.lex"
 { fprintf(stderr, "*** %d: Unexpected character %d (%c)\n",                                      
                     yylineno, (int) yytext[0], yytext[0]); }  
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 64 "quack.lex"
+#line 65 "quack.lex"
 ECHO;
 	YY_BREAK
-#line 1041 "lex.yy.c"
+#line 1042 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2044,7 +2045,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 64 "quack.lex"
+#line 65 "quack.lex"
 
 
 

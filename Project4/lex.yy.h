@@ -314,7 +314,7 @@ extern int yylex (void);
 #undef YY_DECL
 #endif
 
-#line 64 "quack.lex"
+#line 65 "quack.lex"
 
 
 #line 321 "lex.yy.h"

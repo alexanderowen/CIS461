@@ -8,10 +8,19 @@ class Visitor;
 
 using std::list;
 
+class Node 
+{
+    public:
+        int lineno;
+        Node(int l);
+        Node() {lineno = 0;}
+        void setLineno(int l);
+};
+
 class ClassSignature;
 class ClassBody;
 
-class Class 
+class Class : public Node 
 {
     public:
         ClassSignature *clssig;
@@ -26,7 +35,7 @@ class Class
 
 class FormalArgs;
 
-class ExtendsOption //ABC
+class ExtendsOption : public Node //ABC
 {
     public:
         virtual void print() = 0;
@@ -55,7 +64,7 @@ class TrueExtendsOption : public ExtendsOption
         virtual char *getID();
 };
 
-class FormalArg 
+class FormalArg : public Node 
 {
     public:
         char *id;
@@ -66,7 +75,7 @@ class FormalArg
         virtual void accept(Visitor *v);
 };
 
-class ClassSignature 
+class ClassSignature : public Node 
 {
     public:
         char *id;
@@ -84,7 +93,7 @@ class ClassSignature
 
 class Statement;
 class Method;
-class ClassBody 
+class ClassBody : public Node 
 {
     public:
         list<Statement *> *stmts;
@@ -95,7 +104,7 @@ class ClassBody
         virtual void accept(Visitor *v);
 };
 
-class IdentOption //ABC 
+class IdentOption : public Node //ABC 
 {
     public:
         virtual void print() = 0;
@@ -119,7 +128,7 @@ class TrueIdentOption : public IdentOption
         virtual void print();
         virtual void accept(Visitor *v);
 };
-class Method 
+class Method : public Node 
 {
     public:
         char *id;
@@ -141,7 +150,7 @@ class Method
 class ActualArgs;
 class LExpr;
 
-class RExpr  //ABC
+class RExpr : public Node  //ABC
 {
     public:
         virtual void print() = 0;
@@ -312,7 +321,7 @@ class OrNode : public BinaryOperatorNode
 /**********
  * Statement classes
  * ********/
-class Statement //ABC 
+class Statement : public Node //ABC 
 {
     public:
         virtual void print() = 0;
@@ -378,7 +387,7 @@ class IfBlock : public Statement
         virtual void accept(Visitor *v);
 };
 
-class IfClause //Decided not to make this an ABC despite being production and rule
+class IfClause : public Node //Decided not to make this an ABC despite being production and rule
 {
     public:
         RExpr *rexpr;
@@ -389,7 +398,7 @@ class IfClause //Decided not to make this an ABC despite being production and ru
         virtual void accept(Visitor *v);
 };
 
-class ElifClause
+class ElifClause : public Node 
 {
     public:
         RExpr *rexpr;
@@ -401,7 +410,7 @@ class ElifClause
 
 };
 
-class ElseOption //ABC
+class ElseOption : public Node //ABC
 {
     public:
         virtual void print() = 0;
@@ -430,7 +439,7 @@ class TrueElseOption : public ElseOption
 /***************
  * LExpr classes
  * *************/
-class LExpr // ABC 
+class LExpr : public Node // ABC 
 {
     public:
         virtual void print() = 0;
@@ -460,13 +469,13 @@ class ObjectFieldLExpr : public LExpr
 
 class RExprOption {};
 
-class Program 
+class Program : public Node 
 {
     public:
         list<Statement *> *statements;
         list<Class *>     *classes;
     public:
-        Program(list<Class *> *c, list<Statement *> *s);
+        Program(list<Class *> *c, list<Statement *> *s, int);
         bool checkClassHierarchy();
         virtual void accept(Visitor *v);
 };
