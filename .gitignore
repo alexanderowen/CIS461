@@ -4,6 +4,7 @@ parser
 quack
 actual/*.out
 actual/*.err
+a.out
 
 # Vim files
 *.swp
