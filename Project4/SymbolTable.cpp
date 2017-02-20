@@ -28,6 +28,12 @@ VariableSym *SymbolTable::lookupVariable(char *name)
         return NULL;
     }
 }
+
+void SymbolTable::addVariable(char *name, VariableSym *value)
+{
+    vMap.insert({name, value});
+}
+/*
 MethodSym *SymbolTable::lookupMethod(char *name)
 {
     auto search = mMap.find(name);
@@ -44,13 +50,8 @@ MethodSym *SymbolTable::lookupMethod(char *name)
         return NULL;
     }
 }
-
-void SymbolTable::addVariable(char *name, VariableSym *value)
-{
-    vMap.insert({name, value});
-}
 void SymbolTable::addMethod(char *name, MethodSym *value)
 {
     mMap.insert({name, value});
 }
-
+*/

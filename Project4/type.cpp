@@ -25,14 +25,30 @@ int TypeNode::addChild(char *name)
     return 1;
 }
 
+int TypeNode::addMethod(MethodNode *m)
+{
+    methods.push_back(m);
+    return 1;
+}
+
+int TypeNode::hasMethod(char *name)
+{
+    for (list<MethodNode *>::const_iterator it = this->methods.begin(); it != this->methods.end(); ++it)
+    {
+        if ( strcmp((*it)->id, name) == 0)
+            return 1;
+    }
+    return 0;
+}
+
 int TypeNode::equals(TypeNode *type)
 {
-    return strcmp(this->name, type->name);
+    return !strcmp(this->name, type->name); // since strcmp returns 0 if equal
 }
 
 int TypeNode::equals(char *n)
 {
-    return strcmp(this->name, n);
+    return !strcmp(this->name, n);
 }
 
 void TypeNode::print()
@@ -67,6 +83,22 @@ int TypeTree::addSubtype(char *sub, char *super)
     return this->addSubtype(n, super);
 }
 
+int TypeTree::addMethodToType(char *_type, MethodNode *m)
+{
+    TypeNode *type = findType(_type);
+    if (type == NULL)
+        return 0;
+    return type->addMethod(m);
+}
+
+int TypeTree::typeHasMethod(char *_type, char *method)
+{
+    TypeNode *type = findType(_type);
+    if (type == NULL)
+        return 0;
+    return type->hasMethod(method);
+}
+
 TypeNode *TypeTree::findType(char *name)
 {
     return search(root, name);
@@ -77,7 +109,7 @@ TypeNode *TypeTree::search(TypeNode *r, char *name)
     //printf("root: ");
     //r->print();
     //printf("name: %s\n", name);
-    if (r->equals(name) == 0)
+    if (r->equals(name))
         return r;
     //printf("doesn't equal: %d\n", r->equals(name));
     for (list<TypeNode *>::const_iterator it = r->children.begin(); it != r->children.end(); ++it)

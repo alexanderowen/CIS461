@@ -24,6 +24,7 @@ class MethodSym : public Symbol
         MethodSym(char *, list<VariableSym *> *, char *);
 };
 
+/*
 class SymbolTable 
 {
     public:
@@ -36,4 +37,16 @@ class SymbolTable
         MethodSym *lookupMethod(char *name);
         void  addVariable(char *name, VariableSym *value); 
         void  addMethod(char *name, MethodSym *value); 
+};
+*/
+
+class SymbolTable
+{
+    public:
+        SymbolTable *parent;
+        unordered_map<char *, VariableSym *> vMap;
+
+        SymbolTable(SymbolTable *p);
+        VariableSym *lookupVariable(char *name);
+        void addVariable(char *name, VariableSym *value);
 };
