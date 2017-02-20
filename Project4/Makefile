@@ -1,6 +1,9 @@
 quack: quack.tab.o lex.yy.o node.o visitor.o util.o
 	g++ lex.yy.o quack.tab.o node.o visitor.o util.o -o quack -ll
 
+SymbolTable.o: SymbolTable.h SymbolTable.cpp
+	g++ -std=c++11 -c SymbolTable.cpp
+
 util.o: util.h util.cpp
 	g++ -c util.cpp -I.
 
