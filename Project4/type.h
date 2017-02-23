@@ -9,9 +9,9 @@ class MethodNode
 {                                                                                                      
     public:                                                                                            
         char *id;                                                                                      
-        list<char *> *argsType;                                                                     
-        char *returnType;                                                                              
-        MethodNode(char *, list<char *> *, char *);                                              
+        list<char *> argsType;
+        char *returnType;
+        MethodNode(char *, list<char *> , char *);                                              
 }; 
 
 class TypeNode

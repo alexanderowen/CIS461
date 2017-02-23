@@ -6,6 +6,7 @@
 
 #include "lex.yy.h"
 #include "visitor.h"
+#include "type.h"
 #include "node.h"
 
 using namespace std;
@@ -233,7 +234,7 @@ int main(int argc, char* argv[])
     if (condition != 0)
         return -1;
 
-    fprintf(stderr, "Program lineno: %d", root->lineno);
+    //fprintf(stderr, "Program lineno: %d", root->lineno);
     if (!root->checkClassHierarchy())
     {
         fprintf(stderr, "Error: Class hierarchy is malformed\n");
@@ -247,6 +248,17 @@ int main(int argc, char* argv[])
     {
         fprintf(stderr, "Error: Call to constructor that is not defined\n");
         return 0;
+    }
+    TypeCheckVisitor tcv;
+    root->accept(&tcv);
+    //printf("Size: %d\n", tcv.st->vMap.size());
+    if (tcv.errors > 0)
+    {
+        for (list<char*>::const_iterator it = tcv.msgs.begin(); it != tcv.msgs.end(); ++it)
+        {
+            fprintf(stderr, "%s:", argv[0]);
+            fprintf(stderr, "%s\n", (*it));
+        }
     }
 
     std::cout << "\n" << std::endl;

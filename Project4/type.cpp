@@ -6,6 +6,8 @@
 
 using std::list;
 
+MethodNode::MethodNode(char *i, list<char*> a, char *r) : id(i), argsType(a), returnType(r) {}
+
 TypeNode::TypeNode(char *n, TypeNode *p) : name(n), parent(p) 
 {
 }
@@ -59,9 +61,46 @@ void TypeNode::print()
 
 TypeTree::TypeTree()
 {
+    char *OBJ = (char*)"Obj";
+    char *INT = (char*)"Int";
+    char *STR = (char*)"String";
+    char *NOT = (char*)"Nothing";
+    char *BOOL = (char*)"Boolean";
+
     TypeNode *o = new TypeNode((char*)"Obj", NULL);
     root = o;
     root->addChild((char*)"Int");
+
+    //this->addMethodToType((char*)"OBJ", MethodNode((char*)"STR",&(list<char*>((char*)"OBJ")),(char*)"OBJ"));
+    list<char*> args;
+    args.push_back(OBJ);
+    MethodNode m((char*)"STR", args, STR);
+    this->addMethodToType(OBJ, &m);
+    MethodNode ObjPrint((char*)"PRINT", args, NOT);
+    this->addMethodToType(OBJ, &ObjPrint); 
+    MethodNode ObjEquals((char*)"EQUALS", args, BOOL);
+
+    // Assignment built-in methods of Int to the typechecker
+    list<char*> int_args;
+    int_args.push_back(INT);
+    MethodNode IntPlus((char*)"PLUS", int_args, INT);
+    this->addMethodToType(INT, &IntPlus);
+    MethodNode IntMinus((char*)"MINUS", int_args, INT);
+    this->addMethodToType(INT, &IntMinus);
+    MethodNode IntTimes((char*)"TIMES", int_args, INT);
+    this->addMethodToType(INT, &IntTimes);
+    MethodNode IntDivide((char*)"DIVIDE", int_args, INT);
+    this->addMethodToType(INT, &IntDivide);
+    MethodNode IntAtMost((char*)"ATMOST", int_args, BOOL);
+    this->addMethodToType(INT, &IntAtMost);
+    MethodNode IntLess((char*)"LESS", int_args, BOOL);
+    this->addMethodToType(INT, &IntLess);
+    MethodNode IntAtLeast((char*)"ATLEAST", int_args, BOOL);
+    this->addMethodToType(INT, &IntAtLeast);
+    MethodNode IntMore((char*)"MORE", int_args, BOOL);
+    this->addMethodToType(INT, &IntMore);
+
+    // TODO: Methods for String, Boolean, and Nothing
     root->addChild((char*)"String");
     root->addChild((char*)"Boolean");
     root->addChild((char*)"Nothing");

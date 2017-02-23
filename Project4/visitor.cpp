@@ -1,6 +1,7 @@
 
 #include <list>
 #include <stdio.h>
+#include <stdlib.h>
 #include <iostream>
 #include <algorithm>
 #include <iterator>
@@ -224,4 +225,72 @@ void ConstructorVisitor::print()
     std::cout << "Classes: ";
     std::copy(std::begin(classes), std::end(classes), std::ostream_iterator<char *>(std::cout, " "));
     std::cout << "\n" << std::endl;
+}
+
+TypeCheckVisitor::TypeCheckVisitor()
+{
+    st = new SymbolTable(NULL);
+    tt = new TypeTree();    
+    errors = 0;
+}
+TypeCheckVisitor::~TypeCheckVisitor() 
+{
+    delete st;
+    delete tt;
+}
+
+// Has the type checker met the max number of errors?
+bool TypeCheckVisitor::check()
+{
+    return (errors > 10) ? true : false;
+}
+
+void TypeCheckVisitor::visitBinaryOperatorNode(BinaryOperatorNode *b)
+{
+    if (check())
+        return;
+    b->left->accept(this);
+    b->right->accept(this);
+    char *t1 = b->left->type();
+    char *t2 = b->right->type();
+    printf("Type1: %s Type2: %s\n", t1, t2);
+    //TODO: Check if t1 has binary operator method
+    //TODO: COME TO THIS LATER, DONT WANT TO FACE IT RIGHT NOW
+    switch(b->operation) {
+        case 0:
+            printf("Plus");
+            break;
+        case 1:
+            printf("Minus");
+            break;
+        default:
+            printf("Other");
+            break;
+    }
+}
+   
+void TypeCheckVisitor::visitAssignmentStatement(AssignmentStatement *a)
+{
+    //TODO: If the variable is already defined, do least common ancestor
+    IdentNode *id = dynamic_cast<IdentNode*>(a->lexpr);
+    if (id != NULL)
+    {
+        //TODO: Use a->ident, just ignoring it currently
+        VariableSym v(id->id, a->rexpr->type());
+        st->addVariable(id->id, &v);
+    }
+    a->lexpr->accept(this);
+    a->ident->accept(this);
+    a->rexpr->accept(this);
+}
+
+void TypeCheckVisitor::visitIdentNode(IdentNode *i) 
+{
+    if (st->lookupVariable(i->id) == NULL) 
+    {
+        errors++;
+        char *msg = (char*) malloc(sizeof(char)*256);
+        sprintf(msg, "%d: Syntax Error\n\tUse of uninitialized variable\n", i->lineno);
+        msgs.push_back(msg);
+    }
 }

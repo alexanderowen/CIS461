@@ -135,6 +135,11 @@ void TrueIdentOption::accept(Visitor *v)
 /*****************
  * RExpr classes *
  *****************/
+char *RExpr::type() //TODO: REMOVE THIS
+{
+    return (char*)"-";
+}
+
 EmptyRExpr::EmptyRExpr() {}
 void EmptyRExpr::print()
 {
@@ -143,6 +148,10 @@ void EmptyRExpr::print()
 void EmptyRExpr::accept(Visitor *v)
 {
     v->visitEmptyRExpr(this);
+}
+char *EmptyRExpr::type()
+{
+    return (char*)"Nothing";
 }
 
 DotRExpr::DotRExpr(RExpr *r, char *i, list<RExpr *> *a) : rexpr(r), id(i), args(a) {}
@@ -164,6 +173,10 @@ void ConstructorRExpr::accept(Visitor *v)
 {
     v->visitConstructorRExpr(this);
 }
+char *ConstructorRExpr::type()
+{
+    return (char*)"Nothing";
+}
 
 RExprToLExpr::RExprToLExpr(LExpr *l) : lexpr(l) {}
 void RExprToLExpr::print()
@@ -184,6 +197,10 @@ void StringNode::accept(Visitor *v)
 {
     v->visitStringNode(this);
 }
+char *StringNode::type()
+{
+    return (char*)"String";
+}
 
 IntNode::IntNode(int i) : value(i) {}
 void IntNode::print()
@@ -193,6 +210,10 @@ void IntNode::print()
 void IntNode::accept(Visitor *v)
 {
     v->visitIntNode(this);
+}
+char *IntNode::type()
+{
+    return (char*)"Int";
 }
 
 NotNode::NotNode(RExpr *v) : value(v) {}
@@ -205,78 +226,83 @@ void NotNode::accept(Visitor *v)
     v->visitNotNode(this);
 }
 
-BinaryOperatorNode::BinaryOperatorNode(RExpr *r, RExpr *l)
+BinaryOperatorNode::BinaryOperatorNode(RExpr *r, RExpr *l, int o)
 {
     right = r;
     left  = l;
+    operation = o;
 }
 void BinaryOperatorNode::accept(Visitor *v)
 {
     v->visitBinaryOperatorNode(this);
 }
+char *BinaryOperatorNode::type()
+{
+    return left->type(); //TODO: Is this ok? Doesn't consider 'right'
+}
 
-PlusNode::PlusNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r) {} 
+PlusNode::PlusNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r, 0) {} 
 void PlusNode::print()
 {
     fprintf(stdout, "Found PlusNode\n");
 }
 
-MinusNode::MinusNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r) {}
+MinusNode::MinusNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r, 1) {}
 void MinusNode::print()
 {
     fprintf(stdout, "Found MinusNode\n");
 }
 
-TimesNode::TimesNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r) {}
+TimesNode::TimesNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r, 2) {}
 void TimesNode::print()
 {
     fprintf(stdout, "Found TimesNode\n");
 }
 
-DivideNode::DivideNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r) {}
+DivideNode::DivideNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r, 3) {}
 void DivideNode::print()
 {
     fprintf(stdout, "Found DivideNode\n");
 }
 
-EqualsNode::EqualsNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r) {}
+EqualsNode::EqualsNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r, 4) {}
 void EqualsNode::print()
 {
     fprintf(stdout, "Found EqualsNode\n");
 }
 
-AtMostNode::AtMostNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r) {}
+AtMostNode::AtMostNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r, 5) {}
 void AtMostNode::print()
 {
     fprintf(stdout, "Found AtMostNode\n");
 }
 
-LessThanNode::LessThanNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r) {}
+LessThanNode::LessThanNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r, 6) {}
 void LessThanNode::print()
 {
     fprintf(stdout, "Found LessThanNode\n");
 }
 
-AtLeastNode::AtLeastNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r) {}
+AtLeastNode::AtLeastNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r, 7) {}
 void AtLeastNode::print()
 {
     fprintf(stdout, "Found AtLeastNode\n");
 }
 
 
-GreaterThanNode::GreaterThanNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r) {}
+GreaterThanNode::GreaterThanNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r, 8) {}
 void GreaterThanNode::print()
 {
     fprintf(stdout, "Found GreaterThanNode\n");
 }
 
-AndNode::AndNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r) {}
+AndNode::AndNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r, 9) {}
 void AndNode::print()
 {
     fprintf(stdout, "Found AndNode\n");
 }
 
-OrNode::OrNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r) {}
+OrNode::OrNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r, 10) {}
 void OrNode::print()
 {
     fprintf(stdout, "Found OrNode\n");

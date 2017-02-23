@@ -155,6 +155,7 @@ class RExpr : public Node  //ABC
     public:
         virtual void print() = 0;
         virtual void accept(Visitor *v) = 0;
+        virtual char *type(); // TODO: make pure virtual
 };
 
 class EmptyRExpr : public RExpr
@@ -163,6 +164,7 @@ class EmptyRExpr : public RExpr
         EmptyRExpr();
         virtual void print();
         virtual void accept(Visitor *v);
+        virtual char *type();
 };
 
 class DotRExpr : public RExpr
@@ -186,6 +188,7 @@ class ConstructorRExpr : public RExpr
         ConstructorRExpr(char *i, list<RExpr *> *a);
         virtual void print();
         virtual void accept(Visitor *v);
+        virtual char *type();
 };
 
 class RExprToLExpr : public RExpr
@@ -206,6 +209,7 @@ class StringNode : public RExpr
         StringNode(char *i);
         virtual void print(); 
         virtual void accept(Visitor *v);
+        virtual char *type();
 };
 
 class IntNode : public RExpr
@@ -216,6 +220,7 @@ class IntNode : public RExpr
         IntNode(int i);
         virtual void print(); 
         virtual void accept(Visitor *v);
+        virtual char *type();
 };
 
 class NotNode : public RExpr
@@ -235,9 +240,11 @@ class BinaryOperatorNode : public RExpr
     public:
         RExpr *left;
         RExpr *right;
+        int operation; //plus:0 minus:1 times:2 divide:3 equals:4 atmost:5 lessthan:6 atleast:7 greater:8 and:9 or:10
     public:
-        BinaryOperatorNode(RExpr *l, RExpr *r);
+        BinaryOperatorNode(RExpr *l, RExpr *r, int o);
         virtual void accept(Visitor *v);
+        virtual char *type();
 };
 
 class PlusNode : public BinaryOperatorNode

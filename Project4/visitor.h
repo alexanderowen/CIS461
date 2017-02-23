@@ -4,6 +4,8 @@
 #include <list>
 #include <stdio.h>
 #include "node.h"
+#include "SymbolTable.h"
+#include "type.h"
 
 using std::list;
 
@@ -53,6 +55,27 @@ class ConstructorVisitor : public Visitor
         virtual void visitClassSignature(ClassSignature *cs);
         bool checkStructure();
         void print();
+};
+
+class TypeCheckVisitor : public Visitor
+{
+    public: //TODO: Change to private
+        typedef Visitor super;
+        SymbolTable *st;
+        TypeTree *tt;
+
+    public:
+        int errors;
+        list<char*> msgs;
+
+        TypeCheckVisitor();
+        ~TypeCheckVisitor();
+    
+        bool check(); 
+        virtual void visitBinaryOperatorNode(BinaryOperatorNode *b);
+        virtual void visitAssignmentStatement(AssignmentStatement *a);
+        virtual void visitIdentNode(IdentNode *i);
+
 };
 
 #endif
