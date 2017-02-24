@@ -67,9 +67,8 @@ class TypeTreeVisitor : public Visitor
 
         TypeTreeVisitor();
         virtual void visitProgram(Program *p);
-        //virtual void visitClass(Class *c);
         virtual void visitClassSignature(ClassSignature *cs);
-        virtual void visitClassBody(ClassBody *cb);
+        //virtual void visitClassBody(ClassBody *cb);
         virtual void visitFalseExtendsOption(FalseExtendsOption *f);
         virtual void visitTrueExtendsOption(TrueExtendsOption *t);
         virtual void visitMethod(Method *m);
@@ -90,6 +89,7 @@ class TypeCheckVisitor : public Visitor
         list<char*> msgs;
 
         TypeCheckVisitor();
+        TypeCheckVisitor(TypeTree *t);
         ~TypeCheckVisitor();
     
         bool check(); 

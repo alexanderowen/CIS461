@@ -249,7 +249,12 @@ int main(int argc, char* argv[])
         fprintf(stderr, "Error: Call to constructor that is not defined\n");
         return 0;
     }
-    TypeCheckVisitor tcv;
+
+    TypeTreeVisitor ttv;
+    //root->accept(&ttv);    
+    ttv.tt->print();
+/*
+    TypeCheckVisitor tcv(ttv.tt);
     root->accept(&tcv);
     //printf("Size: %d\n", tcv.st->vMap.size());
     if (tcv.errors > 0)
@@ -259,8 +264,10 @@ int main(int argc, char* argv[])
             fprintf(stderr, "%s:", argv[0]);
             fprintf(stderr, "%s\n", (*it));
         }
+        fprintf(stderr, "%d errors reported\n", tcv.errors);
+        return -1;
     }
-
+*/
     std::cout << "\n" << std::endl;
     if (condition == 0)
         fprintf(stderr, "Finished parse with no errors\n"); 

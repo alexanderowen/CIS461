@@ -12,6 +12,8 @@ class MethodNode
         list<char *> argsType;
         char *returnType;
         MethodNode(char *, list<char *> , char *);                                              
+
+        void print();
 }; 
 
 class TypeNode

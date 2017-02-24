@@ -8,6 +8,18 @@ using std::list;
 
 MethodNode::MethodNode(char *i, list<char*> a, char *r) : id(i), argsType(a), returnType(r) {}
 
+void MethodNode::print()
+{
+    //fprintf(stderr, "About to print info\n");
+    fprintf(stderr, "  Method: '%s' takes: '", id);
+    //fprintf(stderr, "Printed the name\n");
+    for (list<char*>::const_iterator it = argsType.begin(); it != argsType.end(); ++it)
+    {
+        printf("%s ", (*it));
+    }
+    printf("'and returns '%s'\n", returnType);
+}
+
 TypeNode::TypeNode(char *n, TypeNode *p) : name(n), parent(p) 
 {
 }
@@ -55,55 +67,73 @@ int TypeNode::equals(char *n)
 
 void TypeNode::print()
 {
-    printf("%s\n",this->name);
+    printf("Type: %s\n",this->name);
+    for (list<MethodNode*>::const_iterator it = methods.begin(); it != methods.end(); ++it)
+    {
+        //fprintf(stderr, "Printing a method\n");
+        (*it)->print();
+    }
+
 }
 /***/
 
 TypeTree::TypeTree()
 {
-    char *OBJ = (char*)"Obj";
-    char *INT = (char*)"Int";
-    char *STR = (char*)"String";
-    char *NOT = (char*)"Nothing";
-    char *BOOL = (char*)"Boolean";
+    char *OBJ = strdup((char*)"Obj");
+    char *INT = strdup((char*)"Int");
+    char *STR = strdup((char*)"String");
+    char *NOTHING = strdup((char*)"Nothing");
+    char *BOOL = strdup((char*)"Boolean");
 
-    TypeNode *o = new TypeNode((char*)"Obj", NULL);
+    TypeNode *o = new TypeNode(OBJ, NULL);
     root = o;
-    root->addChild((char*)"Int");
+    root->addChild(INT);
 
     //this->addMethodToType((char*)"OBJ", MethodNode((char*)"STR",&(list<char*>((char*)"OBJ")),(char*)"OBJ"));
     list<char*> args;
     args.push_back(OBJ);
-    MethodNode m((char*)"STR", args, STR);
-    this->addMethodToType(OBJ, &m);
-    MethodNode ObjPrint((char*)"PRINT", args, NOT);
-    this->addMethodToType(OBJ, &ObjPrint); 
-    MethodNode ObjEquals((char*)"EQUALS", args, BOOL);
+    MethodNode *m = new MethodNode(strdup((char*)"STR"), args, STR);
+    this->addMethodToType(OBJ, m);
+    MethodNode *ObjPrint = new MethodNode(strdup((char*)"PRINT"), args, NOTHING);
+    this->addMethodToType(OBJ, ObjPrint); 
+    MethodNode *ObjEquals = new MethodNode(strdup((char*)"EQUALS"), args, BOOL);
 
     // Assignment built-in methods of Int to the typechecker
     list<char*> int_args;
     int_args.push_back(INT);
-    MethodNode IntPlus((char*)"PLUS", int_args, INT);
-    this->addMethodToType(INT, &IntPlus);
-    MethodNode IntMinus((char*)"MINUS", int_args, INT);
-    this->addMethodToType(INT, &IntMinus);
-    MethodNode IntTimes((char*)"TIMES", int_args, INT);
-    this->addMethodToType(INT, &IntTimes);
-    MethodNode IntDivide((char*)"DIVIDE", int_args, INT);
-    this->addMethodToType(INT, &IntDivide);
-    MethodNode IntAtMost((char*)"ATMOST", int_args, BOOL);
-    this->addMethodToType(INT, &IntAtMost);
-    MethodNode IntLess((char*)"LESS", int_args, BOOL);
-    this->addMethodToType(INT, &IntLess);
-    MethodNode IntAtLeast((char*)"ATLEAST", int_args, BOOL);
-    this->addMethodToType(INT, &IntAtLeast);
-    MethodNode IntMore((char*)"MORE", int_args, BOOL);
-    this->addMethodToType(INT, &IntMore);
+    MethodNode *IntPlus = new MethodNode(strdup((char*)"PLUS"), int_args, INT);
+    this->addMethodToType(INT, IntPlus);
+    MethodNode *IntMinus = new MethodNode(strdup((char*)"MINUS"), int_args, INT);
+    this->addMethodToType(INT, IntMinus);
+    MethodNode *IntTimes = new MethodNode(strdup((char*)"TIMES"), int_args, INT);
+    this->addMethodToType(INT, IntTimes);
+    MethodNode *IntDivide = new MethodNode(strdup((char*)"DIVIDE"), int_args, INT);
+    this->addMethodToType(INT, IntDivide);
+    MethodNode *IntAtMost = new MethodNode(strdup((char*)"ATMOST"), int_args, BOOL);
+    this->addMethodToType(INT, IntAtMost);
+    MethodNode *IntLess = new MethodNode(strdup((char*)"LESS"), int_args, BOOL);
+    this->addMethodToType(INT, IntLess);
+    MethodNode *IntAtLeast = new MethodNode(strdup((char*)"ATLEAST"), int_args, BOOL);
+    this->addMethodToType(INT, IntAtLeast);
+    MethodNode *IntMore = new MethodNode(strdup((char*)"MORE"), int_args, BOOL);
+    this->addMethodToType(INT, IntMore);
 
-    // TODO: Methods for String, Boolean, and Nothing
-    root->addChild((char*)"String");
-    root->addChild((char*)"Boolean");
-    root->addChild((char*)"Nothing");
+    // Methods for String
+    root->addChild(STR);
+    list<char*> str_args;
+    str_args.push_back(STR);
+    MethodNode *StrPlus = new MethodNode(strdup((char*)"PLUS"), str_args, STR);
+    this->addMethodToType(STR, StrPlus);
+
+    // Methods for Bool
+    root->addChild(BOOL);
+    /* 'not' is not a method
+    list<char*> bool_args;
+    bool_args.push_back(BOOL);
+    MethodNode *BoolNot = new MethodNode(strdup((char*)"NOT"), bool_args, BOOL);
+    this->addMethodToType(BOOL, BoolNot);
+    */
+    root->addChild(NOTHING);
 }
 
 int TypeTree::addSubtype(TypeNode *sub, char *super)
@@ -167,9 +197,11 @@ void TypeTree::print()
 
 void TypeTree::print(TypeNode *t)
 {
+    //fprintf(stderr, "Printing a parent\n");
     t->print();
     for (list<TypeNode *>::const_iterator it = t->children.begin(); it != t->children.end(); ++it)
     {
+        //fprintf(stderr, "Printing a child\n");
         (*it)->print();
     }
 }   

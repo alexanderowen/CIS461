@@ -281,6 +281,7 @@ class EqualsNode : public BinaryOperatorNode
     public:
         EqualsNode(RExpr *l, RExpr *r);
         virtual void print();
+        virtual char *type();
 };
 
 class AtMostNode : public BinaryOperatorNode
@@ -288,6 +289,7 @@ class AtMostNode : public BinaryOperatorNode
     public:
         AtMostNode(RExpr *l, RExpr *r);
         virtual void print();
+        virtual char* type();
 };
 
 class LessThanNode : public BinaryOperatorNode
@@ -295,6 +297,7 @@ class LessThanNode : public BinaryOperatorNode
     public:
         LessThanNode(RExpr *l, RExpr *r);
         virtual void print();
+        virtual char* type();
 };
 
 class AtLeastNode : public BinaryOperatorNode
@@ -302,6 +305,7 @@ class AtLeastNode : public BinaryOperatorNode
     public:
         AtLeastNode(RExpr *l, RExpr *r);
         virtual void print();
+        virtual char* type();
 };
 
 class GreaterThanNode : public BinaryOperatorNode
@@ -309,6 +313,7 @@ class GreaterThanNode : public BinaryOperatorNode
     public:
         GreaterThanNode(RExpr *l, RExpr *r);
         virtual void print();
+        virtual char* type();
 };
 
 class AndNode : public BinaryOperatorNode
@@ -316,6 +321,7 @@ class AndNode : public BinaryOperatorNode
     public:
         AndNode(RExpr *l, RExpr *r);
         virtual void print();
+        virtual char* type();
 };
 
 class OrNode : public BinaryOperatorNode
@@ -323,6 +329,7 @@ class OrNode : public BinaryOperatorNode
     public:
         OrNode(RExpr *l, RExpr *r);
         virtual void print();
+        virtual char* type();
 };
 // END RExpr
 

@@ -248,7 +248,7 @@ void TypeTreeVisitor::visitProgram(Program *p)
 
 void TypeTreeVisitor::visitClassSignature(ClassSignature *cs) 
 {
-    cur = cs->id; //current class working on
+    cur = strdup(cs->id); //current class working on
     for (list<FormalArg *>::const_iterator it = cs->fargs->begin(); it != cs->fargs->end(); ++it)
     {
         (*it)->accept(this);
@@ -309,6 +309,12 @@ TypeCheckVisitor::TypeCheckVisitor()
 {
     st = new SymbolTable(NULL);
     tt = new TypeTree();    
+    errors = 0;
+}
+TypeCheckVisitor::TypeCheckVisitor(TypeTree *t)
+{
+    st = new SymbolTable(NULL);
+    tt = t;
     errors = 0;
 }
 TypeCheckVisitor::~TypeCheckVisitor() 
