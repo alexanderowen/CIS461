@@ -1,10 +1,13 @@
 #include <unordered_map>
 #include <list>
+#include <string>
 #include <string.h>
 #include "SymbolTable.h"
+#include "stdio.h"
 
 using std::unordered_map;
 using std::list;
+using std::string;
 
 VariableSym::VariableSym(char *i, char *t) : id(i), type(t) {}
 
@@ -14,7 +17,10 @@ SymbolTable::SymbolTable(SymbolTable *p) : parent(p) {}
 
 VariableSym *SymbolTable::lookupVariable(char *name)
 {
-    auto search = vMap.find(name);
+    //fprintf(stderr, "Looking up variable '%s'\n", name);
+    string key = name;
+    auto search = vMap.find(key);
+
     if (search != vMap.end())
     {
         return search->second;
@@ -31,7 +37,8 @@ VariableSym *SymbolTable::lookupVariable(char *name)
 
 void SymbolTable::addVariable(char *name, VariableSym *value)
 {
-    vMap.insert({name, value});
+    string key = name;
+    vMap.insert({key, value});
 }
 /*
 MethodSym *SymbolTable::lookupMethod(char *name)

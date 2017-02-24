@@ -1,8 +1,10 @@
 #include <unordered_map>
+#include <string>
 #include <list>
 
 using std::unordered_map;
 using std::list;
+using std::string;
 
 class Symbol
 {};
@@ -44,7 +46,7 @@ class SymbolTable
 {
     public:
         SymbolTable *parent;
-        unordered_map<char *, VariableSym *> vMap;
+        unordered_map<string, VariableSym *> vMap;
 
         SymbolTable(SymbolTable *p);
         VariableSym *lookupVariable(char *name);
