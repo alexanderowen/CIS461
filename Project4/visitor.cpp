@@ -249,6 +249,7 @@ void TypeTreeVisitor::visitProgram(Program *p)
 void TypeTreeVisitor::visitClassSignature(ClassSignature *cs) 
 {
     cur = strdup(cs->id); //current class working on
+    fprintf(stderr, "currently working on %s\n", cur);
     for (list<FormalArg *>::const_iterator it = cs->fargs->begin(); it != cs->fargs->end(); ++it)
     {
         (*it)->accept(this);
@@ -258,12 +259,13 @@ void TypeTreeVisitor::visitClassSignature(ClassSignature *cs)
 
 void TypeTreeVisitor::visitFalseExtendsOption(FalseExtendsOption *f) 
 {
-    tt->addSubtype(cur, (char*)"Obj");
+    tt->addSubtype(cur, strdup((char*)"Obj"));
 }
 
 void TypeTreeVisitor::visitTrueExtendsOption(TrueExtendsOption *t) 
 {
-    tt->addSubtype(cur, t->id);
+    int f = tt->addSubtype(cur, t->id);
+    //fprintf(stderr, "adding %s to %s resulted in:%d\n", cur, t->id, f);
 }
 
 
@@ -294,7 +296,7 @@ void TypeTreeVisitor::visitFormalArg(FormalArg *f)
 
 void TypeTreeVisitor::visitFalseIdentOption(FalseIdentOption *f) 
 {
-    ret = (char*)"Nothing";
+    ret = strdup((char*)"Nothing");
 }
 
 void TypeTreeVisitor::visitTrueIdentOption(TrueIdentOption *t) 

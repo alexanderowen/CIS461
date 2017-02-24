@@ -17,7 +17,7 @@ void MethodNode::print()
     {
         printf("%s ", (*it));
     }
-    printf("'and returns '%s'\n", returnType);
+    printf("' and returns '%s'\n", returnType);
 }
 
 TypeNode::TypeNode(char *n, TypeNode *p) : name(n), parent(p) 
@@ -202,7 +202,9 @@ void TypeTree::print(TypeNode *t)
     for (list<TypeNode *>::const_iterator it = t->children.begin(); it != t->children.end(); ++it)
     {
         //fprintf(stderr, "Printing a child\n");
-        (*it)->print();
+        //(*it)->print();
+        printf("Children of %s:\n", t->name);
+        print((*it));
     }
 }   
 

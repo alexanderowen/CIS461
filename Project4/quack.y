@@ -251,7 +251,7 @@ int main(int argc, char* argv[])
     }
 
     TypeTreeVisitor ttv;
-    //root->accept(&ttv);    
+    root->accept(&ttv);    
     ttv.tt->print();
 /*
     TypeCheckVisitor tcv(ttv.tt);
