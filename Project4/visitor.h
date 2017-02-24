@@ -57,6 +57,27 @@ class ConstructorVisitor : public Visitor
         void print();
 };
 
+class TypeTreeVisitor : public Visitor
+{
+    public:
+        TypeTree *tt;
+        char *cur; //current class visiting
+        char *ret; //current return value of method
+        list<char*> *args; 
+
+        TypeTreeVisitor();
+        virtual void visitProgram(Program *p);
+        //virtual void visitClass(Class *c);
+        virtual void visitClassSignature(ClassSignature *cs);
+        virtual void visitClassBody(ClassBody *cb);
+        virtual void visitFalseExtendsOption(FalseExtendsOption *f);
+        virtual void visitTrueExtendsOption(TrueExtendsOption *t);
+        virtual void visitMethod(Method *m);
+        virtual void visitFormalArg(FormalArg *f);
+        virtual void visitFalseIdentOption(FalseIdentOption *f);
+        virtual void visitTrueIdentOption(TrueIdentOption *t);
+};
+
 class TypeCheckVisitor : public Visitor
 {
     public: //TODO: Change to private

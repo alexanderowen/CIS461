@@ -225,6 +225,10 @@ void NotNode::accept(Visitor *v)
 {
     v->visitNotNode(this);
 }
+char *NotNode::type()
+{
+    return (char*)"Boolean";
+}
 
 BinaryOperatorNode::BinaryOperatorNode(RExpr *r, RExpr *l, int o)
 {
@@ -270,11 +274,19 @@ void EqualsNode::print()
 {
     fprintf(stdout, "Found EqualsNode\n");
 }
+char* EqualsNode::type()
+{
+    return (char*)"Boolean";
+}
 
 AtMostNode::AtMostNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r, 5) {}
 void AtMostNode::print()
 {
     fprintf(stdout, "Found AtMostNode\n");
+}
+char* AtMostNode::type()
+{
+    return (char*)"Boolean";
 }
 
 LessThanNode::LessThanNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r, 6) {}
@@ -282,11 +294,19 @@ void LessThanNode::print()
 {
     fprintf(stdout, "Found LessThanNode\n");
 }
+char* LessThanNode::type()
+{
+    return (char*)"Boolean";
+}
 
 AtLeastNode::AtLeastNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r, 7) {}
 void AtLeastNode::print()
 {
     fprintf(stdout, "Found AtLeastNode\n");
+}
+char* AtLeastNode::type()
+{
+    return (char*)"Boolean";
 }
 
 
@@ -295,17 +315,29 @@ void GreaterThanNode::print()
 {
     fprintf(stdout, "Found GreaterThanNode\n");
 }
+char* GreaterThanNode::type()
+{
+    return (char*)"Boolean";
+}
 
 AndNode::AndNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r, 9) {}
 void AndNode::print()
 {
     fprintf(stdout, "Found AndNode\n");
 }
+char* AndNode::type()
+{
+    return (char*)"Boolean";
+}
 
 OrNode::OrNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r, 10) {}
 void OrNode::print()
 {
     fprintf(stdout, "Found OrNode\n");
+}
+char* OrNode::type()
+{
+    return (char*)"Boolean";
 }
 
 /*********

@@ -226,7 +226,85 @@ void ConstructorVisitor::print()
     std::copy(std::begin(classes), std::end(classes), std::ostream_iterator<char *>(std::cout, " "));
     std::cout << "\n" << std::endl;
 }
+/***/
 
+TypeTreeVisitor::TypeTreeVisitor()
+{
+    tt = new TypeTree();
+    cur = NULL;
+    ret = NULL;
+    args = NULL;
+}
+
+//TODO: CURRENT ASSUMPTION IS THAT CLASS INHERITANCE WON'T BE OUT OF ORDER
+//TODO: THIS IS NOT TRUE IN QUACK
+void TypeTreeVisitor::visitProgram(Program *p) 
+{
+    for (list<Class *>::const_iterator it = p->classes->begin(); it != p->classes->end(); ++it)
+    {
+        (*it)->accept(this);
+    }
+}
+
+void TypeTreeVisitor::visitClassSignature(ClassSignature *cs) 
+{
+    cur = cs->id; //current class working on
+    for (list<FormalArg *>::const_iterator it = cs->fargs->begin(); it != cs->fargs->end(); ++it)
+    {
+        (*it)->accept(this);
+    }
+    cs->exop->accept(this);
+}
+
+void TypeTreeVisitor::visitFalseExtendsOption(FalseExtendsOption *f) 
+{
+    tt->addSubtype(cur, (char*)"Obj");
+}
+
+void TypeTreeVisitor::visitTrueExtendsOption(TrueExtendsOption *t) 
+{
+    tt->addSubtype(cur, t->id);
+}
+
+
+void TypeTreeVisitor::visitMethod(Method *m)
+{
+    args = new list<char*>; // TODO: Delete old one? Maybe not. Still exists in MethodNode
+    for (list<FormalArg *>::const_iterator it = m->fargs->begin(); it != m->fargs->end(); ++it)
+    {
+        (*it)->accept(this);
+    }
+
+    m->ident->accept(this);
+    MethodNode *meth = new MethodNode(m->id, *args, ret);
+    tt->addMethodToType(cur, meth);
+    /*
+    for (list<Statement *>::const_iterator it = m->stmts->begin(); it != m->stmts->end(); ++it)
+    {
+        (*it)->accept(this);
+    }
+    */
+    
+}
+
+void TypeTreeVisitor::visitFormalArg(FormalArg *f) 
+{
+    args->push_back(f->type);
+}
+
+void TypeTreeVisitor::visitFalseIdentOption(FalseIdentOption *f) 
+{
+    ret = (char*)"Nothing";
+}
+
+void TypeTreeVisitor::visitTrueIdentOption(TrueIdentOption *t) 
+{
+    ret = t->id;
+}
+
+
+
+/***/
 TypeCheckVisitor::TypeCheckVisitor()
 {
     st = new SymbolTable(NULL);

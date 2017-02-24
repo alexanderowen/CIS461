@@ -231,6 +231,7 @@ class NotNode : public RExpr
         NotNode(RExpr* v);
         void print();
         virtual void accept(Visitor *v);
+        virtual char *type();
 };
 
 
