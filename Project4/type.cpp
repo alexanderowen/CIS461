@@ -8,6 +8,22 @@ using std::list;
 
 MethodNode::MethodNode(char *i, list<char*> a, char *r) : id(i), argsType(a), returnType(r) {}
 
+int MethodNode::argsMatch(list<char*> args)
+{
+    if (args.size() != argsType.size())
+        return 0;
+    list<char*>::const_iterator thisArgs = argsType.begin();
+    list<char*>::const_iterator otherArgs = args.begin();
+    for (int i = 0; i < args.size(); i++)
+    {
+        if (strcmp((*thisArgs), (*otherArgs)) != 0)
+            return 0;
+        std::advance(thisArgs, 1);  // Turns out std::list is not the right structure for this
+        std::advance(otherArgs, 1); // Requires this silly stuff
+    }
+    return 1;
+}
+
 void MethodNode::print()
 {
     //fprintf(stderr, "About to print info\n");
@@ -52,7 +68,25 @@ int TypeNode::hasMethod(char *name)
         if ( strcmp((*it)->id, name) == 0)
             return 1;
     }
+    if (this->parent != NULL)
+    {
+        return parent->hasMethod(name);
+    }
     return 0;
+}
+
+MethodNode *TypeNode::getMethod(char *name)
+{
+    for (list<MethodNode *>::const_iterator it = this->methods.begin(); it != this->methods.end(); ++it)
+    {
+        if ( strcmp((*it)->id, name) == 0)
+            return (*it);
+    }
+    if (this->parent != NULL)
+    {
+        return parent->getMethod(name);
+    }
+    return NULL;
 }
 
 int TypeNode::equals(TypeNode *type)
@@ -166,6 +200,14 @@ int TypeTree::typeHasMethod(char *_type, char *method)
     if (type == NULL)
         return 0;
     return type->hasMethod(method);
+}
+
+MethodNode *TypeTree::typeGetMethod(char *_type, char *method)
+{
+    TypeNode *type = findType(_type);
+    if (type == NULL)
+        return NULL;
+    return type->getMethod(method);
 }
 
 TypeNode *TypeTree::findType(char *name)

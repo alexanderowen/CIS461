@@ -249,7 +249,7 @@ void TypeTreeVisitor::visitProgram(Program *p)
 void TypeTreeVisitor::visitClassSignature(ClassSignature *cs) 
 {
     cur = strdup(cs->id); //current class working on
-    fprintf(stderr, "currently working on %s\n", cur);
+    //fprintf(stderr, "currently working on %s\n", cur);
     for (list<FormalArg *>::const_iterator it = cs->fargs->begin(); it != cs->fargs->end(); ++it)
     {
         (*it)->accept(this);

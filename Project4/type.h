@@ -13,6 +13,8 @@ class MethodNode
         char *returnType;
         MethodNode(char *, list<char *> , char *);                                              
 
+        int argsMatch(list<char*> args);
+
         void print();
 }; 
 
@@ -29,6 +31,7 @@ class TypeNode
         int addChild(char *type);
         int addMethod(MethodNode *m);
         int hasMethod(char *name);
+        MethodNode *getMethod(char *name);
         int equals(TypeNode *type);
         int equals(char *name);
         void print();
@@ -45,6 +48,7 @@ class TypeTree
         int addSubtype(char *sub, char *super);
         int addMethodToType(char *type, MethodNode *m);
         int typeHasMethod(char *type, char* method); //TODO: Make sure args match
+        MethodNode *typeGetMethod(char *type, char *method);
         TypeNode *findType(char *name);
         TypeNode *search(TypeNode *root, char *name);
         void print();
