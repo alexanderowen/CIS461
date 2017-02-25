@@ -99,6 +99,12 @@ class TypeCheckVisitor : public Visitor
         virtual void visitIdentNode(IdentNode *i);
         virtual void visitDotRExpr(DotRExpr *d);    
 
+        virtual void visitIfClause(IfClause *i);
+        virtual void visitElifClause(ElifClause *e);
+        virtual void visitWhileStatement(WhileStatement *w);
+
+    private:
+        IdentNode *isIdent(RExpr *r);
 };
 
 #endif

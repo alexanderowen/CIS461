@@ -310,12 +310,24 @@ void TypeTreeVisitor::visitTrueIdentOption(TrueIdentOption *t)
 TypeCheckVisitor::TypeCheckVisitor()
 {
     st = new SymbolTable(NULL);
+    // Adding the built in 'variables'
+    VariableSym *t = new VariableSym(strdup((char*)"true"), strdup((char*)"Boolean"));
+    st->addVariable(strdup((char*)"true"), t);
+    VariableSym *f = new VariableSym(strdup((char*)"false"), strdup((char*)"Boolean"));
+    st->addVariable(strdup((char*)"false"), f);
+
     tt = new TypeTree();    
     errors = 0;
 }
 TypeCheckVisitor::TypeCheckVisitor(TypeTree *t)
 {
     st = new SymbolTable(NULL);
+    // Adding the built in 'variables'
+    VariableSym *tr = new VariableSym(strdup((char*)"true"), strdup((char*)"Boolean"));
+    st->addVariable(strdup((char*)"true"), tr);
+    VariableSym *f = new VariableSym(strdup((char*)"false"), strdup((char*)"Boolean"));
+    st->addVariable(strdup((char*)"false"), f);
+
     tt = t;
     errors = 0;
 }
@@ -423,6 +435,51 @@ void TypeCheckVisitor::visitDotRExpr(DotRExpr *d)
         addError(msg);
     }
 }
+
+void TypeCheckVisitor::visitIfClause(IfClause *i)
+{
+    char *type;
+    IdentNode *ident = isIdent(i->rexpr);
+    if (ident != NULL)
+        type = st->lookupVariable(ident->id)->type;    
+    else
+        type = i->rexpr->type();
+
+    if (strcmp(type, (char*)"Boolean") != 0)
+    {
+        char *msg = (char*) malloc(sizeof(char)*256);
+        sprintf(msg, "%d: Syntax Error\n\tIf condition must be of type 'Boolean'\n", i->lineno);
+        addError(msg);
+    }
+}
+
+void TypeCheckVisitor::visitElifClause(ElifClause *e)
+{
+    char *type;
+    IdentNode *ident = isIdent(e->rexpr);
+    if (ident != NULL)
+        type = st->lookupVariable(ident->id)->type;    
+    else
+        type = e->rexpr->type();
+
+    if (strcmp(type, (char*)"Boolean") != 0)
+    {
+        char *msg = (char*) malloc(sizeof(char)*256);
+        sprintf(msg, "%d: Syntax Error\n\tElif condition must be of type 'Boolean'\n", e->lineno);
+        addError(msg);
+    }
+}
+
+void TypeCheckVisitor::visitWhileStatement(WhileStatement *w)
+{
+    char *type = w->rexpr->type();
+    if (strcmp(type, (char*)"Boolean") != 0)
+    {
+        char *msg = (char*) malloc(sizeof(char)*256);
+        sprintf(msg, "%d: Syntax Error\n\tWhile condition must be of type 'Boolean'\n", w->lineno);
+        addError(msg);
+    }
+}
 /*
 {
 }    
@@ -431,4 +488,19 @@ void TypeCheckVisitor::addError(char *msg)
 {
     errors++;
     msgs.push_back(msg);
+}
+
+IdentNode *TypeCheckVisitor::isIdent(RExpr *r)
+{
+    RExprToLExpr *rl = dynamic_cast<RExprToLExpr*>(r);
+    if (rl != NULL) //if it is an lexpr
+    {
+        IdentNode *id = dynamic_cast<IdentNode*>(rl->lexpr);
+        if (id != NULL) //and the lexpr is an ident node
+        {
+            return id; 
+        }
+    }
+    return NULL;
+
 }
