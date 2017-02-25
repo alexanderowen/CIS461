@@ -93,9 +93,11 @@ class TypeCheckVisitor : public Visitor
         ~TypeCheckVisitor();
     
         bool check(); 
+        void addError(char *msg);
         virtual void visitBinaryOperatorNode(BinaryOperatorNode *b);
         virtual void visitAssignmentStatement(AssignmentStatement *a);
         virtual void visitIdentNode(IdentNode *i);
+        virtual void visitDotRExpr(DotRExpr *d);    
 
 };
 

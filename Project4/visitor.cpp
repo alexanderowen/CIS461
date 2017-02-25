@@ -362,8 +362,9 @@ void TypeCheckVisitor::visitAssignmentStatement(AssignmentStatement *a)
     if (id != NULL)
     {
         //TODO: Use a->ident, just ignoring it currently
-        VariableSym v(id->id, a->rexpr->type());
-        st->addVariable(id->id, &v);
+        VariableSym *v = new VariableSym(id->id, a->rexpr->type());
+        //fprintf(stderr, "Adding variable '%s' with type '%s'\n", id->id, a->rexpr->type());
+        st->addVariable(strdup(id->id), v);
     }
     a->lexpr->accept(this);
     a->ident->accept(this);
@@ -376,7 +377,58 @@ void TypeCheckVisitor::visitIdentNode(IdentNode *i)
     {
         errors++;
         char *msg = (char*) malloc(sizeof(char)*256);
-        sprintf(msg, "%d: Syntax Error\n\tUse of uninitialized variable\n", i->lineno);
+        sprintf(msg, "%d: Syntax Error\n\tUse of uninitialized variable '%s'\n", i->lineno, i->id);
         msgs.push_back(msg);
     }
+}
+
+void TypeCheckVisitor::visitDotRExpr(DotRExpr *d)
+{
+    // visit first, collect args
+    list<char*> args;
+    d->rexpr->accept(this);
+    for (list<RExpr *>::const_iterator it = d->args->begin(); it != d->args->end(); ++it)
+    {
+        (*it)->accept(this);
+        args.push_back((*it)->type());
+    }
+    // now type check
+    //IdentNode *id = dynamic_cast<IdentNode*>(a->lexpr);
+    char *type;
+    RExprToLExpr *rl = dynamic_cast<RExprToLExpr*>(d->rexpr);
+    if (rl != NULL) //if it is an lexpr
+    {
+        IdentNode *id = dynamic_cast<IdentNode*>(rl->lexpr);
+        if (id != NULL) //and the lexpr is an ident node
+        {
+            type = st->lookupVariable(id->id)->type;
+        }
+    }
+    else 
+    {
+        type = d->rexpr->type();
+    }
+    MethodNode *m = tt->typeGetMethod(type, d->id);
+    if (m == NULL)
+    {
+        errors++;
+        char *msg = (char*) malloc(sizeof(char)*256);
+        sprintf(msg, "%d: Syntax Error\n\tType '%s' has no method named '%s'\n", d->lineno, type, d->id);
+        msgs.push_back(msg);
+    } 
+    else if (!m->argsMatch(args))
+    {
+        char *msg = (char*) malloc(sizeof(char)*256);
+        sprintf(msg, "%d: Syntax Error\n\tArguments don't match on method call to '%s'\n", d->lineno, d->id);
+        addError(msg);
+    }
+}
+/*
+{
+}    
+*/
+void TypeCheckVisitor::addError(char *msg)
+{
+    errors++;
+    msgs.push_back(msg);
 }

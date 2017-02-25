@@ -175,7 +175,8 @@ void ConstructorRExpr::accept(Visitor *v)
 }
 char *ConstructorRExpr::type()
 {
-    return (char*)"Nothing";
+    //return (char*)"Nothing";
+    return id;
 }
 
 RExprToLExpr::RExprToLExpr(LExpr *l) : lexpr(l) {}

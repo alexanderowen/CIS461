@@ -47,7 +47,7 @@ class TypeTree
         int addSubtype(TypeNode *sub, char *super);
         int addSubtype(char *sub, char *super);
         int addMethodToType(char *type, MethodNode *m);
-        int typeHasMethod(char *type, char* method); //TODO: Make sure args match
+        int typeHasMethod(char *type, char* method); 
         MethodNode *typeGetMethod(char *type, char *method);
         TypeNode *findType(char *name);
         TypeNode *search(TypeNode *root, char *name);

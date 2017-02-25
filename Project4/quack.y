@@ -252,8 +252,8 @@ int main(int argc, char* argv[])
 
     TypeTreeVisitor ttv;
     root->accept(&ttv);    
-    ttv.tt->print();
-/*
+    //ttv.tt->print();
+
     TypeCheckVisitor tcv(ttv.tt);
     root->accept(&tcv);
     //printf("Size: %d\n", tcv.st->vMap.size());
@@ -267,7 +267,7 @@ int main(int argc, char* argv[])
         fprintf(stderr, "%d errors reported\n", tcv.errors);
         return -1;
     }
-*/
+
     std::cout << "\n" << std::endl;
     if (condition == 0)
         fprintf(stderr, "Finished parse with no errors\n"); 
