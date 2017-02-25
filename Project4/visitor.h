@@ -99,11 +99,25 @@ class TypeCheckVisitor : public Visitor
         virtual void visitIdentNode(IdentNode *i);
         virtual void visitDotRExpr(DotRExpr *d);    
 
+        virtual void visitIfBlock(IfBlock *i);
         virtual void visitIfClause(IfClause *i);
         virtual void visitElifClause(ElifClause *e);
         virtual void visitWhileStatement(WhileStatement *w);
 
+        virtual void visitMethod(Method *m);
+        virtual void visitFalseIdentOption(FalseIdentOption *f);
+        virtual void visitTrueIdentOption(TrueIdentOption *t);
+        virtual void visitReturnStatement(ReturnStatement *r);
+
     private:
+        bool inIf;
+        int  ifCount;
+        unordered_map<string, int> assignments;
+
+        bool inMethod;
+        char *returnType;
+        bool returned;
+
         IdentNode *isIdent(RExpr *r);
 };
 

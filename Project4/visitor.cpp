@@ -318,6 +318,13 @@ TypeCheckVisitor::TypeCheckVisitor()
 
     tt = new TypeTree();    
     errors = 0;
+
+    inIf = false;
+    ifCount = 0;
+
+    inMethod = false;
+    returnType = NULL;
+    returned = false;
 }
 TypeCheckVisitor::TypeCheckVisitor(TypeTree *t)
 {
@@ -330,6 +337,13 @@ TypeCheckVisitor::TypeCheckVisitor(TypeTree *t)
 
     tt = t;
     errors = 0;
+
+    inIf = false;
+    ifCount = 0;
+
+    inMethod = false;
+    returnType = NULL;
+    returned = false;
 }
 TypeCheckVisitor::~TypeCheckVisitor() 
 {
@@ -436,6 +450,39 @@ void TypeCheckVisitor::visitDotRExpr(DotRExpr *d)
     }
 }
 
+/* Cases currently ignoring
+ * 1)
+ * if - {
+ *      x = 10
+ *      x = 20
+ * } else {
+ *
+ * }
+ *
+ * q = x
+ *
+ * 2)
+ * if - {
+ *      y = 2
+ *      x = x + y //valid thing to do
+ * }
+ *
+ * TODO: Resolve how to do this.
+ * */
+void TypeCheckVisitor::visitIfBlock(IfBlock *i)
+{
+    inIf = true;
+    i->_if->accept(this);
+    for (list<ElifClause *>::const_iterator it = i->_elifs->begin(); it != i->_elifs->end(); ++it)
+    {
+        (*it)->accept(this);
+    }
+    i->_else->accept(this);
+    inIf = false;
+    ifCount = 0;
+    assignments.clear();
+}
+
 void TypeCheckVisitor::visitIfClause(IfClause *i)
 {
     char *type;
@@ -478,6 +525,79 @@ void TypeCheckVisitor::visitWhileStatement(WhileStatement *w)
         char *msg = (char*) malloc(sizeof(char)*256);
         sprintf(msg, "%d: Syntax Error\n\tWhile condition must be of type 'Boolean'\n", w->lineno);
         addError(msg);
+    }
+}
+
+void TypeCheckVisitor::visitMethod(Method *m)
+{
+    inMethod = true;
+    for (list<FormalArg *>::const_iterator it = m->fargs->begin(); it != m->fargs->end(); ++it)
+    {
+        (*it)->accept(this);
+    }
+    m->ident->accept(this);
+    for (list<Statement *>::const_iterator it = m->stmts->begin(); it != m->stmts->end(); ++it)
+    {
+        (*it)->accept(this);
+    }
+
+    if (!returned)
+    {
+        char *msg = (char*) malloc(sizeof(char)*256);
+        sprintf(msg, "%d: Syntax Error\n\tMethod '%s' does not return value of type '%s'\n", m->lineno, m->id, returnType);
+        addError(msg);
+    }
+    inMethod = false;
+    returned = false;
+}
+
+void TypeCheckVisitor::visitTrueIdentOption(TrueIdentOption *t)
+{
+    if (inMethod)
+        returnType = t->id;
+}
+
+void TypeCheckVisitor::visitFalseIdentOption(FalseIdentOption *f)
+{
+    if (inMethod)
+    {
+        returnType = strdup((char*)"Nothing");
+        returned = true; // by default, assume the method returns nothing
+    }
+}
+
+void TypeCheckVisitor::visitReturnStatement(ReturnStatement *r)
+{
+    if (!inMethod)
+    {
+        char *msg = (char*) malloc(sizeof(char)*256);
+        sprintf(msg, "%d: Syntax Error\n\tReturn statement outside of method declaration\n", r->lineno);
+        addError(msg);
+        return; 
+    }
+    char *type;
+    r->rexpr->accept(this);
+
+    IdentNode *ident = isIdent(r->rexpr);
+    if (ident != NULL)
+    {
+        type = st->lookupVariable(ident->id)->type;    
+    } 
+    else 
+    {
+        type = r->rexpr->type();
+    }
+
+    // TODO: If return type is subtype, it's ok
+    if (strcmp(type, returnType) != 0)
+    {
+        char *msg = (char*) malloc(sizeof(char)*256);
+        sprintf(msg, "%d: Syntax Error\n\tMethod returns value of type '%s', should return '%s'\n", r->lineno, type, returnType);
+        addError(msg);
+    } 
+    else 
+    {
+        returned = true;
     }
 }
 /*
