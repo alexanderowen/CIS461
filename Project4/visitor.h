@@ -109,6 +109,8 @@ class TypeCheckVisitor : public Visitor
         virtual void visitTrueIdentOption(TrueIdentOption *t);
         virtual void visitReturnStatement(ReturnStatement *r);
 
+        virtual void visitClass(Class *c);
+
     private:
         bool inIf;
         int  ifCount;
@@ -117,8 +119,30 @@ class TypeCheckVisitor : public Visitor
         bool inMethod;
         char *returnType;
         bool returned;
+        
+        bool inClass;
+        char *className;
+        char *supertype;
+
 
         IdentNode *isIdent(RExpr *r);
 };
 
+/*
+// To be dispatched by the TypeCheckVisitor
+class OverrideMethodVisitor : public TypeCheckVisitor
+//class OverrideMethodVisitor : public Visitor
+{
+    public:
+        SymbolTable *st;
+        TypeTree *tt;
+        TypeCheckVisitor *parent; //to pass errors back up
+
+        OverrideMethodVisitor(TypeCheckVisitor *p, SymbolTable *s, TypeTree *t, char *super, char *sub);
+
+    private:
+        char *superclass;
+        char *subclass;
+};
+*/
 #endif

@@ -23,7 +23,20 @@ int MethodNode::argsMatch(list<char*> args)
     }
     return 1;
 }
+/*
+// Used to determine if an overridden method is being overridden properly
+// Compares args to match sure they match or are supertype
+// Assumes 'this' is the overridden method 
+int MethodNode::compareArgs(MethodNode *other)
+{
+}
 
+// Same as above
+// Compares return type to match sure they match or are subtype
+int MethodNode::compareReturn(MethodNode *other)
+{
+}
+*/
 void MethodNode::print()
 {
     //fprintf(stderr, "About to print info\n");
@@ -55,6 +68,19 @@ int TypeNode::addChild(char *name)
     return 1;
 }
 
+// Does this type have a (direct or indirect) subtype somewhere named 'type'
+int TypeNode::hasDescendant(char *type)
+{
+    for (list<TypeNode*>::const_iterator it = children.begin(); it != children.end(); ++it)
+    {
+        if (strcmp((*it)->name, type) == 0)
+            return 1;
+        if ((*it)->hasDescendant(type))
+            return 1;
+    }
+    return 0;
+}
+
 int TypeNode::addMethod(MethodNode *m)
 {
     methods.push_back(m);
@@ -82,7 +108,7 @@ MethodNode *TypeNode::getMethod(char *name)
         if ( strcmp((*it)->id, name) == 0)
             return (*it);
     }
-    if (this->parent != NULL)
+    if (this->parent != NULL) //follow inheritance tree
     {
         return parent->getMethod(name);
     }
@@ -249,4 +275,27 @@ void TypeTree::print(TypeNode *t)
         print((*it));
     }
 }   
+
+// is t1 a subtype of t2?
+int TypeTree::isSubtype(char *_t1, char *_t2)
+{
+    TypeNode *t1 = findType(_t1);
+    TypeNode *t2 = findType(_t2);
+    if (t1 == NULL || t2 == NULL)
+        return 0;
+
+    return t2->hasDescendant(_t1);
+}
+
+
+// is t1 a supertype of t2?
+int TypeTree::isSupertype(char *_t1, char *_t2)
+{
+    TypeNode *t1 = findType(_t1); //do they exist in the first place?
+    TypeNode *t2 = findType(_t2);
+    if (t1 == NULL || t2 == NULL)
+        return 0;
+
+    return t1->hasDescendant(_t2); 
+}
 

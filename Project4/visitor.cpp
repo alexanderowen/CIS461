@@ -325,6 +325,10 @@ TypeCheckVisitor::TypeCheckVisitor()
     inMethod = false;
     returnType = NULL;
     returned = false;
+
+    inClass = false;
+    className = NULL;
+    supertype = NULL;
 }
 TypeCheckVisitor::TypeCheckVisitor(TypeTree *t)
 {
@@ -442,7 +446,7 @@ void TypeCheckVisitor::visitDotRExpr(DotRExpr *d)
         sprintf(msg, "%d: Syntax Error\n\tType '%s' has no method named '%s'\n", d->lineno, type, d->id);
         msgs.push_back(msg);
     } 
-    else if (!m->argsMatch(args))
+    else if (!m->argsMatch(args))  // TODO: It's ok to call the method using super/sub types?
     {
         char *msg = (char*) malloc(sizeof(char)*256);
         sprintf(msg, "%d: Syntax Error\n\tArguments don't match on method call to '%s'\n", d->lineno, d->id);
@@ -531,6 +535,48 @@ void TypeCheckVisitor::visitWhileStatement(WhileStatement *w)
 void TypeCheckVisitor::visitMethod(Method *m)
 {
     inMethod = true;
+    // check if it's inherited, and if it's doing it properly
+    MethodNode *superMethod = tt->typeGetMethod(supertype, m->id);
+    if (superMethod != NULL)
+    {
+        MethodNode *override = tt->typeGetMethod(className, m->id);
+        if (superMethod->argsType.size() != override->argsType.size())
+        {
+            char *msg = (char*) malloc(sizeof(char)*256);
+            sprintf(msg, "%d: Syntax Error\n\tOverridden method '%s' does not have the correct number of arguments\n", m->lineno, m->id);
+            addError(msg);
+        }
+        else //check that the args and return type are overridden correctly
+        {
+            list<char*>::const_iterator superArgs = superMethod->argsType.begin();                                           
+            list<char*>::const_iterator overrideArgs = override->argsType.begin();                                              
+            for (int i = 0; i < superMethod->argsType.size(); i++)                                                              
+            {                                                                                                  
+                if (strcmp((*superArgs), (*overrideArgs)) != 0)                                                    
+                {
+                    if (!tt->isSupertype((*overrideArgs),(*superArgs)))
+                    {
+                        char *msg = (char*) malloc(sizeof(char)*256);
+                        sprintf(msg, "%d: Syntax Error\n\tMethod argument override at position %d is not the same type or supertype of overridden method\n", m->lineno, i+1);
+                        addError(msg);
+                    }
+                }
+                std::advance(superArgs, 1);
+                std::advance(overrideArgs, 1);
+            }
+            //check return statement
+            if (strcmp(superMethod->returnType, override->returnType) != 0)
+            {
+                if (!tt->isSubtype(override->returnType, superMethod->returnType))
+                {
+                    char *msg = (char*) malloc(sizeof(char)*256);
+                    sprintf(msg, "%d: Syntax Error\n\tReturn value of override method is not the same type or subtype of overridden method\n", m->lineno);
+                    addError(msg);
+                }
+            }
+        }        
+    }
+    //
     for (list<FormalArg *>::const_iterator it = m->fargs->begin(); it != m->fargs->end(); ++it)
     {
         (*it)->accept(this);
@@ -600,6 +646,18 @@ void TypeCheckVisitor::visitReturnStatement(ReturnStatement *r)
         returned = true;
     }
 }
+
+void TypeCheckVisitor::visitClass(Class *c) 
+{
+    inClass = true;
+    className = c->getID();
+    supertype = c->getExtends();
+    c->clssig->accept(this);
+    c->clsbdy->accept(this);
+    inClass = false;
+}
+
+
 /*
 {
 }    
@@ -624,3 +682,13 @@ IdentNode *TypeCheckVisitor::isIdent(RExpr *r)
     return NULL;
 
 }
+
+/*
+ *
+ * 
+
+OverrideMethodVisitor::OverrideMethodVisitor(TypeCheckVisitor *p, SymbolTable *s, TypeTree *t, char *super, char *sub) 
+    : parent(p), st(s), tt(t), superclass(super), subclass(sub) {}
+
+
+*/

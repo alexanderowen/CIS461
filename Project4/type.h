@@ -14,6 +14,8 @@ class MethodNode
         MethodNode(char *, list<char *> , char *);                                              
 
         int argsMatch(list<char*> args);
+        //int compareArgs(MethodNode *other);
+        //int compareReturn(MethodNode *other);
 
         void print();
 }; 
@@ -29,6 +31,7 @@ class TypeNode
         TypeNode(char *n, TypeNode *p);
         int addChild(TypeNode *type);
         int addChild(char *type);
+        int hasDescendant(char *type);
         int addMethod(MethodNode *m);
         int hasMethod(char *name);
         MethodNode *getMethod(char *name);
@@ -43,6 +46,9 @@ class TypeTree
         TypeNode *root;
     public:
         TypeTree();
+
+        int isSubtype(char *_t1, char *_t2);
+        int isSupertype(char *_t1, char *_t2);
 
         int addSubtype(TypeNode *sub, char *super);
         int addSubtype(char *sub, char *super);
