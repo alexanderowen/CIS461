@@ -420,16 +420,23 @@ void TypeCheckVisitor::visitDotRExpr(DotRExpr *d)
     for (list<RExpr *>::const_iterator it = d->args->begin(); it != d->args->end(); ++it)
     {
         (*it)->accept(this);
-        args.push_back((*it)->type());
+        IdentNode *ident = isIdent((*it)); // TODO: If we are in a class, then 'this.x'(objectfieldlexpr) is ok if it exists
+        if (ident != NULL) 
+        {
+            args.push_back(st->lookupVariable(ident->id)->type);
+        }
+        else 
+        {
+            args.push_back((*it)->type());
+        }
     }
     // now type check
-    //IdentNode *id = dynamic_cast<IdentNode*>(a->lexpr);
     char *type;
     RExprToLExpr *rl = dynamic_cast<RExprToLExpr*>(d->rexpr);
     if (rl != NULL) //if it is an lexpr
     {
         IdentNode *id = dynamic_cast<IdentNode*>(rl->lexpr);
-        if (id != NULL) //and the lexpr is an ident node
+        if (id != NULL) //and the lexpr is an ident node //TODO: If we are in a class, then 'this.x' is ok if it exists and is a class
         {
             type = st->lookupVariable(id->id)->type;
         }
@@ -446,12 +453,42 @@ void TypeCheckVisitor::visitDotRExpr(DotRExpr *d)
         sprintf(msg, "%d: Syntax Error\n\tType '%s' has no method named '%s'\n", d->lineno, type, d->id);
         msgs.push_back(msg);
     } 
+    else  
+    { 
+        if (m->argsType.size() != args.size())
+        {
+            char *msg = (char*) malloc(sizeof(char)*256);
+            sprintf(msg, "%d: Syntax Error\n\tInvalid call to method '%s'; not enough arguments supplied\n", d->lineno, d->id);
+            addError(msg);
+            return;
+        }
+
+        list<char*>::const_iterator methodArgs = m->argsType.begin();
+        list<char*>::const_iterator arg = args.begin(); 
+        for (int i = 0; i < m->argsType.size(); i++)
+        {
+            if (strcmp((*methodArgs), (*arg)) != 0)
+            {
+                if (!tt->isSubtype((*arg),(*methodArgs)))
+                {
+                    char *msg = (char*) malloc(sizeof(char)*256);
+                    sprintf(msg, "%d: Syntax Error\n\tMethod call argument at position %d is not the same type or a subtype of required argument\n", d->lineno, i+1);
+                    addError(msg);
+                }
+            }
+            std::advance(methodArgs, 1);
+            std::advance(arg, 1);
+        }
+    }
+    /*
     else if (!m->argsMatch(args))  // TODO: It's ok to call the method using super/sub types?
     {
         char *msg = (char*) malloc(sizeof(char)*256);
         sprintf(msg, "%d: Syntax Error\n\tArguments don't match on method call to '%s'\n", d->lineno, d->id);
         addError(msg);
     }
+    */
+
 }
 
 /* Cases currently ignoring
