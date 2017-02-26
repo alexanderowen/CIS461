@@ -231,20 +231,23 @@ char *NotNode::type()
     return (char*)"Boolean";
 }
 
-BinaryOperatorNode::BinaryOperatorNode(RExpr *r, RExpr *l, int o)
+BinaryOperatorNode::BinaryOperatorNode(RExpr *l, RExpr *r, int o)
 {
     right = r;
     left  = l;
-    operation = o;
+    operation = o;  //plus:0 minus:1 times:2 divide:3 equals:4 atmost:5 lessthan:6 atleast:7 greater:8 and:9 or:10
 }
 void BinaryOperatorNode::accept(Visitor *v)
 {
     v->visitBinaryOperatorNode(this);
 }
+
 char *BinaryOperatorNode::type()
 {
-    return left->type(); //TODO: Is this ok? Doesn't consider 'right'
+    //return left->type(); //TODO: Is this ok? Doesn't consider 'right'  BAD 10 <= 15 returns Boolean
+    return (char*)"-";  //the default
 }
+
 
 PlusNode::PlusNode(RExpr *l, RExpr *r) : BinaryOperatorNode(l, r, 0) {} 
 void PlusNode::print()

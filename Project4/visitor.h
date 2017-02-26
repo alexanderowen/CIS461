@@ -126,6 +126,9 @@ class TypeCheckVisitor : public Visitor
 
 
         IdentNode *isIdent(RExpr *r);
+        ObjectFieldLExpr *isOFL(RExpr *r);
+
+        char *getType(RExpr *r);
 };
 
 /*

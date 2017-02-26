@@ -187,12 +187,15 @@ TypeTree::TypeTree()
 
     // Methods for Bool
     root->addChild(BOOL);
-    /* 'not' is not a method
     list<char*> bool_args;
     bool_args.push_back(BOOL);
     MethodNode *BoolNot = new MethodNode(strdup((char*)"NOT"), bool_args, BOOL);
     this->addMethodToType(BOOL, BoolNot);
-    */
+    MethodNode *BoolAnd = new MethodNode(strdup((char*)"AND"), bool_args, BOOL);
+    this->addMethodToType(BOOL, BoolAnd);
+    MethodNode *BoolOr  = new MethodNode(strdup((char*)"OR" ), bool_args, BOOL);
+    this->addMethodToType(BOOL, BoolOr);
+
     root->addChild(NOTHING);
 }
 

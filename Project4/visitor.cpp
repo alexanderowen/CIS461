@@ -363,26 +363,78 @@ bool TypeCheckVisitor::check()
 
 void TypeCheckVisitor::visitBinaryOperatorNode(BinaryOperatorNode *b)
 {
+    //fprintf(stderr, "Inside Binary op\n");
     if (check())
         return;
     b->left->accept(this);
     b->right->accept(this);
-    char *t1 = b->left->type();
-    char *t2 = b->right->type();
-    printf("Type1: %s Type2: %s\n", t1, t2);
+    char *t1 = getType(b->left);
+    char *t2 = getType(b->right);
+    if (t1 == NULL || t2 == NULL)
+    {
+        fprintf(stderr, "Compiler error. One of the binary operator types is null\n");
+    }
+    if (strcmp(t1, (char*)"-") == 0 || strcmp(t2, (char*)"-") == 0)
+    {
+        fprintf(stderr, "Compiler error. I don't know the types of this binary operator\n");
+    }
+
+    if (strcmp(t1, t2) != 0)
+    {
+        char *msg = (char*) malloc(sizeof(char)*256);
+        sprintf(msg, "%d: Syntax Error\n\tBinary opeartor type mismatch: '%s' and '%s'\n", b->lineno, t1, t2);
+        addError(msg);
+    }
+
+    char *op;
+
+    //plus:0 minus:1 times:2 divide:3 equals:4 atmost:5 lessthan:6 atleast:7 greater:8 and:9 or:10
     //TODO: Check if t1 has binary operator method
     //TODO: COME TO THIS LATER, DONT WANT TO FACE IT RIGHT NOW
     switch(b->operation) {
         case 0:
-            printf("Plus");
+            op = (char*)"PLUS";
             break;
         case 1:
-            printf("Minus");
+            op = (char*)"MINUS";
+            break;
+        case 2:
+            op = (char*)"TIMES";
+            break;
+        case 3:
+            op = (char*)"DIVIDE";
+            break;
+        case 4:
+            op = (char*)"EQUALS";
+            break;
+        case 5:
+            op = (char*)"ATMOST";
+            break;
+        case 6:
+            op = (char*)"LESS";
+            break;
+        case 7:
+            op = (char*)"ATLEAST";
+            break;
+        case 8:
+            op = (char*)"MORE";
+            break;
+        case 9:
+            op = (char*)"AND";
+            break;
+        case 10:
+            op = (char*)"OR";
             break;
         default:
-            printf("Other");
             break;
     }
+    MethodNode *method = tt->typeGetMethod(t1, op);
+    if (method == NULL)
+    {
+        char *msg = (char*) malloc(sizeof(char)*256);
+        sprintf(msg, "%d: Syntax Error\n\tType '%s' has no operator named '%s'\n", b->lineno, t1, op);
+        addError(msg);
+    } 
 }
    
 void TypeCheckVisitor::visitAssignmentStatement(AssignmentStatement *a)
@@ -720,6 +772,71 @@ IdentNode *TypeCheckVisitor::isIdent(RExpr *r)
 
 }
 
+ObjectFieldLExpr *TypeCheckVisitor::isOFL(RExpr *r)
+{
+    RExprToLExpr *rl = dynamic_cast<RExprToLExpr*>(r);
+    if (rl != NULL) //if it is an lexpr
+    {
+        ObjectFieldLExpr *ofl = dynamic_cast<ObjectFieldLExpr*>(rl->lexpr);
+        if (ofl != NULL)
+        {
+            return ofl;
+        }
+    }
+    return NULL;
+}
+
+char *TypeCheckVisitor::getType(RExpr *r)
+{
+    char *type;
+    type = r->type();
+    if (strcmp(type, (char*)"-") != 0) //type covered because it's a literal or easy to identify
+        return type;
+
+    IdentNode *ident = isIdent(r);
+    if (ident != NULL) //type is in the variable information
+    {
+        return st->lookupVariable(ident->id)->type;
+    }
+
+    DotRExpr *dot = dynamic_cast<DotRExpr*>(r);
+    if (dot != NULL)
+    {
+        char *_type = getType(dot->rexpr);
+        MethodNode *m = tt->typeGetMethod(_type, dot->id);
+        return m->returnType;
+    }
+
+    ObjectFieldLExpr *ofl = isOFL(r);
+    if (ofl != NULL)
+    {
+        // TODO: How to handle this???
+        // I believe this should only work when ofl->rexpr == "this", because instance vars are private 
+    }
+
+    PlusNode *plus = dynamic_cast<PlusNode*>(r);
+    if (plus != NULL)
+    {
+        return getType(plus->left);
+    }
+    MinusNode *minus = dynamic_cast<MinusNode*>(r);
+    if (minus != NULL)
+    {
+        return getType(minus->left);
+    }
+    TimesNode *times = dynamic_cast<TimesNode*>(r);
+    if (times != NULL)
+    {
+        return getType(times->left);
+    }
+    DivideNode *divide = dynamic_cast<DivideNode*>(r);
+    if (divide != NULL)
+    {
+        return getType(divide->left);
+    }
+
+    return strdup((char*)"-");
+}
 /*
  *
  * 
