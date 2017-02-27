@@ -102,6 +102,7 @@ class TypeCheckVisitor : public Visitor
         virtual void visitIfBlock(IfBlock *i);
         virtual void visitIfClause(IfClause *i);
         virtual void visitElifClause(ElifClause *e);
+        virtual void visitTrueElseOption(TrueElseOption *e);
         virtual void visitWhileStatement(WhileStatement *w);
 
         virtual void visitMethod(Method *m);
@@ -112,9 +113,6 @@ class TypeCheckVisitor : public Visitor
         virtual void visitClass(Class *c);
 
     private:
-        bool inIf;
-        int  ifCount;
-        unordered_map<string, int> assignments;
 
         bool inMethod;
         char *returnType;

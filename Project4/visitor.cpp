@@ -319,9 +319,6 @@ TypeCheckVisitor::TypeCheckVisitor()
     tt = new TypeTree();    
     errors = 0;
 
-    inIf = false;
-    ifCount = 0;
-
     inMethod = false;
     returnType = NULL;
     returned = false;
@@ -342,8 +339,6 @@ TypeCheckVisitor::TypeCheckVisitor(TypeTree *t)
     tt = t;
     errors = 0;
 
-    inIf = false;
-    ifCount = 0;
 
     inMethod = false;
     returnType = NULL;
@@ -444,8 +439,11 @@ void TypeCheckVisitor::visitAssignmentStatement(AssignmentStatement *a)
     if (id != NULL)
     {
         //TODO: Use a->ident, just ignoring it currently
-        VariableSym *v = new VariableSym(id->id, a->rexpr->type());
-        //fprintf(stderr, "Adding variable '%s' with type '%s'\n", id->id, a->rexpr->type());
+        char *type = getType(a->rexpr);
+        if (type == NULL)
+            return;
+        VariableSym *v = new VariableSym(id->id, strdup(type));
+        //fprintf(stderr, "Adding variable '%s' with type '%s'\n", id->id, getType(a->rexpr));
         st->addVariable(strdup(id->id), v);
     }
     a->lexpr->accept(this);
@@ -543,47 +541,41 @@ void TypeCheckVisitor::visitDotRExpr(DotRExpr *d)
 
 }
 
-/* Cases currently ignoring
- * 1)
- * if - {
- *      x = 10
- *      x = 20
- * } else {
- *
- * }
- *
- * q = x
- *
- * 2)
- * if - {
- *      y = 2
- *      x = x + y //valid thing to do
- * }
- *
- * TODO: Resolve how to do this.
- * */
 void TypeCheckVisitor::visitIfBlock(IfBlock *i)
 {
-    inIf = true;
+    //fprintf(stderr, "Inside the if block\n");
+    list<SymbolTable*> sts;
+    SymbolTable *origin = st;
+    st = new SymbolTable(origin);
+    sts.push_back(st);
+
     i->_if->accept(this);
     for (list<ElifClause *>::const_iterator it = i->_elifs->begin(); it != i->_elifs->end(); ++it)
     {
+        st = new SymbolTable(origin);
+        sts.push_back(st);
         (*it)->accept(this);
     }
+
+    st = new SymbolTable(origin);
+    sts.push_back(st);
     i->_else->accept(this);
-    inIf = false;
-    ifCount = 0;
-    assignments.clear();
+
+    //fprintf(stderr, "Calling intersection\n");
+    st = sts.front()->intersection(sts);
 }
 
 void TypeCheckVisitor::visitIfClause(IfClause *i)
 {
     char *type;
+    /*
     IdentNode *ident = isIdent(i->rexpr);
     if (ident != NULL)
         type = st->lookupVariable(ident->id)->type;    
     else
         type = i->rexpr->type();
+    */
+    type = getType(i->rexpr);
 
     if (strcmp(type, (char*)"Boolean") != 0)
     {
@@ -591,22 +583,45 @@ void TypeCheckVisitor::visitIfClause(IfClause *i)
         sprintf(msg, "%d: Syntax Error\n\tIf condition must be of type 'Boolean'\n", i->lineno);
         addError(msg);
     }
+    i->rexpr->accept(this);
+    for (list<Statement *>::const_iterator it = i->stmts->begin(); it != i->stmts->end(); ++it)
+    {
+        (*it)->accept(this);
+    }
 }
 
 void TypeCheckVisitor::visitElifClause(ElifClause *e)
 {
     char *type;
+    /*
     IdentNode *ident = isIdent(e->rexpr);
     if (ident != NULL)
         type = st->lookupVariable(ident->id)->type;    
     else
         type = e->rexpr->type();
+    */
+    type = getType(e->rexpr);
 
     if (strcmp(type, (char*)"Boolean") != 0)
     {
         char *msg = (char*) malloc(sizeof(char)*256);
         sprintf(msg, "%d: Syntax Error\n\tElif condition must be of type 'Boolean'\n", e->lineno);
         addError(msg);
+    }
+    e->rexpr->accept(this);
+    for (list<Statement *>::const_iterator it = e->stmts->begin(); it != e->stmts->end(); ++it)
+    {
+        (*it)->accept(this);
+    }
+}
+
+void TypeCheckVisitor::visitTrueElseOption(TrueElseOption *e)
+{
+    //fprintf(stderr, "Inside the else option\n");
+    for (list<Statement *>::const_iterator it = e->stmts->begin(); it != e->stmts->end(); ++it)
+    {
+        //fprintf(stderr, "Visiting a statement inside else\n");
+        (*it)->accept(this);
     }
 }
 
@@ -796,7 +811,15 @@ char *TypeCheckVisitor::getType(RExpr *r)
     IdentNode *ident = isIdent(r);
     if (ident != NULL) //type is in the variable information
     {
-        return st->lookupVariable(ident->id)->type;
+        VariableSym *v = st->lookupVariable(ident->id);
+        if (v == NULL)
+        {
+            char *msg = (char*) malloc(sizeof(char)*256);
+            sprintf(msg, "%d: Syntax Error\n\tUse of uninitialized variable '%s'\n", r->lineno, ident->id);
+            addError(msg);
+            return NULL;
+        }
+        return v->type;
     }
 
     DotRExpr *dot = dynamic_cast<DotRExpr*>(r);

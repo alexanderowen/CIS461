@@ -15,6 +15,36 @@ MethodSym::MethodSym(char *i, list<VariableSym *> *a, char *r) : id(i), args(a),
 
 SymbolTable::SymbolTable(SymbolTable *p) : parent(p) {}
 
+// note: this intersection does not travel all the way up the symboltable (ignores parent)
+SymbolTable *SymbolTable::intersection(list<SymbolTable*> sts)
+{
+    SymbolTable *total = new SymbolTable(parent);
+    bool found = true;
+    VariableSym *v;
+    //fprintf(stderr, "About to do intersection on map with size %lu\n", vMap.size());
+    for (unordered_map<string, VariableSym*>::const_iterator key = vMap.begin(); key != vMap.end(); ++key)
+    {
+        for (list<SymbolTable*>::const_iterator it = sts.begin(); it != sts.end(); ++it)
+        {
+            v = (*it)->lookupVariableNoParent(strdup(key->first.c_str()));
+            if (v == NULL)
+            {
+                //fprintf(stderr, "No match found: %s\n", key->first.c_str());
+                found = false;
+            }
+        }
+
+        if (found) 
+        {
+            //fprintf(stderr, "Found a match: %s\n", key->first.c_str());
+            total->addVariable(strdup(key->first.c_str()), key->second);
+        }
+        found = true;
+    }
+    //fprintf(stderr, "All done with intersection\n");
+    return total;    
+}
+
 VariableSym *SymbolTable::lookupVariable(char *name)
 {
     //fprintf(stderr, "Looking up variable '%s'\n", name);
@@ -33,6 +63,16 @@ VariableSym *SymbolTable::lookupVariable(char *name)
     {
         return NULL;
     }
+}
+VariableSym *SymbolTable::lookupVariableNoParent(char *name)
+{
+    string key = name;
+    auto search = vMap.find(key);
+
+    if (search != vMap.end())
+        return search->second;
+    else
+        return NULL;
 }
 
 void SymbolTable::addVariable(char *name, VariableSym *value)
