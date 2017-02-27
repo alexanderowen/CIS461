@@ -79,7 +79,7 @@ class TypeTreeVisitor : public Visitor
 
 class TypeCheckVisitor : public Visitor
 {
-    public: //TODO: Change to private
+    public:
         typedef Visitor super;
         SymbolTable *st;
         TypeTree *tt;

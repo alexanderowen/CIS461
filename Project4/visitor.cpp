@@ -666,6 +666,9 @@ void TypeCheckVisitor::visitWhileStatement(WhileStatement *w)
 void TypeCheckVisitor::visitMethod(Method *m)
 {
     inMethod = true;
+    SymbolTable *origin = st;
+    st = new SymbolTable(origin); //scope for Methods
+
     // check if it's inherited, and if it's doing it properly
     MethodNode *superMethod = tt->typeGetMethod(supertype, m->id);
     if (superMethod != NULL)
@@ -726,6 +729,7 @@ void TypeCheckVisitor::visitMethod(Method *m)
     }
     inMethod = false;
     returned = false;
+    st = origin;
 }
 
 void TypeCheckVisitor::visitTrueIdentOption(TrueIdentOption *t)
@@ -783,9 +787,13 @@ void TypeCheckVisitor::visitClass(Class *c)
     inClass = true;
     className = c->getID();
     supertype = c->getExtends();
+    SymbolTable *classScope = new SymbolTable(st);
+    SymbolTable *global = st;
+    st = classScope;
     c->clssig->accept(this);
     c->clsbdy->accept(this);
     inClass = false;
+    st = global;
 }
 
 
