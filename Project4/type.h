@@ -20,6 +20,15 @@ class MethodNode
         void print();
 }; 
 
+class VariableNode
+{
+    public:
+        char *name;
+        char *type;
+
+        VariableNode(char *n, char *t);
+};
+
 class TypeNode
 {
     public:
@@ -27,6 +36,7 @@ class TypeNode
         TypeNode *parent;
         list<TypeNode *> children;
         list<MethodNode *> methods;
+        list<VariableNode *> instanceVars;
 
         TypeNode(char *n, TypeNode *p);
         int addChild(TypeNode *type);
@@ -35,6 +45,11 @@ class TypeNode
         int addMethod(MethodNode *m);
         int hasMethod(char *name);
         MethodNode *getMethod(char *name);
+
+        int hasInstanceVar(char *name);
+        VariableNode *getInstanceVar(char *name);
+        void addInstanceVar(VariableNode *v);
+
         int equals(TypeNode *type);
         int equals(char *name);
         void print();
@@ -56,6 +71,10 @@ class TypeTree
         int addSubtype(char *sub, char *super);
         int addMethodToType(char *type, MethodNode *m);
         int typeHasMethod(char *type, char* method); 
+
+        void addVarToType(char *type, VariableNode *v);
+        char *getVarFromType(char *type, char *var);
+
         MethodNode *typeGetMethod(char *type, char *method);
         TypeNode *findType(char *name);
         TypeNode *search(TypeNode *root, char *name);

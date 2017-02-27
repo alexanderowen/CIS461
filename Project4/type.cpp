@@ -49,6 +49,34 @@ void MethodNode::print()
     printf("' and returns '%s'\n", returnType);
 }
 
+VariableNode::VariableNode(char *n, char *t) : name(n), type(t) {}
+
+int TypeNode::hasInstanceVar(char *name)
+{
+    for (list<VariableNode*>::const_iterator it = instanceVars.begin(); it != instanceVars.end(); ++it)
+    {
+        if (strcmp((*it)->name, name) == 0)
+            return 1;
+    }
+    return 0;
+}
+
+void TypeNode::addInstanceVar(VariableNode *v)
+{
+    instanceVars.push_back(v);
+}
+
+VariableNode *TypeNode::getInstanceVar(char *name)
+{
+    for (list<VariableNode*>::const_iterator it = instanceVars.begin(); it != instanceVars.end(); ++it)
+    {
+        if (strcmp((*it)->name, name) == 0)
+            return (*it);
+    }
+    return NULL;
+}
+
+
 TypeNode::TypeNode(char *n, TypeNode *p) : name(n), parent(p) 
 {
 }
@@ -331,4 +359,27 @@ char *TypeTree::LCA(char *_t1, char *_t2)
     }
 
     return (char*)"Obj"; //The top level ancestor
+}
+
+void TypeTree::addVarToType(char *type, VariableNode *v)
+{
+    TypeNode *t = findType(type);
+    if (t == NULL)
+        return;
+
+    t->addInstanceVar(v);
+}
+
+// returns the type of instance variable
+char *TypeTree::getVarFromType(char *type, char *var)
+{
+    TypeNode *t = findType(type);
+    if (t == NULL)
+        return NULL;
+
+    VariableNode *v = t->getInstanceVar(var);
+    if (v == NULL)
+        return NULL;
+
+    return v->type;
 }

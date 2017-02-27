@@ -234,6 +234,8 @@ TypeTreeVisitor::TypeTreeVisitor()
     cur = NULL;
     ret = NULL;
     args = NULL;
+
+    inMethod = false;
 }
 
 //TODO: CURRENT ASSUMPTION IS THAT CLASS INHERITANCE WON'T BE OUT OF ORDER
@@ -271,6 +273,7 @@ void TypeTreeVisitor::visitTrueExtendsOption(TrueExtendsOption *t)
 
 void TypeTreeVisitor::visitMethod(Method *m)
 {
+    inMethod = true;
     args = new list<char*>; // TODO: Delete old one? Maybe not. Still exists in MethodNode
     for (list<FormalArg *>::const_iterator it = m->fargs->begin(); it != m->fargs->end(); ++it)
     {
@@ -280,6 +283,7 @@ void TypeTreeVisitor::visitMethod(Method *m)
     m->ident->accept(this);
     MethodNode *meth = new MethodNode(m->id, *args, ret);
     tt->addMethodToType(cur, meth);
+    inMethod = false;
     /*
     for (list<Statement *>::const_iterator it = m->stmts->begin(); it != m->stmts->end(); ++it)
     {
@@ -291,7 +295,10 @@ void TypeTreeVisitor::visitMethod(Method *m)
 
 void TypeTreeVisitor::visitFormalArg(FormalArg *f) 
 {
-    args->push_back(f->type);
+    //fprintf(stderr, "Formal arg id: %s", f->id);
+    //fprintf(stderr, "and type: %s", f->type);
+    if (inMethod)
+        args->push_back(f->type);
 }
 
 void TypeTreeVisitor::visitFalseIdentOption(FalseIdentOption *f) 
@@ -434,7 +441,6 @@ void TypeCheckVisitor::visitBinaryOperatorNode(BinaryOperatorNode *b)
    
 void TypeCheckVisitor::visitAssignmentStatement(AssignmentStatement *a)
 {
-    // TODO: Handle assignment of 'this.x'
     char *type;
     IdentNode *id = dynamic_cast<IdentNode*>(a->lexpr);
     if (id != NULL)
@@ -464,6 +470,20 @@ void TypeCheckVisitor::visitAssignmentStatement(AssignmentStatement *a)
         //fprintf(stderr, "Adding variable '%s' with type '%s'\n", id->id, getType(a->rexpr));
         st->addVariable(strdup(id->id), v);
     }
+    ObjectFieldLExpr *ofl = dynamic_cast<ObjectFieldLExpr*>(a->lexpr);
+    if (ofl != NULL) //TODO: Handle the ident, LCA thing
+    {
+        IdentNode *ident = isIdent(ofl->rexpr);
+        if (ident != NULL)
+        {
+            if (strcmp(ident->id, (char*)"this") == 0)
+            {
+                //fprintf(stderr, "Adding variable node. Adding '%s' of type '%s' to type '%s'\n", ofl->id, getType(a->rexpr), className);
+                VariableNode *v = new VariableNode(strdup(ofl->id), strdup(getType(a->rexpr)));
+                tt->addVarToType(className, v);
+            }
+        } 
+    }
     a->lexpr->accept(this);
     a->ident->accept(this);
     a->rexpr->accept(this);
@@ -471,7 +491,10 @@ void TypeCheckVisitor::visitAssignmentStatement(AssignmentStatement *a)
 
 void TypeCheckVisitor::visitIdentNode(IdentNode *i) 
 {
-    if (st->lookupVariable(i->id) == NULL) 
+    if (strcmp(i->id, (char*)"this") == 0) {
+        return;
+    }
+    else if (st->lookupVariable(i->id) == NULL) 
     {
         errors++;
         char *msg = (char*) malloc(sizeof(char)*256);
@@ -810,6 +833,21 @@ void TypeCheckVisitor::visitFormalArg(FormalArg *f)
     VariableSym *v = new VariableSym(f->id, f->type);
     st->addVariable(f->id, v);
 }
+
+/*
+void TypeCheckVisitor::visitObjectFieldLExpr(ObjectFieldLExpr *o)
+{
+    IdentNode *ident = dynamic_cast<IdentNode*>(o->rexpr);
+    if (ident != NULL)
+    {
+        if (strcmp(ident->id, (char*)"this") == 0) //special instance variable keyword
+        {
+                
+        }
+    }
+    o->rexpr->accept(this);
+}
+*/
 /*
 {
 }    
@@ -859,6 +897,10 @@ char *TypeCheckVisitor::getType(RExpr *r)
     IdentNode *ident = isIdent(r);
     if (ident != NULL) //type is in the variable information
     {
+        if (strcmp(ident->id, (char*)"this") == 0)
+        {
+            return className;
+        }
         VariableSym *v = st->lookupVariable(ident->id);
         if (v == NULL)
         {
@@ -881,8 +923,24 @@ char *TypeCheckVisitor::getType(RExpr *r)
     ObjectFieldLExpr *ofl = isOFL(r);
     if (ofl != NULL)
     {
-        // TODO: How to handle this???
-        // I believe this should only work when ofl->rexpr == "this", because instance vars are private 
+        /*
+        ObjectFieldLExpr *rofl = isOFL(ofl->rexpr);
+        char *rType;
+        if (rolf != NULL)
+        {
+            rType = getType(ofl->rexpr);
+        }*/
+        char *rType = getType(ofl->rexpr);
+        if (rType == NULL)
+            return NULL;
+        char *__type = tt->getVarFromType(rType, ofl->id);
+        if (__type == NULL)
+        {
+            char *msg = (char*) malloc(sizeof(char)*256);
+            sprintf(msg, "%d: Syntax Error\n\tType '%s' has no instance variable '%s'\n", r->lineno, rType, ofl->id);
+            addError(msg);
+            return NULL;
+        }
     }
 
     PlusNode *plus = dynamic_cast<PlusNode*>(r);

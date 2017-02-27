@@ -64,6 +64,7 @@ class TypeTreeVisitor : public Visitor
         char *cur; //current class visiting
         char *ret; //current return value of method
         list<char*> *args; 
+        bool inMethod;
 
         TypeTreeVisitor();
         virtual void visitProgram(Program *p);
@@ -98,6 +99,7 @@ class TypeCheckVisitor : public Visitor
         virtual void visitAssignmentStatement(AssignmentStatement *a);
         virtual void visitIdentNode(IdentNode *i);
         virtual void visitDotRExpr(DotRExpr *d);    
+        //virtual void visitObjectFieldLExpr(ObjectFieldLExpr *o);
 
         virtual void visitIfBlock(IfBlock *i);
         virtual void visitIfClause(IfClause *i);
