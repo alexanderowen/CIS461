@@ -37,7 +37,7 @@ SymbolTable *SymbolTable::intersection(list<SymbolTable*> sts)
         if (found) 
         {
             //fprintf(stderr, "Found a match: %s\n", key->first.c_str());
-            total->addVariable(strdup(key->first.c_str()), key->second);
+            total->addVariable(strdup(key->first.c_str()), key->second); //TODO: If the variable types do not match, use LCA
         }
         found = true;
     }

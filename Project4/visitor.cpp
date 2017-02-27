@@ -627,13 +627,22 @@ void TypeCheckVisitor::visitTrueElseOption(TrueElseOption *e)
 
 void TypeCheckVisitor::visitWhileStatement(WhileStatement *w)
 {
-    char *type = w->rexpr->type();
-    if (strcmp(type, (char*)"Boolean") != 0)
+    char *type = getType(w->rexpr);
+    if (type != NULL && strcmp(type, (char*)"Boolean") != 0)
     {
         char *msg = (char*) malloc(sizeof(char)*256);
         sprintf(msg, "%d: Syntax Error\n\tWhile condition must be of type 'Boolean'\n", w->lineno);
         addError(msg);
     }
+    SymbolTable *origin = st;
+    st = new SymbolTable(origin);
+    w->rexpr->accept(this);
+    for (list<Statement *>::const_iterator it = w->stmts->begin(); it != w->stmts->end(); ++it)
+    {
+        (*it)->accept(this);
+    }
+    delete st;
+    st = origin;
 }
 
 void TypeCheckVisitor::visitMethod(Method *m)
