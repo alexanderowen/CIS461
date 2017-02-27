@@ -434,12 +434,30 @@ void TypeCheckVisitor::visitBinaryOperatorNode(BinaryOperatorNode *b)
    
 void TypeCheckVisitor::visitAssignmentStatement(AssignmentStatement *a)
 {
-    //TODO: If the variable is already defined, do least common ancestor
+    // TODO: Handle assignment of 'this.x'
+    char *type;
     IdentNode *id = dynamic_cast<IdentNode*>(a->lexpr);
     if (id != NULL)
     {
-        //TODO: Use a->ident, just ignoring it currently
-        char *type = getType(a->rexpr);
+        VariableSym *defined = st->lookupVariable(id->id);
+        TrueIdentOption *tio = dynamic_cast<TrueIdentOption*>(a->ident);
+        if (tio != NULL && defined != NULL)
+        {
+            type = tt->LCA(tio->id, getType(a->rexpr));
+            type = tt->LCA(defined->type, type);
+        }
+        else if (defined != NULL) // If this variable has already been defined, perform LCA
+        {
+            type = tt->LCA(defined->type, getType(a->rexpr));    
+        }
+        else if (tio != NULL)
+        {
+            type = tt->LCA(tio->id, getType(a->rexpr));
+        }
+        else 
+        {
+            type = getType(a->rexpr);
+        }
         if (type == NULL)
             return;
         VariableSym *v = new VariableSym(id->id, strdup(type));

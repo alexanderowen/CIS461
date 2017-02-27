@@ -50,6 +50,8 @@ class TypeTree
         int isSubtype(char *_t1, char *_t2);
         int isSupertype(char *_t1, char *_t2);
 
+        char *LCA(char *_t1, char *_t2);
+
         int addSubtype(TypeNode *sub, char *super);
         int addSubtype(char *sub, char *super);
         int addMethodToType(char *type, MethodNode *m);

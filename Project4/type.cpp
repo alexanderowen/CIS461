@@ -117,12 +117,12 @@ MethodNode *TypeNode::getMethod(char *name)
 
 int TypeNode::equals(TypeNode *type)
 {
-    return !strcmp(this->name, type->name); // since strcmp returns 0 if equal
+    return strcmp(this->name, type->name) == 0;
 }
 
 int TypeNode::equals(char *n)
 {
-    return !strcmp(this->name, n);
+    return strcmp(this->name, n) == 0;
 }
 
 void TypeNode::print()
@@ -302,3 +302,33 @@ int TypeTree::isSupertype(char *_t1, char *_t2)
     return t1->hasDescendant(_t2); 
 }
 
+// Find the name of the least common ancestor between two types
+char *TypeTree::LCA(char *_t1, char *_t2)
+{
+    TypeNode *t1 = findType(_t1); //do they exist in the first place?
+    TypeNode *t2 = findType(_t2);
+    if (t1 == NULL || t2 == NULL)
+        return NULL;
+
+    //TypeNode *t1origin = t1;
+    TypeNode *t2origin = t2;
+
+    if (t1->equals(t2))
+        return t1->name;
+
+    while (strcmp(t1->name, (char*)"Obj") != 0)
+    {
+        while (strcmp(t2->name, (char*)"Obj") != 0)
+        {
+            //fprintf(stderr, "t1 name: %s t2 name: %s\n", t1->name, t2->name);
+            if (t1->equals(t2))
+                return t1->name;
+            t2 = t2->parent;
+        }
+        //fprintf(stderr, "t1 name: %s t2 name: %s\n", t1->name, t2->name);
+        t1 = t1->parent;
+        t2 = t2origin;
+    }
+
+    return (char*)"Obj"; //The top level ancestor
+}
