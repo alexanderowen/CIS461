@@ -111,6 +111,8 @@ class TypeCheckVisitor : public Visitor
         virtual void visitReturnStatement(ReturnStatement *r);
 
         virtual void visitClass(Class *c);
+        virtual void visitClassSignature(ClassSignature *cs);
+        virtual void visitFormalArg(FormalArg *f);
 
     private:
 

@@ -796,7 +796,20 @@ void TypeCheckVisitor::visitClass(Class *c)
     st = global;
 }
 
+void TypeCheckVisitor::visitClassSignature(ClassSignature *cs) 
+{
+    for (list<FormalArg *>::const_iterator it = cs->fargs->begin(); it != cs->fargs->end(); ++it)
+    {
+        (*it)->accept(this);
+    }
+    cs->exop->accept(this);
+}
 
+void TypeCheckVisitor::visitFormalArg(FormalArg *f)
+{
+    VariableSym *v = new VariableSym(f->id, f->type);
+    st->addVariable(f->id, v);
+}
 /*
 {
 }    
