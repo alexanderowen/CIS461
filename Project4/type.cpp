@@ -85,6 +85,7 @@ int TypeNode::addChild(TypeNode *type)
 {
     children.push_back(type);  //TODO: when does this fail?
     type->parent = this;
+    //fprintf(stderr, "Added %s as a subtype of %s\n", type->name, this->name);
     //type->print();
     return 1; 
 }
@@ -138,8 +139,11 @@ MethodNode *TypeNode::getMethod(char *name)
     }
     if (this->parent != NULL) //follow inheritance tree
     {
+        //fprintf(stderr, "Following inheritance tree\n");
+        //fprintf(stderr, "Currently in %s\n", this->name);
         return parent->getMethod(name);
     }
+    //fprintf(stderr, "Giving up. Currently in %s looking for %s\n", this->name, name);
     return NULL;
 }
 
@@ -181,11 +185,12 @@ TypeTree::TypeTree()
     list<char*> args;
     args.push_back(OBJ);
     list<char*> emptyArgs;
-    MethodNode *m = new MethodNode(strdup((char*)"STR"), args, STR);
+    MethodNode *m = new MethodNode(strdup((char*)"STR"), emptyArgs, STR);
     this->addMethodToType(OBJ, m);
     MethodNode *ObjPrint = new MethodNode(strdup((char*)"PRINT"), emptyArgs, NOTHING);
     this->addMethodToType(OBJ, ObjPrint); 
     MethodNode *ObjEquals = new MethodNode(strdup((char*)"EQUALS"), args, BOOL);
+    this->addMethodToType(OBJ, ObjEquals);
 
     // Assignment built-in methods of Int to the typechecker
     list<char*> int_args;

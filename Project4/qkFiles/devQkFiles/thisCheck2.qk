@@ -1,0 +1,4 @@
+class A(x : Int) {
+    this.x = x;
+    this.y = 10;
+}

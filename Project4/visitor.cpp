@@ -274,7 +274,7 @@ void TypeTreeVisitor::visitTrueExtendsOption(TrueExtendsOption *t)
 void TypeTreeVisitor::visitMethod(Method *m)
 {
     inMethod = true;
-    args = new list<char*>; // TODO: Delete old one? Maybe not. Still exists in MethodNode
+    args = new list<char*>;
     for (list<FormalArg *>::const_iterator it = m->fargs->begin(); it != m->fargs->end(); ++it)
     {
         (*it)->accept(this);
@@ -327,6 +327,7 @@ TypeCheckVisitor::TypeCheckVisitor()
     errors = 0;
 
     inMethod = false;
+    inMethodReturnCheck = false;
     returnType = NULL;
     returned = false;
 
@@ -348,6 +349,7 @@ TypeCheckVisitor::TypeCheckVisitor(TypeTree *t)
 
 
     inMethod = false;
+    inMethodReturnCheck = false;
     returnType = NULL;
     returned = false;
 }
@@ -374,7 +376,13 @@ void TypeCheckVisitor::visitBinaryOperatorNode(BinaryOperatorNode *b)
     char *t2 = getType(b->right);
     if (t1 == NULL || t2 == NULL)
     {
-        fprintf(stderr, "Compiler error. At line %d. One of the binary operator types is null\n", b->lineno);
+        //fprintf(stderr, "Compiler error. At line %d. One of the binary operator types is null\n", b->lineno);
+        /*
+        char *msg = (char*) malloc(sizeof(char)*256);
+        sprintf(msg, "%d: Syntax Error\n\tType error. Undefined types.\n", b->lineno);
+        addError(msg);
+        */
+        return;
     }
     if (strcmp(t1, (char*)"-") == 0 || strcmp(t2, (char*)"-") == 0)
     {
@@ -391,8 +399,6 @@ void TypeCheckVisitor::visitBinaryOperatorNode(BinaryOperatorNode *b)
     char *op;
 
     //plus:0 minus:1 times:2 divide:3 equals:4 atmost:5 lessthan:6 atleast:7 greater:8 and:9 or:10
-    //TODO: Check if t1 has binary operator method
-    //TODO: COME TO THIS LATER, DONT WANT TO FACE IT RIGHT NOW
     switch(b->operation) {
         case 0:
             op = (char*)"PLUS";
@@ -480,7 +486,7 @@ void TypeCheckVisitor::visitAssignmentStatement(AssignmentStatement *a)
             {
                 //fprintf(stderr, "Adding variable node. Adding '%s' of type '%s' to type '%s'\n", ofl->id, getType(a->rexpr), className);
                 VariableNode *v = new VariableNode(strdup(ofl->id), strdup(getType(a->rexpr)));
-                tt->addVarToType(className, v);
+                tt->addVarToType(strdup(className), v);
             }
         } 
     }
@@ -525,25 +531,35 @@ void TypeCheckVisitor::visitDotRExpr(DotRExpr *d)
     }
     // now type check
     char *type;
+    /*
     RExprToLExpr *rl = dynamic_cast<RExprToLExpr*>(d->rexpr);
     if (rl != NULL) //if it is an lexpr
     {
         IdentNode *id = dynamic_cast<IdentNode*>(rl->lexpr);
         if (id != NULL) //and the lexpr is an ident node //TODO: If we are in a class, then 'this.x' is ok if it exists and is a class
         {
+            //fprintf(stderr, "Setting up using lookupVar\n");
             type = st->lookupVariable(id->id)->type;
+            fprintf(stderr, "Found type %s\n", type);
         }
     }
     else 
     {
-        type = d->rexpr->type();
+        //type = d->rexpr->type();
+        fprintf(stderr, "Setting up using getType\n");
+        type = getType(d->rexpr);
     }
+    */
+    type = getType(d->rexpr);
+    fprintf(stderr, "searching for method '%s' of type '%s'\n", d->id, type);
     MethodNode *m = tt->typeGetMethod(type, d->id);
     if (m == NULL)
     {
         errors++;
         char *msg = (char*) malloc(sizeof(char)*256);
+        //fprintf(stderr, "This type? : %s\n", type);
         sprintf(msg, "%d: Syntax Error\n\tType '%s' has no method named '%s'\n", d->lineno, type, d->id);
+        //fprintf(stderr, "Error message: %s\n", msg);
         msgs.push_back(msg);
     } 
     else  
@@ -573,15 +589,6 @@ void TypeCheckVisitor::visitDotRExpr(DotRExpr *d)
             std::advance(arg, 1);
         }
     }
-    /*
-    else if (!m->argsMatch(args))  // TODO: It's ok to call the method using super/sub types?
-    {
-        char *msg = (char*) malloc(sizeof(char)*256);
-        sprintf(msg, "%d: Syntax Error\n\tArguments don't match on method call to '%s'\n", d->lineno, d->id);
-        addError(msg);
-    }
-    */
-
 }
 
 void TypeCheckVisitor::visitIfBlock(IfBlock *i)
@@ -605,7 +612,7 @@ void TypeCheckVisitor::visitIfBlock(IfBlock *i)
     i->_else->accept(this);
 
     //fprintf(stderr, "Calling intersection\n");
-    st = sts.front()->intersection(sts);
+    st = sts.front()->intersection(sts, tt);
 }
 
 void TypeCheckVisitor::visitIfClause(IfClause *i)
@@ -740,7 +747,9 @@ void TypeCheckVisitor::visitMethod(Method *m)
     {
         (*it)->accept(this);
     }
+    inMethodReturnCheck = true;
     m->ident->accept(this);
+    inMethodReturnCheck = false;
     for (list<Statement *>::const_iterator it = m->stmts->begin(); it != m->stmts->end(); ++it)
     {
         (*it)->accept(this);
@@ -759,17 +768,32 @@ void TypeCheckVisitor::visitMethod(Method *m)
 
 void TypeCheckVisitor::visitTrueIdentOption(TrueIdentOption *t)
 {
-    if (inMethod)
+    //fprintf(stderr, "TrueIdentOption visited\n");
+    if (inMethodReturnCheck)
+    {
+        if (strcmp(t->id, (char*)"Nothing") == 0)
+        {
+            returned = true;  //assume method returns nothing
+        }
         returnType = t->id;
+    }
 }
 
 void TypeCheckVisitor::visitFalseIdentOption(FalseIdentOption *f)
 {
-    if (inMethod)
+    if (inMethodReturnCheck)
     {
         returnType = strdup((char*)"Nothing");
         returned = true; // by default, assume the method returns nothing
     }
+    /*
+    if (inMethod)
+    {
+        fprintf(stderr, "FalseIdentOption visited\n");
+        returnType = strdup((char*)"Nothing");
+        returned = true; // by default, assume the method returns nothing
+    }
+    */
 }
 
 void TypeCheckVisitor::visitReturnStatement(ReturnStatement *r)
@@ -800,9 +824,12 @@ void TypeCheckVisitor::visitReturnStatement(ReturnStatement *r)
     // TODO: If return type is subtype, it's ok
     if (strcmp(type, returnType) != 0)
     {
-        char *msg = (char*) malloc(sizeof(char)*256);
-        sprintf(msg, "%d: Syntax Error\n\tMethod returns value of type '%s', should return '%s'\n", r->lineno, type, returnType);
-        addError(msg);
+        if (!tt->isSubtype(type, returnType))
+        {
+            char *msg = (char*) malloc(sizeof(char)*256);
+            sprintf(msg, "%d: Syntax Error\n\tMethod returns value of type '%s', should return '%s' or a subtype of '%s'\n", r->lineno, type, returnType, returnType);
+            addError(msg);
+        }
     } 
     else 
     {

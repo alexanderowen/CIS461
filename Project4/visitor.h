@@ -120,6 +120,7 @@ class TypeCheckVisitor : public Visitor
     private:
 
         bool inMethod;
+        bool inMethodReturnCheck;
         char *returnType;
         bool returned;
         

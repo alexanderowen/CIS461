@@ -1,0 +1,10 @@
+class A() {
+    def foo() {
+
+    }
+}
+class B() extends A {
+    def bar(x : Int, y : String) : Int {
+
+    }
+}

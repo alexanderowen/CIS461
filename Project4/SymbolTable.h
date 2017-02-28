@@ -1,6 +1,11 @@
+#ifndef SYMBOLTABLE_H
+#define SYMBOLTABLE_H
+
 #include <unordered_map>
 #include <string>
 #include <list>
+
+#include "type.h"
 
 using std::unordered_map;
 using std::list;
@@ -52,8 +57,10 @@ class SymbolTable
         VariableSym *lookupVariable(char *name);
         void addVariable(char *name, VariableSym *value);
 
-        SymbolTable *intersection(list<SymbolTable*> sts);
+        SymbolTable *intersection(list<SymbolTable*> sts, TypeTree *tt);
     private:
         VariableSym *lookupVariableNoParent(char *name);
 
 };
+
+#endif

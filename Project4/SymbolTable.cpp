@@ -2,8 +2,10 @@
 #include <list>
 #include <string>
 #include <string.h>
-#include "SymbolTable.h"
 #include "stdio.h"
+
+#include "SymbolTable.h"
+#include "type.h"
 
 using std::unordered_map;
 using std::list;
@@ -16,7 +18,7 @@ MethodSym::MethodSym(char *i, list<VariableSym *> *a, char *r) : id(i), args(a),
 SymbolTable::SymbolTable(SymbolTable *p) : parent(p) {}
 
 // note: this intersection does not travel all the way up the symboltable (ignores parent)
-SymbolTable *SymbolTable::intersection(list<SymbolTable*> sts)
+SymbolTable *SymbolTable::intersection(list<SymbolTable*> sts, TypeTree *tt)
 {
     SymbolTable *total = new SymbolTable(parent);
     bool found = true;
@@ -24,6 +26,7 @@ SymbolTable *SymbolTable::intersection(list<SymbolTable*> sts)
     //fprintf(stderr, "About to do intersection on map with size %lu\n", vMap.size());
     for (unordered_map<string, VariableSym*>::const_iterator key = vMap.begin(); key != vMap.end(); ++key)
     {
+        char *type = key->second->type;
         for (list<SymbolTable*>::const_iterator it = sts.begin(); it != sts.end(); ++it)
         {
             v = (*it)->lookupVariableNoParent(strdup(key->first.c_str()));
@@ -31,13 +34,19 @@ SymbolTable *SymbolTable::intersection(list<SymbolTable*> sts)
             {
                 //fprintf(stderr, "No match found: %s\n", key->first.c_str());
                 found = false;
-            }
+                break;
+            } 
+            else 
+            {
+                type = tt->LCA(type, v->type);
+            } 
         }
 
         if (found) 
         {
             //fprintf(stderr, "Found a match: %s\n", key->first.c_str());
-            total->addVariable(strdup(key->first.c_str()), key->second); //TODO: If the variable types do not match, use LCA
+            VariableSym *newVar = new VariableSym(strdup(key->first.c_str()),type);
+            total->addVariable(strdup(key->first.c_str()), newVar);
         }
         found = true;
     }
