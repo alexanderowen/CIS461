@@ -7,6 +7,7 @@
 #include <iterator>
 
 #include "visitor.h"
+#include "string.h"
 #include "node.h"
 #include "util.h"
 
