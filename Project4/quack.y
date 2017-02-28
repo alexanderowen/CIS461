@@ -228,7 +228,7 @@ int main(int argc, char* argv[])
 
     int condition;
     yyin = myfile;
-    fprintf(stderr, "Beginning parse of %s\n", argv[1]);
+    //fprintf(stderr, "Beginning parse of %s\n", argv[1]);
     
     condition = yyparse();
     if (condition != 0)
@@ -268,9 +268,10 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    std::cout << "\n" << std::endl;
     if (condition == 0)
-        fprintf(stderr, "Finished parse with no errors\n"); 
+    {
+        //fprintf(stderr, "Finished parse with no errors\n"); 
+    }
 
     return 0;
 }

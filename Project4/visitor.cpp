@@ -374,7 +374,7 @@ void TypeCheckVisitor::visitBinaryOperatorNode(BinaryOperatorNode *b)
     char *t2 = getType(b->right);
     if (t1 == NULL || t2 == NULL)
     {
-        fprintf(stderr, "Compiler error. One of the binary operator types is null\n");
+        fprintf(stderr, "Compiler error. At line %d. One of the binary operator types is null\n", b->lineno);
     }
     if (strcmp(t1, (char*)"-") == 0 || strcmp(t2, (char*)"-") == 0)
     {
@@ -494,6 +494,7 @@ void TypeCheckVisitor::visitIdentNode(IdentNode *i)
     if (strcmp(i->id, (char*)"this") == 0) {
         return;
     }
+    /*
     else if (st->lookupVariable(i->id) == NULL) 
     {
         errors++;
@@ -501,6 +502,7 @@ void TypeCheckVisitor::visitIdentNode(IdentNode *i)
         sprintf(msg, "%d: Syntax Error\n\tUse of uninitialized variable '%s'\n", i->lineno, i->id);
         msgs.push_back(msg);
     }
+    */
 }
 
 void TypeCheckVisitor::visitDotRExpr(DotRExpr *d)
@@ -782,6 +784,7 @@ void TypeCheckVisitor::visitReturnStatement(ReturnStatement *r)
     char *type;
     r->rexpr->accept(this);
 
+    /*
     IdentNode *ident = isIdent(r->rexpr);
     if (ident != NULL)
     {
@@ -791,6 +794,8 @@ void TypeCheckVisitor::visitReturnStatement(ReturnStatement *r)
     {
         type = r->rexpr->type();
     }
+    */
+    type = getType(r->rexpr);
 
     // TODO: If return type is subtype, it's ok
     if (strcmp(type, returnType) != 0)
@@ -811,12 +816,15 @@ void TypeCheckVisitor::visitClass(Class *c)
     className = c->getID();
     supertype = c->getExtends();
     SymbolTable *classScope = new SymbolTable(st);
-    SymbolTable *global = st;
+    //SymbolTable *global = st;
+    beyondConstructorScope = st;
     st = classScope;
+
     c->clssig->accept(this);
     c->clsbdy->accept(this);
+
     inClass = false;
-    st = global;
+    //st = global; //st is restored to global in visitClassBody
 }
 
 void TypeCheckVisitor::visitClassSignature(ClassSignature *cs) 
@@ -826,6 +834,23 @@ void TypeCheckVisitor::visitClassSignature(ClassSignature *cs)
         (*it)->accept(this);
     }
     cs->exop->accept(this);
+}
+
+void TypeCheckVisitor::visitClassBody(ClassBody *cb)  
+{
+    for (list<Statement *>::const_iterator it = cb->stmts->begin(); it != cb->stmts->end(); ++it)
+    {
+        (*it)->accept(this);
+    }
+    /* We need a way for the constructor of a class to throw out arguments, and keep 'this'
+     * instance variables. We define the 'classScope' as only for the constructor. We escape 
+     * the class scope once this is done. Instance variables are retained because they 
+     * exist in the TypeTree. */
+    st = beyondConstructorScope;
+    for (list<Method *>::const_iterator it = cb->meths->begin(); it != cb->meths->end(); ++it)
+    {
+        (*it)->accept(this);
+    }
 }
 
 void TypeCheckVisitor::visitFormalArg(FormalArg *f)
@@ -932,15 +957,16 @@ char *TypeCheckVisitor::getType(RExpr *r)
         }*/
         char *rType = getType(ofl->rexpr);
         if (rType == NULL)
-            return NULL;
+            return strdup((char*)"-");
         char *__type = tt->getVarFromType(rType, ofl->id);
         if (__type == NULL)
         {
             char *msg = (char*) malloc(sizeof(char)*256);
             sprintf(msg, "%d: Syntax Error\n\tType '%s' has no instance variable '%s'\n", r->lineno, rType, ofl->id);
             addError(msg);
-            return NULL;
+            return strdup((char*)"-");
         }
+        return __type;
     }
 
     PlusNode *plus = dynamic_cast<PlusNode*>(r);

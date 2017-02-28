@@ -114,6 +114,7 @@ class TypeCheckVisitor : public Visitor
 
         virtual void visitClass(Class *c);
         virtual void visitClassSignature(ClassSignature *cs);
+        virtual void visitClassBody(ClassBody *cb);
         virtual void visitFormalArg(FormalArg *f);
 
     private:
@@ -126,6 +127,7 @@ class TypeCheckVisitor : public Visitor
         char *className;
         char *supertype;
 
+        SymbolTable *beyondConstructorScope;
 
         IdentNode *isIdent(RExpr *r);
         ObjectFieldLExpr *isOFL(RExpr *r);

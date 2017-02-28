@@ -180,9 +180,10 @@ TypeTree::TypeTree()
     //this->addMethodToType((char*)"OBJ", MethodNode((char*)"STR",&(list<char*>((char*)"OBJ")),(char*)"OBJ"));
     list<char*> args;
     args.push_back(OBJ);
+    list<char*> emptyArgs;
     MethodNode *m = new MethodNode(strdup((char*)"STR"), args, STR);
     this->addMethodToType(OBJ, m);
-    MethodNode *ObjPrint = new MethodNode(strdup((char*)"PRINT"), args, NOTHING);
+    MethodNode *ObjPrint = new MethodNode(strdup((char*)"PRINT"), emptyArgs, NOTHING);
     this->addMethodToType(OBJ, ObjPrint); 
     MethodNode *ObjEquals = new MethodNode(strdup((char*)"EQUALS"), args, BOOL);
 
