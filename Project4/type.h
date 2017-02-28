@@ -29,6 +29,8 @@ class VariableNode
         VariableNode(char *n, char *t);
 };
 
+class TypeTree;
+
 class TypeNode
 {
     public:
@@ -48,7 +50,7 @@ class TypeNode
 
         int hasInstanceVar(char *name);
         VariableNode *getInstanceVar(char *name);
-        void addInstanceVar(VariableNode *v);
+        void addInstanceVar(VariableNode *v, TypeTree *tt);
 
         int equals(TypeNode *type);
         int equals(char *name);

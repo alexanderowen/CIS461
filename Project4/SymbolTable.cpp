@@ -23,7 +23,7 @@ SymbolTable *SymbolTable::intersection(list<SymbolTable*> sts, TypeTree *tt)
     SymbolTable *total = new SymbolTable(parent);
     bool found = true;
     VariableSym *v;
-    //fprintf(stderr, "About to do intersection on map with size %lu\n", vMap.size());
+    fprintf(stderr, "About to do intersection on map with size %lu\n", vMap.size());
     for (unordered_map<string, VariableSym*>::const_iterator key = vMap.begin(); key != vMap.end(); ++key)
     {
         char *type = key->second->type;
@@ -32,12 +32,13 @@ SymbolTable *SymbolTable::intersection(list<SymbolTable*> sts, TypeTree *tt)
             v = (*it)->lookupVariableNoParent(strdup(key->first.c_str()));
             if (v == NULL)
             {
-                //fprintf(stderr, "No match found: %s\n", key->first.c_str());
+                fprintf(stderr, "No match found: %s\n", key->first.c_str());
                 found = false;
                 break;
             } 
             else 
             {
+                fprintf(stderr, "Performing LCA on '%s' and '%s'\n", type, v->type);
                 type = tt->LCA(type, v->type);
             } 
         }

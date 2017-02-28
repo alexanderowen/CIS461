@@ -61,9 +61,17 @@ int TypeNode::hasInstanceVar(char *name)
     return 0;
 }
 
-void TypeNode::addInstanceVar(VariableNode *v)
-{
-    instanceVars.push_back(v);
+void TypeNode::addInstanceVar(VariableNode *v, TypeTree *tt)
+{//TODO: Has no way of knowing if this variable should be trashed
+    VariableNode *_v = this->getInstanceVar(v->name);
+    if (_v != NULL)
+    {
+        _v->type = tt->LCA(_v->type, v->type);
+    }
+    else 
+    {
+        instanceVars.push_back(v);
+    }
 }
 
 VariableNode *TypeNode::getInstanceVar(char *name)
@@ -381,7 +389,7 @@ void TypeTree::addVarToType(char *type, VariableNode *v)
     if (t == NULL)
         return;
 
-    t->addInstanceVar(v);
+    t->addInstanceVar(v, this);
 }
 
 // returns the type of instance variable
