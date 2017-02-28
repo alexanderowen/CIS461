@@ -213,6 +213,14 @@ TypeTree::TypeTree()
     str_args.push_back(STR);
     MethodNode *StrPlus = new MethodNode(strdup((char*)"PLUS"), str_args, STR);
     this->addMethodToType(STR, StrPlus);
+    MethodNode *StrAtMost = new MethodNode(strdup((char*)"ATMOST"), str_args, BOOL);
+    this->addMethodToType(STR, StrAtMost);
+    MethodNode *StrLess = new MethodNode(strdup((char*)"LESS"), str_args, BOOL);
+    this->addMethodToType(STR, StrLess);
+    MethodNode *StrAtLeast = new MethodNode(strdup((char*)"ATLEAST"), str_args, BOOL);
+    this->addMethodToType(STR, StrAtLeast);
+    MethodNode *StrMore = new MethodNode(strdup((char*)"MORE"), str_args, BOOL);
+    this->addMethodToType(STR, StrMore);
 
     // Methods for Bool
     root->addChild(BOOL);
