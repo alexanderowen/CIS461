@@ -1,7 +1,0 @@
-
-for src in `ls samples`; do
-    echo "Running on samples/${src}"
-    srcname=`basename ${src}`
-    ./quack samples/${src}
-    echo "------"
-done
