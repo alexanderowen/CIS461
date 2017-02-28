@@ -1,0 +1,5 @@
+if true {
+    x = 10;
+} else {
+}
+y = x + 1;
