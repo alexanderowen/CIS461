@@ -5,6 +5,6 @@ class Sample(x: Int) extends Obj {
    }
 }
 
-z = "strings can have \" escaped quotes and \. other escapes"; 
+z = "strings";
 y = Sample(5);
 y.PRINT();

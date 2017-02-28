@@ -485,7 +485,7 @@ void TypeCheckVisitor::visitAssignmentStatement(AssignmentStatement *a)
         {
             if (strcmp(ident->id, (char*)"this") == 0)
             {
-                fprintf(stderr, "Adding variable node. Adding '%s' of type '%s' to type '%s'\n", ofl->id, getType(a->rexpr), className);
+                //fprintf(stderr, "Adding variable node. Adding '%s' of type '%s' to type '%s'\n", ofl->id, getType(a->rexpr), className);
                 VariableNode *v = new VariableNode(strdup(ofl->id), strdup(getType(a->rexpr)));
                 tt->addVarToType(strdup(className), v);
             }
@@ -552,7 +552,7 @@ void TypeCheckVisitor::visitDotRExpr(DotRExpr *d)
     }
     */
     type = getType(d->rexpr);
-    fprintf(stderr, "searching for method '%s' of type '%s'\n", d->id, type);
+    //fprintf(stderr, "searching for method '%s' of type '%s'\n", d->id, type);
     MethodNode *m = tt->typeGetMethod(type, d->id);
     if (m == NULL)
     {
@@ -594,7 +594,7 @@ void TypeCheckVisitor::visitDotRExpr(DotRExpr *d)
 
 void TypeCheckVisitor::visitIfBlock(IfBlock *i)
 {
-    fprintf(stderr, "Inside the if block\n");
+    //fprintf(stderr, "Inside the if block\n");
     list<SymbolTable*> sts;
     SymbolTable *origin = st;
     st = new SymbolTable(origin);
@@ -612,7 +612,7 @@ void TypeCheckVisitor::visitIfBlock(IfBlock *i)
     sts.push_back(st);
     i->_else->accept(this);
 
-    fprintf(stderr, "Calling intersection\n");
+    //fprintf(stderr, "Calling intersection\n");
     st = sts.front()->intersection(sts, tt);
 }
 

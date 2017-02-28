@@ -1791,7 +1791,7 @@ yyreduce:
 
   case 55:
 #line 200 "quack.y"
-    {(yyval.rexpr) = (yyvsp[(1) - (1)].rexpr);}
+    {(yyval.rexpr) = (yyvsp[(1) - (1)].rexpr);;}
     break;
 
   case 56:

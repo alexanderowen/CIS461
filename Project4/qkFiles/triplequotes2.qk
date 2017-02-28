@@ -1,4 +1,0 @@
-s = "hello world this has lots of spaces";
-s = "this  has as many spaces";
-s = "asdf  asd as asnf asdfef";
-s = "stuff in a triplequoted string";
