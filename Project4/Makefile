@@ -22,7 +22,7 @@ quack.tab.o: quack.y
 
 lex.yy.o: quack.lex 
 	flex quack.lex
-	g++ -std=c++11 -c -g lex.yy.c
+	g++ -c -g lex.yy.c
 
 
 clean:
