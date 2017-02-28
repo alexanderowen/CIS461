@@ -197,7 +197,7 @@ r_expr:
 
 r_expr_option:
               /* epsilon */ {$$ = new EmptyRExpr(); $$->setLineno(@$.first_line);}
-            | r_expr        {$$ = $1}
+            | r_expr        {$$ = $1;}
             ;
 
 actual_args:

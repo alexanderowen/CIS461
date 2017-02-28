@@ -8,21 +8,21 @@ SymbolTable.o: SymbolTable.h SymbolTable.cpp
 	g++ -std=c++11 -c -g SymbolTable.cpp
 
 util.o: util.h util.cpp
-	g++ -c util.cpp -I.
+	g++ -std=c++11 -c util.cpp -I.
 
 visitor.o: visitor.h visitor.cpp
-	g++ -c -g visitor.cpp -I.
+	g++ -std=c++11 -c -g visitor.cpp -I.
 
 node.o: node.cpp node.h
-	g++ -c -g node.cpp -I.
+	g++ -std=c++11 -c -g node.cpp -I.
 
 quack.tab.o: quack.y
 	bison -d quack.y
-	g++ -c -g quack.tab.c
+	g++ -std=c++11 -c -g quack.tab.c
 
 lex.yy.o: quack.lex 
 	flex quack.lex
-	g++ -c -g lex.yy.c
+	g++ -std=c++11 -c -g lex.yy.c
 
 
 clean:
