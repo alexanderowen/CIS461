@@ -1,0 +1,7 @@
+class A(x : Int) {
+    this.x = x;
+
+    def foo(a : A) {
+        a.x = 20;
+    }
+}

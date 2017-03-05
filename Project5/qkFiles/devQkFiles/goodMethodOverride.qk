@@ -1,0 +1,16 @@
+class A() {
+}
+class B() extends A {
+}
+
+class C() {
+    def foo(b : B) : A {
+        return A();
+    }
+}
+
+class D() extends C {
+    def foo(a : A) : B {
+        return B();
+    }
+}

@@ -1,0 +1,9 @@
+class A() {
+    def foo(x : Int) : Int {
+        return x;
+    }
+}
+
+a = A();
+a.foo(10);
+a.bar();

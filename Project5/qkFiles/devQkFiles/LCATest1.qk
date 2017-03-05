@@ -1,0 +1,11 @@
+class A() {
+    def foo() {
+    }
+}
+class B() extends A {
+    def bar() {
+    }
+}
+var : A = B();
+var.bar(); //error, var's declared type is A
+

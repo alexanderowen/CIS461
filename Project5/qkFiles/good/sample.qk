@@ -1,0 +1,10 @@
+class Sample(x: Int) extends Obj {
+   this.x = x;
+   def foo() : Int {
+       return this.x;
+   }
+}
+
+z = "strings";
+y = Sample(5);
+y.PRINT();
