@@ -17,6 +17,11 @@ void Node::setLineno(int l)
 }
 
 Class::Class(ClassSignature *cs, ClassBody *cb) : clssig(cs), clsbdy(cb) {}
+Class::~Class()
+{
+    //TODO: Call delete on cs and cb
+}
+
 void Class::print()
 {
     fprintf(stdout, "Found Class\n");
@@ -503,12 +508,10 @@ Program::Program(list<Class *> *c, list<Statement *> *s, int l)
     : classes(c), statements(s), Node(l) {}
 Program::~Program()
 {
-    /*
-    for (list<Class *>::const_iterator it = classes.begin(); it != classes.end(); ++it) 
+    for (list<Class *>::const_iterator it = classes->begin(); it != classes->end(); ++it) 
     {
         delete (*it);
     }
-    */
     delete classes;
     for (list<Statement *>::const_iterator it = statements->begin(); it != statements->end(); ++it) 
     {

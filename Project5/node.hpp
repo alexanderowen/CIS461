@@ -94,6 +94,8 @@ class Class : public Node
         ClassBody *clsbdy;
 
         Class(ClassSignature *cs, ClassBody *cb);
+        virtual ~Class();
+
         virtual void print();
         virtual void accept(Visitor *v);
         char *getID();

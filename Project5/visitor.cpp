@@ -381,8 +381,8 @@ TypeCheckVisitor::TypeCheckVisitor(TypeTree *t)
 }
 TypeCheckVisitor::~TypeCheckVisitor() 
 {
-    delete st;
-    delete tt;
+//    delete st;
+//    delete tt;
 }
 
 // Has the type checker met the max number of errors?
