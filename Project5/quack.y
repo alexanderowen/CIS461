@@ -4,12 +4,14 @@
 #include <list>
 #include <iostream>
 
-#include "lex.yy.h"
 #include "visitor.h"
 #include "type.hpp"
 #include "node.hpp"
+#include "lex.yy.h"
+#include "quack.tab.h"
 
 using namespace std;
+using std::list;
 
 extern int yylex();
 extern int yyparse();
@@ -23,12 +25,12 @@ Program *root;
 %union {
     int integer;
     char *id;
-    list<Statement *> *stmts;
-    list<Class *>     *clsss; 
-    list<RExpr *> *rexprs;
-    list<ElifClause *> *elifs;
-    list<FormalArg *> *fargs;
-    list<Method *> *meths;
+    std::list<Statement *> *stmts;
+    std::list<Class *>     *clsss; 
+    std::list<RExpr *> *rexprs;
+    std::list<ElifClause *> *elifs;
+    std::list<FormalArg *> *fargs;
+    std::list<Method *> *meths;
     Class *cls;
     ClassBody *clsbdy;
     ClassSignature *clssig;
@@ -86,7 +88,7 @@ program:
         ;
 
 class_star: 
-            /* epsilon */    {$$ = new list<Class *>();}
+            /* epsilon */    {$$ = new std::list<Class *>();}
           | class_star class {$$ = $1; $1->push_back($2);}
           ;
 
@@ -104,7 +106,7 @@ extends_option:
             ;
 
 formal_args: 
-             /* epsilon */  {$$ = new list<FormalArg *>();}
+             /* epsilon */  {$$ = new std::list<FormalArg *>();}
            | formal_arg extra_formal_args_star  {$$ = $2; $2->push_front($1);} /*works???*/
            ;
 
@@ -113,7 +115,7 @@ formal_arg:
         ;
 
 extra_formal_args_star: 
-                  /* epsilon */ {$$ = new list<FormalArg *>();}
+                  /* epsilon */ {$$ = new std::list<FormalArg *>();}
                 | extra_formal_args_star ',' formal_arg {$$ = $1; $1->push_back($3);}  
                 ;
 
@@ -125,7 +127,7 @@ method:
      ;
 
 method_star:
-          /* epsilon */      {$$ = new list<Method *>();}
+          /* epsilon */      {$$ = new std::list<Method *>();}
         | method_star method {$$ = $1; $1->push_back($2);}
         ;
 
@@ -135,7 +137,7 @@ ident_option:
         ;
 
 statement_star: 
-          /* epsilon */            {$$ = new list<Statement *>();}
+          /* epsilon */            {$$ = new std::list<Statement *>();}
         | statement_star statement {$$ = $1; $1->push_back($2);} 
         ;
 
@@ -156,7 +158,7 @@ if_clause:
     ;
 
 elif_star: 
-          /* epsilon */         {$$ = new list<ElifClause *>();}
+          /* epsilon */         {$$ = new std::list<ElifClause *>();}
         | elif_star elif_clause {$$ = $1; $1->push_back($2);}
         ;
                 
@@ -201,16 +203,16 @@ r_expr_option:
             ;
 
 actual_args:
-           /* epsilon */            {$$ = new list<RExpr *>();}
-        |  r_expr extra_actual_args {$$ = new list<RExpr *>(); $$->push_back($1); $$->merge(*($2));}
+           /* epsilon */            {$$ = new std::list<RExpr *>();}
+        |  r_expr extra_actual_args {$$ = new std::list<RExpr *>(); $$->push_back($1); $$->merge(*($2));}
         ;
 
 extra_actual_args:
-                  /* epsilon */                {$$ = new list<RExpr *>();}
+                  /* epsilon */                {$$ = new std::list<RExpr *>();}
                 | extra_actual_args ',' r_expr {$$ = $1; $1->push_back($3);}
 %%
 
-
+/*
 int main(int argc, char* argv[])
 {
     if (argc != 2)
@@ -277,3 +279,4 @@ int main(int argc, char* argv[])
 
     return 0;
 }
+*/

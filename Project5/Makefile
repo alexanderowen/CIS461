@@ -1,5 +1,8 @@
-quack: quack.tab.o lex.yy.o node.o visitor.o util.o SymbolTable.o type.o
-	g++ lex.yy.o quack.tab.o node.o visitor.o util.o SymbolTable.o type.o -o quack -ll
+quack: quack.tab.o lex.yy.o node.o visitor.o util.o SymbolTable.o type.o driver.o
+	g++ driver.o lex.yy.o quack.tab.o node.o visitor.o util.o SymbolTable.o type.o -o quack -ll
+
+driver.o: driver.cpp
+	g++ -c -std=c++11 driver.cpp
 
 type.o: type.hpp type.cpp
 	g++ -std=c++11 -c -g type.cpp
