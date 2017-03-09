@@ -478,6 +478,7 @@ void IfBlock::accept(Visitor *v)
 }
 
 LExpr::~LExpr() {}
+void LExpr::print(FILE *f) {}
 
 IdentNode::IdentNode(char *i) : id(i) {}
 IdentNode::~IdentNode()
@@ -487,6 +488,10 @@ IdentNode::~IdentNode()
 void IdentNode::print()
 {
     fprintf(stdout, "Found a LExpr\n");
+}
+void IdentNode::print(FILE *f)
+{
+    fprintf(f, "%s", id);
 }
 void IdentNode::accept(Visitor *v)
 {

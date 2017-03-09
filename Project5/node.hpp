@@ -549,6 +549,7 @@ class LExpr : public Node
         virtual ~LExpr();
 
         virtual void print() = 0;
+        virtual void print(FILE *);
         virtual void accept(Visitor *v) = 0;
 };
 
@@ -561,6 +562,7 @@ class IdentNode : public LExpr
         virtual ~IdentNode();
 
         virtual void print();
+        virtual void print(FILE *);
         virtual void accept(Visitor *v);
 };
 

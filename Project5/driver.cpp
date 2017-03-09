@@ -3,6 +3,7 @@
 #include <list>
 #include <iostream>
 
+#include "TranslatorVisitor.hpp"
 #include "visitor.h"
 #include "type.hpp"
 #include "node.hpp"
@@ -74,10 +75,13 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    if (condition == 0)
+    if (condition != 0)
     {
-        //fprintf(stderr, "Finished parse with no errors\n"); 
+        return -1;
     }
+
+    TranslatorVisitor tv((char*)"q.out");
+    root->accept(&tv);
 
     delete root;
 
