@@ -1,6 +1,13 @@
 quack: quack.tab.o lex.yy.o node.o visitor.o util.o SymbolTable.o type.o driver.o TranslatorVisitor.o
 	g++ driver.o lex.yy.o quack.tab.o node.o visitor.o util.o SymbolTable.o type.o TranslatorVisitor.o -o quack -ll
 
+mc: 
+	mv q.out q.c
+	gcc -c q.c
+	gcc -c Builtins.c
+	gcc q.o Builtins.o
+
+
 TranslatorVisitor.o: TranslatorVisitor.hpp TranslatorVisitor.cpp
 	g++ -c -std=c++11 TranslatorVisitor.cpp
 
