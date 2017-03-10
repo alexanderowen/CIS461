@@ -30,6 +30,8 @@ class TranslatorVisitor : public Visitor
         void visitAssignmentStatement(AssignmentStatement *);
 
         void visitIntNode(IntNode *);
+        void visitStringNode(StringNode *);
+        void visitBinaryOperatorNode(BinaryOperatorNode *);
         void visitIdentNode(IdentNode *);
         void visitDotRExpr(DotRExpr *);
 };

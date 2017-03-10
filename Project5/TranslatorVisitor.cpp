@@ -44,6 +44,7 @@ void TranslatorVisitor::visitProgram(Program *p)
 void TranslatorVisitor::visitAssignmentStatement(AssignmentStatement *a)
 {
     string t = getType(a->rexpr);
+    fprintf(stderr, "Found type :'%s'\n", t.c_str());
     auto v = typeMap.find(t);
     if (v != typeMap.end()) 
     {
@@ -62,6 +63,60 @@ void TranslatorVisitor::visitAssignmentStatement(AssignmentStatement *a)
 void TranslatorVisitor::visitIntNode(IntNode *i)
 {
     fprintf(f, "int_literal(%d)", i->value);
+}
+
+void TranslatorVisitor::visitStringNode(StringNode *s)
+{
+    fprintf(f, "string_literal(%s)", s->id);
+}
+
+void TranslatorVisitor::visitBinaryOperatorNode(BinaryOperatorNode *b)
+{
+    b->left->accept(this);
+    fprintf(f, "->clazz->");
+    switch(b->operation) {
+        case 0:
+            fprintf(f, "PLUS");
+            break;
+        case 1:
+            fprintf(f, "MINUS");
+            break;
+        case 2:
+            fprintf(f, "TIMES");
+            break;
+        case 3:
+            fprintf(f, "DIVIDE");
+            break;
+        case 4:
+            fprintf(f, "EQUALS");
+            break;
+        case 5:
+            fprintf(f, "ATMOST");
+            break;
+        case 6:
+            fprintf(f, "LESS");
+            break;
+        case 7:
+            fprintf(f, "ATLEAST");
+            break;
+        case 8:
+            fprintf(f, "MORE");
+            break;
+        case 9:
+            fprintf(f, "AND");
+            break;
+        case 10:
+            fprintf(f, "OR");
+            break;
+        default:
+            break;
+    }
+    fprintf(f, "(");
+    b->left->accept(this); // Just a way of visiting printing left again
+    fprintf(f, ", ");
+    b->right->accept(this);
+    fprintf(f, ")");
+
 }
 
 void TranslatorVisitor::visitIdentNode(IdentNode *i)
@@ -162,6 +217,7 @@ char *TranslatorVisitor::getType(RExpr *r)
         }
         return __type;
     }
+*/
 
     PlusNode *plus = dynamic_cast<PlusNode*>(r);
     if (plus != NULL)
@@ -183,7 +239,6 @@ char *TranslatorVisitor::getType(RExpr *r)
     {
         return getType(divide->left);
     }
-*/
     return strdup((char*)"-");
 }
 
