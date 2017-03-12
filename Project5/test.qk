@@ -1,4 +1,0 @@
-s = "String";
-t = "World";
-o = Obj();
-s == o;
