@@ -16,6 +16,7 @@ class TranslatorVisitor : public Visitor
     private:
         FILE *f = NULL;
         unordered_map<string, string> typeMap;
+        unordered_map<string, string> keywords;
 
         IdentNode *isIdent(RExpr *);
         ObjectFieldLExpr *isOFL(RExpr *);
@@ -28,6 +29,10 @@ class TranslatorVisitor : public Visitor
 
         void visitProgram(Program *);
         void visitAssignmentStatement(AssignmentStatement *);
+
+        void visitIfClause(IfClause *);
+        void visitElifClause(ElifClause *);
+        void visitTrueElseOption(TrueElseOption *);
 
         void visitIntNode(IntNode *);
         void visitStringNode(StringNode *);

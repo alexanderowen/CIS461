@@ -15,6 +15,16 @@ TranslatorVisitor::TranslatorVisitor(char *fn)
     }
     typeMap.insert({"Obj", "obj_Obj"});
     typeMap.insert({"Int", "obj_Int"});
+    typeMap.insert({"String", "obj_String"});
+    typeMap.insert({"Boolean", "obj_Boolean"});
+    typeMap.insert({"Nothing", "obj_Nothing"});
+
+    /*
+    keywords.insert({"true", "lit_true"});
+    keywords.insert({"false", "lit_false"});
+    */
+    keywords.insert({"true", "lit_true->value"});
+    keywords.insert({"false", "lit_false->value"});
 }
 
 TranslatorVisitor::~TranslatorVisitor()
@@ -60,6 +70,40 @@ void TranslatorVisitor::visitAssignmentStatement(AssignmentStatement *a)
     fprintf(f, ";");
 }
 
+void TranslatorVisitor::visitIfClause(IfClause *i)
+{
+    fprintf(f, "if (");
+    i->rexpr->accept(this);
+    fprintf(f, ") {\n");
+    for (list<Statement *>::const_iterator it = i->stmts->begin(); it != i->stmts->end(); ++it)
+    {
+        (*it)->accept(this);
+    }
+    fprintf(f, "\n}\n");
+}
+
+void TranslatorVisitor::visitElifClause(ElifClause *e)
+{
+    fprintf(f, "else if (");
+    e->rexpr->accept(this);
+    fprintf(f, ") {\n");
+    for (list<Statement *>::const_iterator it = e->stmts->begin(); it != e->stmts->end(); ++it)
+    {
+        (*it)->accept(this);
+    }
+    fprintf(f, "\n}\n");
+}
+
+void TranslatorVisitor::visitTrueElseOption(TrueElseOption *e)
+{
+    fprintf(f, "else {\n");
+    for (list<Statement *>::const_iterator it = e->stmts->begin(); it != e->stmts->end(); ++it)
+    {
+        (*it)->accept(this);
+    }
+    fprintf(f, "\n}\n");
+}
+
 void TranslatorVisitor::visitIntNode(IntNode *i)
 {
     fprintf(f, "int_literal(%d)", i->value);
@@ -67,7 +111,7 @@ void TranslatorVisitor::visitIntNode(IntNode *i)
 
 void TranslatorVisitor::visitStringNode(StringNode *s)
 {
-    fprintf(f, "string_literal(%s)", s->id);
+    fprintf(f, "str_literal(%s)", s->id);
 }
 
 void TranslatorVisitor::visitBinaryOperatorNode(BinaryOperatorNode *b)
@@ -121,7 +165,16 @@ void TranslatorVisitor::visitBinaryOperatorNode(BinaryOperatorNode *b)
 
 void TranslatorVisitor::visitIdentNode(IdentNode *i)
 {
-    fprintf(f, "%s", i->id);
+    string str = i->id;
+    auto q = keywords.find(str);
+    if (q != keywords.end())
+    {
+        fprintf(f, "%s", q->second.c_str());
+    } 
+    else
+    {
+        fprintf(f, "%s", i->id);
+    }
 }
 
 void TranslatorVisitor::visitDotRExpr(DotRExpr *d) 
