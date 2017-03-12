@@ -104,6 +104,18 @@ void TranslatorVisitor::visitTrueElseOption(TrueElseOption *e)
     fprintf(f, "\n}\n");
 }
 
+void TranslatorVisitor::visitWhileStatement(WhileStatement *w)
+{
+    fprintf(f, "while (");
+    w->rexpr->accept(this);
+    fprintf(f, "->value) {\n"); //since rexpr is of type boolean, must access value
+    for (list<Statement *>::const_iterator it = w->stmts->begin(); it != w->stmts->end(); ++it)
+    {
+        (*it)->accept(this);
+    }
+    fprintf(f, "\n}\n");
+}
+
 void TranslatorVisitor::visitIntNode(IntNode *i)
 {
     fprintf(f, "int_literal(%d)", i->value);

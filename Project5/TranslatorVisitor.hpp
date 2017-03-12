@@ -34,6 +34,8 @@ class TranslatorVisitor : public Visitor
         void visitElifClause(ElifClause *);
         void visitTrueElseOption(TrueElseOption *);
 
+        void visitWhileStatement(WhileStatement *);
+
         void visitIntNode(IntNode *);
         void visitStringNode(StringNode *);
         void visitBinaryOperatorNode(BinaryOperatorNode *);
