@@ -41,6 +41,8 @@ class TranslatorVisitor : public Visitor
         void visitClassSignature(ClassSignature *);
         void visitClassBody(ClassBody *);
 
+        void visitFormalArg(FormalArg *);
+
         void visitAssignmentStatement(AssignmentStatement *);
 
         void visitIfClause(IfClause *);

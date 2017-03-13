@@ -67,7 +67,7 @@ void TranslatorVisitor::visitClassSignature(ClassSignature *cs)
 {
     className = cs->id;
     TypeNode *tn = tt->findType(cs->id);
-    fprintf(f, "class_%s_struct;\n", cs->id);
+    fprintf(f, "struct class_%s_struct;\n", cs->id);
     fprintf(f, "typedef struct class_%s_struct* class_%s;\n", cs->id, cs->id);
     fprintf(f, "typedef struct obj_%s_struct {\n", cs->id);
     fprintf(f, "\tclass_%s clazz;\n", cs->id);
@@ -89,14 +89,26 @@ void TranslatorVisitor::visitClassSignature(ClassSignature *cs)
     fprintf(f, "extern class_%s the_class_%s;\n", cs->id, cs->id);
 
     fprintf(f, "struct class_%s_struct {\n", cs->id);
-    fprintf(f, "\tobj_%s (*constructor) ();\n", cs->id); //TODO: Arguments to constructor
+    fprintf(f, "\tobj_%s (*constructor) (", cs->id); 
+    int i = 0; //need to print out constructor args 
+    for (list<FormalArg *>::const_iterator it = cs->fargs->begin(); it != cs->fargs->end(); ++it)
+    {
+        (*it)->accept(this);
+        if (i+1 < cs->fargs->size())
+        {
+            fprintf(f, ", ");
+            i++;
+        }
+    }
+
+    fprintf(f, ");\n");
 
     // TODO: Resolve printing the methods
     // printMethodSignatures(tn);    
     fprintf(f, "\n};\n\n");
     
     fprintf(f, "obj_%s new_%s(", cs->id, cs->id);
-    int i = 0; 
+    i = 0; 
     for (list<FormalArg *>::const_iterator it = cs->fargs->begin(); it != cs->fargs->end(); ++it)
     {
         (*it)->accept(this);
@@ -164,6 +176,13 @@ void TranslatorVisitor::visitClassBody(ClassBody *cb)
     }
 }
 
+void TranslatorVisitor::visitFormalArg(FormalArg *fa)
+{
+    auto q = typeMap.find(fa->type);
+    //fprintf(stderr, "FormalArg->id = %s; at '%p'\n", fa->id, fa->id);
+    //fprintf(stderr, "FormalArg->type = %s; at '%p'\n", fa->type, fa->type);
+    fprintf(f, "%s %s", q->second.c_str(), fa->id);
+}
 
 void TranslatorVisitor::visitAssignmentStatement(AssignmentStatement *a)
 {

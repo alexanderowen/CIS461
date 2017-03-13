@@ -318,7 +318,7 @@ void TypeTreeVisitor::visitMethod(Method *m)
 void TypeTreeVisitor::visitFormalArg(FormalArg *f) 
 {
     //fprintf(stderr, "Formal arg id: %s", f->id);
-    //fprintf(stderr, "and type: %s", f->type);
+    //fprintf(stderr, " and type: %s", f->type);
     if (inMethod)
         args->push_back(f->type);
 }
@@ -843,8 +843,8 @@ void TypeCheckVisitor::visitClassBody(ClassBody *cb)
 
 void TypeCheckVisitor::visitFormalArg(FormalArg *f)
 {
-    VariableSym *v = new VariableSym(f->id, f->type);
-    st->addVariable(f->id, v);
+    VariableSym *v = new VariableSym(strdup(f->id), strdup(f->type));
+    st->addVariable(strdup(f->id), v);
 }
 
 void TypeCheckVisitor::addError(char *msg)
