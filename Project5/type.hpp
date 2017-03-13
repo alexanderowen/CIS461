@@ -105,6 +105,7 @@ class MethodNode
         MethodNode(char *, list<char *> , char *);                                              
        ~MethodNode();
         void print();
+        bool equals(MethodNode *);
 }; 
 
 /* Specifies a component of a TypeNode that represents an instance variable of a class/type

@@ -5,7 +5,7 @@
 #include "visitor.h"
 #include "TranslatorVisitor.hpp"
 
-TranslatorVisitor::TranslatorVisitor(char *fn)
+TranslatorVisitor::TranslatorVisitor(char *fn, TypeTree *_tt)
 {
     f = fopen(fn, "w");    
     if (f == NULL)
@@ -25,6 +25,8 @@ TranslatorVisitor::TranslatorVisitor(char *fn)
     */
     keywords.insert({"true", "lit_true->value"});
     keywords.insert({"false", "lit_false->value"});
+
+    tt = _tt;
 }
 
 TranslatorVisitor::~TranslatorVisitor()
@@ -36,12 +38,11 @@ TranslatorVisitor::~TranslatorVisitor()
 void TranslatorVisitor::visitProgram(Program *p)
 {
     fprintf(f, "#include \"Builtins.h\"\n");
-    /*  //TODO: Uncomment when ready for classes
+    fprintf(f, "#include <stdlib.h>\n\n");
     for (list<Class *>::const_iterator it = p->classes->begin(); it != p->classes->end(); ++it)
     {
         (*it)->accept(this);
     }
-    */
     fprintf(f, "int main() {\n");
     for (list<Statement *>::const_iterator it = p->statements->begin(); it != p->statements->end(); ++it)
     {
@@ -51,6 +52,119 @@ void TranslatorVisitor::visitProgram(Program *p)
     fprintf(f, "\n}");
 }
 
+void TranslatorVisitor::visitClass(Class *c)
+{
+    c->clssig->accept(this);
+    c->clsbdy->accept(this);
+    fprintf(f, "struct class_%s_struct the_class_%s_struct = {\n", className, className);
+    fprintf(f, "\tnew_%s", className);
+    fprintf(f, "\n};");
+    fprintf(f, "class_%s the_class_%s = &the_class_%s_struct;\n", className, className, className);
+    fprintf(f, "\n\n\n"); //for readablility
+}
+
+void TranslatorVisitor::visitClassSignature(ClassSignature *cs)
+{
+    className = cs->id;
+    TypeNode *tn = tt->findType(cs->id);
+    fprintf(f, "class_%s_struct;\n", cs->id);
+    fprintf(f, "typedef struct class_%s_struct* class_%s;\n", cs->id, cs->id);
+    fprintf(f, "typedef struct obj_%s_struct {\n", cs->id);
+    fprintf(f, "\tclass_%s clazz;\n", cs->id);
+
+    for (list<VariableNode*>::const_iterator it = tn->instanceVars.begin(); it != tn->instanceVars.end(); ++it)
+    {
+        string str = (*it)->type;
+        auto v = typeMap.find(str);
+        fprintf(f, "\t%s %s;\n", v->second.c_str(), (*it)->name);
+    }
+
+    fprintf(f, "\n} * obj_%s;\n", cs->id);
+
+    char c[256];
+    sprintf(c, "obj_%s", cs->id);
+    typeMap.insert({cs->id, c}); 
+
+    fprintf(f, "struct class_%s_struct the_class_%s_struct;\n", cs->id, cs->id);
+    fprintf(f, "extern class_%s the_class_%s;\n", cs->id, cs->id);
+
+    fprintf(f, "struct class_%s_struct {\n", cs->id);
+    fprintf(f, "\tobj_%s (*constructor) ();\n", cs->id); //TODO: Arguments to constructor
+
+    // TODO: Resolve printing the methods
+    // printMethodSignatures(tn);    
+    fprintf(f, "\n};\n\n");
+    
+    fprintf(f, "obj_%s new_%s(", cs->id, cs->id);
+    int i = 0; 
+    for (list<FormalArg *>::const_iterator it = cs->fargs->begin(); it != cs->fargs->end(); ++it)
+    {
+        (*it)->accept(this);
+        if (i+1 < cs->fargs->size())
+        {
+            fprintf(f, ", ");
+            i++;
+        }
+    }
+    fprintf(f, ") {\n");
+    //cs->exop->accept(this);
+
+}
+
+void TranslatorVisitor::printMethodSignatures(TypeNode *tn)
+{
+    list<MethodNode*> meths;
+    meths = collectMethods(tn, meths);
+    for (list<MethodNode*>::const_iterator it = meths.begin(); it != meths.end(); ++it)
+    {
+        //TODO: Print them nicely
+    }
+}
+
+bool methodInList(list<MethodNode*> meths, MethodNode *m)
+{
+    for (list<MethodNode*>::const_iterator it = meths.begin(); it != meths.end(); ++it)
+    {
+        if ((*it)->equals(m)) 
+            return true;
+    }
+    return false;
+}
+
+list<MethodNode*> TranslatorVisitor::collectMethods(TypeNode *tn, list<MethodNode*> meths)
+{
+    while (tn != NULL)
+    {
+        for (list<MethodNode*>::const_iterator it = tn->methods.begin(); it != tn->methods.end(); ++it)
+        {
+            if (!methodInList(meths, (*it)))
+            {
+                meths.push_back((*it));
+            }           
+        }
+        tn = tn->parent;
+    }
+    return meths;
+}
+
+void TranslatorVisitor::visitClassBody(ClassBody *cb)
+{
+    fprintf(f, "\tobj_%s thing = malloc(sizeof(struct obj_%s_struct));\n", className, className);
+    fprintf(f, "\tthing->clazz = the_class_%s;\n", className);
+    for (list<Statement *>::const_iterator it = cb->stmts->begin(); it != cb->stmts->end(); ++it)
+    {
+        fprintf(f, "\t");
+        (*it)->accept(this);
+        fprintf(f, "\n");
+    }
+    fprintf(f, "\treturn thing;\n}\n"); 
+    for (list<Method *>::const_iterator it = cb->meths->begin(); it != cb->meths->end(); ++it)
+    {
+        (*it)->accept(this);
+    }
+}
+
+
 void TranslatorVisitor::visitAssignmentStatement(AssignmentStatement *a)
 {
     string t = getType(a->rexpr);
@@ -58,6 +172,7 @@ void TranslatorVisitor::visitAssignmentStatement(AssignmentStatement *a)
     auto v = typeMap.find(t);
     if (v != typeMap.end()) 
     {
+        //TODO: Prints unnecessarily when the variable is already defined
         fprintf(f, "%s ", v->second.c_str());
     }
     a->lexpr->print(f);
@@ -126,6 +241,13 @@ void TranslatorVisitor::visitStringNode(StringNode *s)
     fprintf(f, "str_literal(%s)", s->id);
 }
 
+void TranslatorVisitor::visitNotNode(NotNode *n)
+{
+    fprintf(f, "!(");
+    n->value->accept(this);
+    fprintf(f, ")");
+}
+
 void TranslatorVisitor::visitBinaryOperatorNode(BinaryOperatorNode *b)
 {
     b->left->accept(this);
@@ -183,10 +305,22 @@ void TranslatorVisitor::visitIdentNode(IdentNode *i)
     {
         fprintf(f, "%s", q->second.c_str());
     } 
+    /*  Moved to ObjectFieldLExpr, where it belongs
+    else if (strcmp(i->id, (char*)"this") == 0)
+    {
+        fprintf(f, "thing->%s", i->id);
+    }
+    */
     else
     {
         fprintf(f, "%s", i->id);
     }
+}
+
+void TranslatorVisitor::visitObjectFieldLExpr(ObjectFieldLExpr *o)
+{
+    fprintf(f, "thing->%s", o->id); //TODO: Only correct within the constructor
+
 }
 
 void TranslatorVisitor::visitDotRExpr(DotRExpr *d) 

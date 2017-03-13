@@ -7,6 +7,7 @@
 #include <string>
 
 #include "visitor.h"
+#include "type.hpp"
 
 using std::unordered_map;
 using std::string;
@@ -17,17 +18,29 @@ class TranslatorVisitor : public Visitor
         FILE *f = NULL;
         unordered_map<string, string> typeMap;
         unordered_map<string, string> keywords;
+        TypeTree *tt;
+
+        char *className;
 
         IdentNode *isIdent(RExpr *);
         ObjectFieldLExpr *isOFL(RExpr *);
         char *getType(RExpr *);
         void printRExpr(RExpr *);
 
+        // Given a TypeNode, print it's methods
+        void printMethodSignatures(TypeNode *);
+        list<MethodNode*> collectMethods(TypeNode *, list<MethodNode*>);
+
     public:
-        TranslatorVisitor(char *);
+        TranslatorVisitor(char *, TypeTree *);
        ~TranslatorVisitor(); 
 
         void visitProgram(Program *);
+
+        void visitClass(Class *);
+        void visitClassSignature(ClassSignature *);
+        void visitClassBody(ClassBody *);
+
         void visitAssignmentStatement(AssignmentStatement *);
 
         void visitIfClause(IfClause *);
@@ -38,8 +51,10 @@ class TranslatorVisitor : public Visitor
 
         void visitIntNode(IntNode *);
         void visitStringNode(StringNode *);
+        void visitNotNode(NotNode *);
         void visitBinaryOperatorNode(BinaryOperatorNode *);
         void visitIdentNode(IdentNode *);
+        void visitObjectFieldLExpr(ObjectFieldLExpr *);
         void visitDotRExpr(DotRExpr *);
 };
 

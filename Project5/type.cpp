@@ -411,6 +411,29 @@ void MethodNode::print()
     printf("' and returns '%s'\n", returnType);
 }
 
+bool MethodNode::equals(MethodNode *m)
+{
+    if (strcmp(m->id, id) == 0)
+    {
+        if (strcmp(m->returnType, returnType) == 0)
+        {
+            list<char*>::iterator it1 = m->argsType.begin();
+            list<char*>::iterator it2 = argsType.begin();
+            while (it1 != m->argsType.end() && it2 != argsType.end())
+            {
+                if (strcmp((*it1), (*it2)) != 0)
+                    return false;
+                ++it1;
+                ++it2;
+            }
+            if (it1 != m->argsType.end() || it2 != argsType.end())
+                return false;
+            return true;
+        }
+    }
+    return false;
+}
+
 /******** VariableNode methods ********/
 
 VariableNode::VariableNode(char *n, char *t) : name(n), type(t) {}
