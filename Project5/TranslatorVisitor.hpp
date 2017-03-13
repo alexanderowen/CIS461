@@ -21,6 +21,7 @@ class TranslatorVisitor : public Visitor
         TypeTree *tt;
 
         char *className;
+        unordered_map<string, string> classMethods;
 
         IdentNode *isIdent(RExpr *);
         ObjectFieldLExpr *isOFL(RExpr *);
@@ -29,7 +30,8 @@ class TranslatorVisitor : public Visitor
 
         // Given a TypeNode, print it's methods
         void printMethodSignatures(TypeNode *);
-        list<MethodNode*> collectMethods(TypeNode *, list<MethodNode*>);
+        void getMethodNames(TypeNode *);
+        //list<MethodNode*> collectMethods(TypeNode *, list<MethodNode*>);
 
     public:
         TranslatorVisitor(char *, TypeTree *);

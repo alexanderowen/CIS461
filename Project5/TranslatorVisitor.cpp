@@ -54,11 +54,19 @@ void TranslatorVisitor::visitProgram(Program *p)
 
 void TranslatorVisitor::visitClass(Class *c)
 {
+    classMethods.clear(); //refresh
     c->clssig->accept(this);
     c->clsbdy->accept(this);
     fprintf(f, "struct class_%s_struct the_class_%s_struct = {\n", className, className);
-    fprintf(f, "\tnew_%s", className);
-    fprintf(f, "\n};");
+    fprintf(f, "\t.constructor = new_%s,\n", className);
+    for (unordered_map<string, string>::const_iterator it = classMethods.begin(); it != classMethods.end(); ++it)
+    {
+        fprintf(f, "\t.%s = %s,\n", it->first.c_str(), it->second.c_str());
+    }
+
+
+    fprintf(f, "\n};\n");
+
     fprintf(f, "class_%s the_class_%s = &the_class_%s_struct;\n", className, className, className);
     fprintf(f, "\n\n\n"); //for readablility
 }
@@ -104,7 +112,8 @@ void TranslatorVisitor::visitClassSignature(ClassSignature *cs)
     fprintf(f, ");\n");
 
     // TODO: Resolve printing the methods
-    // printMethodSignatures(tn);    
+    printMethodSignatures(tn);    
+    getMethodNames(tn); //set the instance variable
     fprintf(f, "\n};\n\n");
     
     fprintf(f, "obj_%s new_%s(", cs->id, cs->id);
@@ -125,38 +134,41 @@ void TranslatorVisitor::visitClassSignature(ClassSignature *cs)
 
 void TranslatorVisitor::printMethodSignatures(TypeNode *tn)
 {
-    list<MethodNode*> meths;
-    meths = collectMethods(tn, meths);
-    for (list<MethodNode*>::const_iterator it = meths.begin(); it != meths.end(); ++it)
+    while (tn != NULL)
     {
-        //TODO: Print them nicely
+        for (list<MethodNode*>::const_iterator it = tn->methods.begin(); it != tn->methods.end(); ++it)
+        {
+            MethodNode *m = (*it);
+            auto ret = typeMap.find(m->returnType);
+            auto methName = typeMap.find(tn->name);
+            fprintf(f, "\t%s (*%s) (%s", ret->second.c_str(), m->id, methName->second.c_str());
+            for (list<char*>::const_iterator it = m->argsType.begin(); it != m->argsType.end(); ++it)
+            {
+                auto arg = typeMap.find((*it));
+                fprintf(f, ", %s", arg->second.c_str());
+            }
+            fprintf(f, ");\n");
+        }
+        tn = tn->parent;
     }
 }
-
-bool methodInList(list<MethodNode*> meths, MethodNode *m)
-{
-    for (list<MethodNode*>::const_iterator it = meths.begin(); it != meths.end(); ++it)
-    {
-        if ((*it)->equals(m)) 
-            return true;
-    }
-    return false;
-}
-
-list<MethodNode*> TranslatorVisitor::collectMethods(TypeNode *tn, list<MethodNode*> meths)
+ 
+//Sets the 'classMethods' instance variable with the appropriate values
+void TranslatorVisitor::getMethodNames(TypeNode *tn)
 {
     while (tn != NULL)
     {
         for (list<MethodNode*>::const_iterator it = tn->methods.begin(); it != tn->methods.end(); ++it)
         {
-            if (!methodInList(meths, (*it)))
-            {
-                meths.push_back((*it));
-            }           
+            MethodNode *m = (*it);
+            string key = m->id;
+            char v[256];
+            sprintf(v, "%s_method_%s", tn->name, m->id);
+            string value = v;
+            classMethods.insert({key, value});
         }
         tn = tn->parent;
     }
-    return meths;
 }
 
 void TranslatorVisitor::visitClassBody(ClassBody *cb)
