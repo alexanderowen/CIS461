@@ -23,6 +23,8 @@ class TranslatorVisitor : public Visitor
         char *className;
         unordered_map<string, string> classMethods;
 
+        bool inMethod;
+
         IdentNode *isIdent(RExpr *);
         ObjectFieldLExpr *isOFL(RExpr *);
         char *getType(RExpr *);
@@ -44,6 +46,9 @@ class TranslatorVisitor : public Visitor
         void visitClassBody(ClassBody *);
 
         void visitFormalArg(FormalArg *);
+        void visitMethod(Method *);
+        void visitTrueIdentOption(TrueIdentOption *);
+        void visitFalseIdentOption(FalseIdentOption *);
 
         void visitAssignmentStatement(AssignmentStatement *);
 

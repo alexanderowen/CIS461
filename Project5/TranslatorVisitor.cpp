@@ -191,9 +191,49 @@ void TranslatorVisitor::visitClassBody(ClassBody *cb)
 void TranslatorVisitor::visitFormalArg(FormalArg *fa)
 {
     auto q = typeMap.find(fa->type);
-    //fprintf(stderr, "FormalArg->id = %s; at '%p'\n", fa->id, fa->id);
-    //fprintf(stderr, "FormalArg->type = %s; at '%p'\n", fa->type, fa->type);
     fprintf(f, "%s %s", q->second.c_str(), fa->id);
+}
+
+void TranslatorVisitor::visitMethod(Method *m)
+{
+    inMethod = true;
+    m->ident->accept(this); // print return type first
+    auto q = typeMap.find(className);
+    fprintf(f, " %s_method_%s(%s self", className, m->id, q->second.c_str());
+    for (list<FormalArg *>::const_iterator it = m->fargs->begin(); it != m->fargs->end(); ++it)
+    {
+        fprintf(f, ", ");
+        (*it)->accept(this);
+    }
+    fprintf(f, ") {\n");
+    for (list<Statement *>::const_iterator it = m->stmts->begin(); it != m->stmts->end(); ++it)
+    {
+        (*it)->accept(this);
+    }
+    FalseIdentOption *fi = dynamic_cast<FalseIdentOption*>(m->ident);
+    if (fi != NULL)
+    {
+        fprintf(f, "\t return nothing;");
+    }
+    fprintf(f, "\n}\n");
+    inMethod = false;
+}
+
+void TranslatorVisitor::visitTrueIdentOption(TrueIdentOption *t)
+{
+    if (inMethod)
+    {
+        auto q = typeMap.find(t->id);
+        fprintf(f, "%s", q->second.c_str());
+    }
+}
+
+void TranslatorVisitor::visitFalseIdentOption(FalseIdentOption *t)
+{
+    if (inMethod)
+    {
+        fprintf(f, "obj_Nothing");
+    }
 }
 
 void TranslatorVisitor::visitAssignmentStatement(AssignmentStatement *a)
