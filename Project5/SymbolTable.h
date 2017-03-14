@@ -28,6 +28,7 @@ class SymbolTable
 
         VariableSym *lookupVariable(char *name);
         void addVariable(char *name, VariableSym *value);
+        void removeVariable(VariableSym *);
 
         SymbolTable *intersection(list<SymbolTable*> sts, TypeTree *tt);
     private:

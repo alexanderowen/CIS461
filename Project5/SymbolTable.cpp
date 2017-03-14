@@ -104,3 +104,10 @@ void SymbolTable::addVariable(char *name, VariableSym *value)
     vMap.insert({key, value});
     free(name);
 }
+
+void SymbolTable::removeVariable(VariableSym *vs)
+{
+    string key = vs->id;
+    auto search = vMap.find(key);
+    vMap.erase(search);    
+}

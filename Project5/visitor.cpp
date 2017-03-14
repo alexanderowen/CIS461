@@ -471,6 +471,7 @@ void TypeCheckVisitor::visitBinaryOperatorNode(BinaryOperatorNode *b)
 void TypeCheckVisitor::visitAssignmentStatement(AssignmentStatement *a)
 {
     char *type;
+    //fprintf(stderr, "visit assignment statement\n");
     IdentNode *id = dynamic_cast<IdentNode*>(a->lexpr);
     if (id != NULL)
     {
@@ -483,7 +484,10 @@ void TypeCheckVisitor::visitAssignmentStatement(AssignmentStatement *a)
         }
         else if (defined != NULL) // If this variable has already been defined, perform LCA
         {
+            //fprintf(stderr, "Variable has been defined. Performed LCA.\n");
             type = tt->LCA(defined->type, getType(a->rexpr));    
+            //fprintf(stderr, "Determined LCA to be '%s'", type);
+            st->removeVariable(defined); 
         }
         else if (tio != NULL)
         {
