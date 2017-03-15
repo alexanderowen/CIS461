@@ -19,12 +19,12 @@ TranslatorVisitor::TranslatorVisitor(char *fn, TypeTree *_tt)
     typeMap.insert({"Boolean", "obj_Boolean"});
     typeMap.insert({"Nothing", "obj_Nothing"});
 
-    /*
     keywords.insert({"true", "lit_true"});
     keywords.insert({"false", "lit_false"});
-    */
+    /*
     keywords.insert({"true", "lit_true->value"});
     keywords.insert({"false", "lit_false->value"});
+    */
 
     tt = _tt;
 }
@@ -258,9 +258,9 @@ void TranslatorVisitor::visitAssignmentStatement(AssignmentStatement *a)
 
 void TranslatorVisitor::visitIfClause(IfClause *i)
 {
-    fprintf(f, "if (");
+    fprintf(f, "if ((");
     i->rexpr->accept(this);
-    fprintf(f, ") {\n");
+    fprintf(f, ")->value) {\n");
     for (list<Statement *>::const_iterator it = i->stmts->begin(); it != i->stmts->end(); ++it)
     {
         (*it)->accept(this);
@@ -321,41 +321,73 @@ void TranslatorVisitor::visitNotNode(NotNode *n)
 
 void TranslatorVisitor::visitBinaryOperatorNode(BinaryOperatorNode *b)
 {
-    b->left->accept(this);
-    fprintf(f, "->clazz->");
+    //b->left->accept(this);
+    //fprintf(f, "->clazz->");
     switch(b->operation) {
         case 0:
+            b->left->accept(this);
+            fprintf(f, "->clazz->");
             fprintf(f, "PLUS");
             break;
         case 1:
+            b->left->accept(this);
+            fprintf(f, "->clazz->");
             fprintf(f, "MINUS");
             break;
         case 2:
+            b->left->accept(this);
+            fprintf(f, "->clazz->");
             fprintf(f, "TIMES");
             break;
         case 3:
+            b->left->accept(this);
+            fprintf(f, "->clazz->");
             fprintf(f, "DIVIDE");
             break;
         case 4:
+            b->left->accept(this);
+            fprintf(f, "->clazz->");
             fprintf(f, "EQUALS");
             break;
         case 5:
+            b->left->accept(this);
+            fprintf(f, "->clazz->");
             fprintf(f, "ATMOST");
             break;
         case 6:
+            b->left->accept(this);
+            fprintf(f, "->clazz->");
             fprintf(f, "LESS");
             break;
         case 7:
+            b->left->accept(this);
+            fprintf(f, "->clazz->");
             fprintf(f, "ATLEAST");
             break;
         case 8:
+            b->left->accept(this);
+            fprintf(f, "->clazz->");
             fprintf(f, "MORE");
             break;
         case 9:
-            fprintf(f, "AND");
+            //fprintf(f, "AND");
+            //
+            fprintf(f, "((");
+            b->left->accept(this);
+            fprintf(f, "->value) ? (");
+            b->right->accept(this);
+            fprintf(f, ") : lit_false)");
+            return;
             break;
         case 10:
-            fprintf(f, "OR");
+            //fprintf(f, "OR");
+            //
+            fprintf(f, "((");
+            b->left->accept(this);
+            fprintf(f, "->value ) ? lit_true : (");
+            b->right->accept(this);
+            fprintf(f, "))");
+            return;
             break;
         default:
             break;
@@ -365,6 +397,7 @@ void TranslatorVisitor::visitBinaryOperatorNode(BinaryOperatorNode *b)
     fprintf(f, ", ");
     b->right->accept(this);
     fprintf(f, ")");
+
 
 }
 

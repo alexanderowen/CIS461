@@ -487,7 +487,7 @@ void TypeCheckVisitor::visitAssignmentStatement(AssignmentStatement *a)
             //fprintf(stderr, "Variable has been defined. Performed LCA.\n");
             type = tt->LCA(defined->type, getType(a->rexpr));    
             //fprintf(stderr, "Determined LCA to be '%s'", type);
-            st->removeVariable(defined); 
+            st->removeVariable(defined); //remove old value 
         }
         else if (tio != NULL)
         {
