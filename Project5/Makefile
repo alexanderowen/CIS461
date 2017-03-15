@@ -1,4 +1,4 @@
-quack: quack.tab.o lex.yy.o node.o visitor.o util.o SymbolTable.o type.o driver.o TranslatorVisitor.o
+quack: quack.tab.o lex.yy.o node.o visitor.o util.o SymbolTable.o type.o TranslatorVisitor.o driver.o 
 	g++ driver.o lex.yy.o quack.tab.o node.o visitor.o util.o SymbolTable.o type.o TranslatorVisitor.o -o quack -ll
 
 mc: 

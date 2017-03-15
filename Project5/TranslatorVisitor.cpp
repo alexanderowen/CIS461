@@ -5,7 +5,35 @@
 #include "visitor.h"
 #include "TranslatorVisitor.hpp"
 
-TranslatorVisitor::TranslatorVisitor(char *fn, TypeTree *_tt)
+
+/**************
+ * 
+ * Helper functions for TranslatorVisitor.cpp
+ *
+ * ************/
+
+void printLocalVariables(unordered_map<string, string> typeMap, SymbolTable *st, FILE *f)
+{
+    fprintf(stderr, "Printing out local vars\n");
+    for (unordered_map<string, VariableSym*>::iterator it = st->vMap.begin(); it != st->vMap.end(); ++it) 
+    {
+        //fprintf(f, "Variable in if: %s\n", (*it).first.c_str());
+        auto q = typeMap.find((*it).second->type);
+        if (q != typeMap.end())
+        {
+            fprintf(f, "%s %s;\n", q->second.c_str(), (*it).first.c_str());
+        }
+    }
+}
+
+
+/**************
+ *
+ * Defining methods for TranslatorVisitor
+ *
+ * ************/
+
+TranslatorVisitor::TranslatorVisitor(char *fn, TypeTree *_tt, SymbolTable *_st)
 {
     f = fopen(fn, "w");    
     if (f == NULL)
@@ -27,6 +55,7 @@ TranslatorVisitor::TranslatorVisitor(char *fn, TypeTree *_tt)
     */
 
     tt = _tt;
+    st = _st;
 }
 
 TranslatorVisitor::~TranslatorVisitor()
@@ -44,6 +73,7 @@ void TranslatorVisitor::visitProgram(Program *p)
         (*it)->accept(this);
     }
     fprintf(f, "int main() {\n");
+    printLocalVariables(typeMap, p->st, f);
     for (list<Statement *>::const_iterator it = p->statements->begin(); it != p->statements->end(); ++it)
     {
         (*it)->accept(this);
@@ -238,6 +268,7 @@ void TranslatorVisitor::visitFalseIdentOption(FalseIdentOption *t)
 
 void TranslatorVisitor::visitAssignmentStatement(AssignmentStatement *a)
 {
+    /* Declares the type of variable; moved to begining of if, method, while, etc
     string t = getType(a->rexpr);
     fprintf(stderr, "Found type :'%s'\n", t.c_str());
     auto v = typeMap.find(t);
@@ -248,6 +279,7 @@ void TranslatorVisitor::visitAssignmentStatement(AssignmentStatement *a)
     }
     a->lexpr->print(f);
     fprintf(f, ";\n");
+    */
     a->lexpr->accept(this);
     fprintf(f, " = ");
     a->ident->accept(this);
@@ -256,11 +288,24 @@ void TranslatorVisitor::visitAssignmentStatement(AssignmentStatement *a)
     fprintf(f, ";");
 }
 
+
 void TranslatorVisitor::visitIfClause(IfClause *i)
 {
     fprintf(f, "if ((");
     i->rexpr->accept(this);
-    fprintf(f, ")->value) {\n");
+    fprintf(f, ")->value) {\n"); // may need to remove
+    printLocalVariables(typeMap, i->st, f);
+    /*
+    for (unordered_map<string, VariableSym*>::iterator it = i->st->vMap.begin(); it != i->st->vMap.end(); ++it) 
+    {
+        //fprintf(f, "Variable in if: %s\n", (*it).first.c_str());
+        auto q = typeMap.find((*it).second->type);
+        if (q != typeMap.end())
+        {
+            fprintf(f, "%s %s;\n", q->second.c_str(), (*it).first.c_str());
+        }
+    }
+    */
     for (list<Statement *>::const_iterator it = i->stmts->begin(); it != i->stmts->end(); ++it)
     {
         (*it)->accept(this);
@@ -273,6 +318,7 @@ void TranslatorVisitor::visitElifClause(ElifClause *e)
     fprintf(f, "else if (");
     e->rexpr->accept(this);
     fprintf(f, ") {\n");
+    printLocalVariables(typeMap, e->st, f);
     for (list<Statement *>::const_iterator it = e->stmts->begin(); it != e->stmts->end(); ++it)
     {
         (*it)->accept(this);
@@ -283,6 +329,7 @@ void TranslatorVisitor::visitElifClause(ElifClause *e)
 void TranslatorVisitor::visitTrueElseOption(TrueElseOption *e)
 {
     fprintf(f, "else {\n");
+    printLocalVariables(typeMap, e->st, f);
     for (list<Statement *>::const_iterator it = e->stmts->begin(); it != e->stmts->end(); ++it)
     {
         (*it)->accept(this);

@@ -5,6 +5,8 @@
 
 #include <stdio.h>
 
+#include "SymbolTable.h"
+
 using std::list;
 
 class Visitor; // Cannot include "visitor.h", as it depends on AST Nodes
@@ -81,6 +83,7 @@ class Node
 {
     public:
         int lineno;
+        SymbolTable *st;
 
         Node(int l);
         Node() {lineno = 0;}

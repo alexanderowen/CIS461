@@ -112,6 +112,7 @@ class TypeCheckVisitor : public Visitor
     
         bool check(); 
         void addError(char *msg);
+        virtual void visitProgram(Program *);
         virtual void visitBinaryOperatorNode(BinaryOperatorNode *b);
         virtual void visitAssignmentStatement(AssignmentStatement *a);
         virtual void visitIdentNode(IdentNode *i);

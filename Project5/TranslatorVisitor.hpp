@@ -19,6 +19,7 @@ class TranslatorVisitor : public Visitor
         unordered_map<string, string> typeMap;
         unordered_map<string, string> keywords;
         TypeTree *tt;
+        SymbolTable *st;
 
         char *className;
         unordered_map<string, string> classMethods;
@@ -36,7 +37,7 @@ class TranslatorVisitor : public Visitor
         //list<MethodNode*> collectMethods(TypeNode *, list<MethodNode*>);
 
     public:
-        TranslatorVisitor(char *, TypeTree *);
+        TranslatorVisitor(char *, TypeTree *, SymbolTable *);
        ~TranslatorVisitor(); 
 
         void visitProgram(Program *);

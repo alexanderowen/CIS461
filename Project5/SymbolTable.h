@@ -31,6 +31,8 @@ class SymbolTable
         void removeVariable(VariableSym *);
 
         SymbolTable *intersection(list<SymbolTable*> sts, TypeTree *tt);
+        // Remove the contents of st2 from st1
+        SymbolTable *remove(SymbolTable *st1, SymbolTable *st2);
     private:
         VariableSym *lookupVariableNoParent(char *name);
 

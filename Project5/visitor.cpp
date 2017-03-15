@@ -391,6 +391,23 @@ bool TypeCheckVisitor::check()
     return (errors > 10) ? true : false;
 }
 
+void TypeCheckVisitor::visitProgram(Program *p)
+{
+    for (list<Class *>::const_iterator it = p->classes->begin(); it != p->classes->end(); ++it)
+    {
+        (*it)->accept(this);
+    }
+    SymbolTable *origin = st;
+    st = new SymbolTable(origin);
+    for (list<Statement *>::const_iterator it = p->statements->begin(); it != p->statements->end(); ++it)
+    {
+        (*it)->accept(this);
+    }
+    p->st = st;
+    st = origin;
+    fprintf(stderr, "size of st->vMap = '%lu'\n", p->st->vMap.size());
+}
+
 void TypeCheckVisitor::visitBinaryOperatorNode(BinaryOperatorNode *b)
 {
     if (check())
@@ -604,18 +621,37 @@ void TypeCheckVisitor::visitIfBlock(IfBlock *i)
     sts.push_back(st);
 
     i->_if->accept(this);
+    SymbolTable *if_st = st;
+
+    list<SymbolTable *> elif_sts;
     for (list<ElifClause *>::const_iterator it = i->_elifs->begin(); it != i->_elifs->end(); ++it)
     {
         st = new SymbolTable(origin);
         sts.push_back(st);
         (*it)->accept(this);
+        //(*it)->st = st;
+        elif_sts.push_back(st);
     }
 
     st = new SymbolTable(origin);
     sts.push_back(st);
     i->_else->accept(this);
+    //i->_else->st = st;
+    SymbolTable *else_st = st;
 
     st = sts.front()->intersection(sts, tt);
+
+    // This removes the higher level variables from the local-if sym table
+    i->_if->st = if_st->remove(if_st, st);
+
+    auto iter = elif_sts.begin();
+    for (list<ElifClause *>::const_iterator it = i->_elifs->begin(); it != i->_elifs->end(); ++it)
+    {
+        (*it)->st = (*iter)->remove((*iter), st);
+        iter++;
+    }
+    
+    i->_else->st = else_st->remove(else_st, st);
 }
 
 void TypeCheckVisitor::visitIfClause(IfClause *i)
@@ -678,7 +714,8 @@ void TypeCheckVisitor::visitWhileStatement(WhileStatement *w)
     {
         (*it)->accept(this);
     }
-    delete st;
+    w->st = st;
+    //delete st;
     st = origin;
 }
 
@@ -750,6 +787,7 @@ void TypeCheckVisitor::visitMethod(Method *m)
     }
     inMethod = false;
     returned = false;
+    m->st = st;
     st = origin;
 }
 
@@ -834,6 +872,7 @@ void TypeCheckVisitor::visitClassBody(ClassBody *cb)
     {
         (*it)->accept(this);
     }
+    cb->st = st; //need to save st for code gen
     /* We need a way for the constructor of a class to throw out arguments, and keep 'this'
      * instance variables. We define the 'classScope' as only for the constructor. We escape 
      * the class scope once this is done. Instance variables are retained because they 

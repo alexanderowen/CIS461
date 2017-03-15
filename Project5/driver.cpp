@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    TranslatorVisitor tv((char*)"q.out", ttv.tt);
+    TranslatorVisitor tv((char*)"q.out", tcv.tt, tcv.st);
     root->accept(&tv);
 
     delete root;

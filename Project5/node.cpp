@@ -5,12 +5,13 @@
 #include <string.h>
 
 #include "visitor.h"
+#include "SymbolTable.h"
 #include "node.hpp"
 #include "util.h"
 
 using std::list;
 
-Node::Node(int l) : lineno(l) {}
+Node::Node(int l) : lineno(l), st(NULL) {}
 void Node::setLineno(int l)
 {
     lineno = l;

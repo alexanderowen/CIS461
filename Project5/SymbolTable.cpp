@@ -68,6 +68,22 @@ SymbolTable *SymbolTable::intersection(list<SymbolTable*> sts, TypeTree *tt)
     return total;    
 }
 
+SymbolTable *SymbolTable::remove(SymbolTable *st1, SymbolTable *st2)
+{
+    SymbolTable *total = new SymbolTable(st1->parent); //using st1 as the base
+    for (unordered_map<string, VariableSym*>::iterator it = st1->vMap.begin(); it != st1->vMap.end(); ++it)
+    {
+        char *q = (char *) it->first.c_str();
+        VariableSym *v = st2->lookupVariableNoParent(q);
+        if (v == NULL)
+        {
+            fprintf(stderr, "Adding variable '%s' to SymTab\n", it->first.c_str());
+            total->addVariable(strdup(it->first.c_str()), it->second);
+        }
+    }
+    return total;
+}
+
 VariableSym *SymbolTable::lookupVariable(char *name)
 {
     //fprintf(stderr, "Looking up variable '%s'\n", name);
@@ -107,7 +123,13 @@ void SymbolTable::addVariable(char *name, VariableSym *value)
 
 void SymbolTable::removeVariable(VariableSym *vs)
 {
-    string key = vs->id;
-    auto search = vMap.find(key);
-    vMap.erase(search);    
+    if (vs != NULL)
+    {
+        string key = vs->id;
+        auto search = vMap.find(key);
+        if (search != vMap.end())
+        {
+            vMap.erase(search);    
+        }
+    }
 }
