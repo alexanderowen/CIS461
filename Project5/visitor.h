@@ -117,6 +117,7 @@ class TypeCheckVisitor : public Visitor
         virtual void visitAssignmentStatement(AssignmentStatement *a);
         virtual void visitIdentNode(IdentNode *i);
         virtual void visitDotRExpr(DotRExpr *d);    
+        virtual void visitConstructorRExpr(ConstructorRExpr *);
 
         virtual void visitIfBlock(IfBlock *i);
         virtual void visitIfClause(IfClause *i);

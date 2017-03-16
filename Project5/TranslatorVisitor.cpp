@@ -12,17 +12,30 @@
  *
  * ************/
 
-void printLocalVariables(unordered_map<string, string> typeMap, SymbolTable *st, FILE *f)
+void printLocalVariables(unordered_map<string, string> typeMap, SymbolTable *st, FILE *f, list<string> *printed = NULL)
 {
     //fprintf(stderr, "Printing out local vars\n");
+    bool unique = true;
     for (unordered_map<string, VariableSym*>::iterator it = st->vMap.begin(); it != st->vMap.end(); ++it) 
     {
         //fprintf(f, "Variable in if: %s\n", (*it).first.c_str());
         auto q = typeMap.find((*it).second->type);
         if (q != typeMap.end())
         {
-            fprintf(f, "%s %s;\n", q->second.c_str(), (*it).first.c_str());
+            if (printed != NULL) //check if local variable is already printed
+            {
+                for (list<string>::iterator iter = printed->begin(); iter != printed->end(); iter++)
+                {
+                    if (strcmp(iter->c_str(), (*it).first.c_str()) == 0)
+                        unique = false;
+                }
+            }
+            if (unique)
+            {
+                fprintf(f, "%s %s;\n", q->second.c_str(), (*it).first.c_str());
+            }
         }
+        unique = true;
     }
 }
 
@@ -85,6 +98,7 @@ void TranslatorVisitor::visitProgram(Program *p)
 void TranslatorVisitor::visitClass(Class *c)
 {
     classMethods.clear(); //refresh
+    printed.clear(); //refresh
     c->clssig->accept(this);
     c->clsbdy->accept(this);
     fprintf(f, "struct class_%s_struct the_class_%s_struct = {\n", className, className);
@@ -151,6 +165,7 @@ void TranslatorVisitor::visitClassSignature(ClassSignature *cs)
     for (list<FormalArg *>::const_iterator it = cs->fargs->begin(); it != cs->fargs->end(); ++it)
     {
         (*it)->accept(this);
+        printed.push_back((*it)->id);
         if (i+1 < cs->fargs->size())
         {
             fprintf(f, ", ");
@@ -203,7 +218,7 @@ void TranslatorVisitor::getMethodNames(TypeNode *tn)
 
 void TranslatorVisitor::visitClassBody(ClassBody *cb)
 {
-    printLocalVariables(typeMap, cb->st, f);
+    printLocalVariables(typeMap, cb->st, f, &printed);
     fprintf(f, "\tobj_%s thing = malloc(sizeof(struct obj_%s_struct));\n", className, className);
     fprintf(f, "\tthing->clazz = the_class_%s;\n", className);
     for (list<Statement *>::const_iterator it = cb->stmts->begin(); it != cb->stmts->end(); ++it)
@@ -230,17 +245,22 @@ void TranslatorVisitor::visitMethod(Method *m)
     inMethod = true;
     m->ident->accept(this); // print return type first
     auto q = typeMap.find(className);
-    fprintf(f, " %s_method_%s(%s self", className, m->id, q->second.c_str());
+    fprintf(f, " %s_method_%s(%s thing", className, m->id, q->second.c_str());
+
+    list<string> printed;
     for (list<FormalArg *>::const_iterator it = m->fargs->begin(); it != m->fargs->end(); ++it)
     {
         fprintf(f, ", ");
         (*it)->accept(this);
+        printed.push_back((*it)->id);
     }
     fprintf(f, ") {\n");
-    printLocalVariables(typeMap, m->st, f);
+    printLocalVariables(typeMap, m->st, f, &printed);
     for (list<Statement *>::const_iterator it = m->stmts->begin(); it != m->stmts->end(); ++it)
     {
+        fprintf(f, "\t");
         (*it)->accept(this);
+        fprintf(f, "\n");
     }
     FalseIdentOption *fi = dynamic_cast<FalseIdentOption*>(m->ident);
     if (fi != NULL)
@@ -359,7 +379,7 @@ void TranslatorVisitor::visitConstructorRExpr(ConstructorRExpr *c)
     for (list<RExpr *>::const_iterator it = c->args->begin(); it != c->args->end(); )
     {
         (*it)->accept(this);
-        if (it++ != c->args->end())
+        if (++it != c->args->end())
         {
             fprintf(f, ", ");
         }
@@ -499,6 +519,7 @@ void TranslatorVisitor::visitDotRExpr(DotRExpr *d)
     d->rexpr->accept(this); // Just a way to print out first argument of methods
     for (list<RExpr *>::const_iterator it = d->args->begin(); it != d->args->end(); ++it)
     {
+        fprintf(f, ", ");
         (*it)->accept(this);
     }
     fprintf(f, ");");

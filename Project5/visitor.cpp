@@ -528,7 +528,7 @@ void TypeCheckVisitor::visitAssignmentStatement(AssignmentStatement *a)
         {
             if (strcmp(ident->id, (char*)"this") == 0)
             {
-                //fprintf(stderr, "Adding variable node. Adding '%s' of type '%s' to type '%s'\n", ofl->id, getType(a->rexpr), className);
+                fprintf(stderr, "Adding variable node. Adding '%s' of type '%s' to type '%s'\n", ofl->id, getType(a->rexpr), className);
                 VariableNode *v = new VariableNode(strdup(ofl->id), strdup(getType(a->rexpr)));
                 tt->addVarToType(strdup(className), v);
             }
@@ -610,6 +610,16 @@ void TypeCheckVisitor::visitDotRExpr(DotRExpr *d)
             std::advance(methodArgs, 1);
             std::advance(arg, 1);
         }
+    }
+}
+
+void TypeCheckVisitor::visitConstructorRExpr(ConstructorRExpr *c)
+{
+    // TODO: Check that the call to the constructor has the correct number of args
+    // and of the right type
+    for (list<RExpr *>::const_iterator it = c->args->begin(); it != c->args->end(); ++it)
+    {
+        (*it)->accept(this);
     }
 }
 
@@ -945,6 +955,7 @@ char *TypeCheckVisitor::getType(RExpr *r)
     {
         if (strcmp(ident->id, (char*)"this") == 0)
         {
+            //fprintf(stderr, "Returning className from getType\n");
             return className;
         }
         VariableSym *v = st->lookupVariable(ident->id);

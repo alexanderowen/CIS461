@@ -21,6 +21,8 @@ class TranslatorVisitor : public Visitor
         TypeTree *tt;
         SymbolTable *st;
 
+        list<string> printed;
+
         char *className;
         unordered_map<string, string> classMethods;
 
