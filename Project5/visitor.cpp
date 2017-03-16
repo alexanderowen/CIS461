@@ -563,6 +563,7 @@ void TypeCheckVisitor::visitDotRExpr(DotRExpr *d)
     for (list<RExpr *>::const_iterator it = d->args->begin(); it != d->args->end(); ++it)
     {
         (*it)->accept(this);
+        /*
         IdentNode *ident = isIdent((*it)); // TODO: If we are in a class, then 'this.x'(objectfieldlexpr) is ok if it exists
         if (ident != NULL) 
         {
@@ -572,6 +573,8 @@ void TypeCheckVisitor::visitDotRExpr(DotRExpr *d)
         {
             args.push_back((*it)->type());
         }
+        */
+        args.push_back(getType((*it)));
     }
     // now type check
     char *type;
@@ -600,6 +603,7 @@ void TypeCheckVisitor::visitDotRExpr(DotRExpr *d)
         {
             if (strcmp((*methodArgs), (*arg)) != 0)
             {
+                fprintf(stderr, "Compared '%s' and '%s' and they are not the same.\n", *methodArgs, *arg);
                 if (!tt->isSubtype((*arg),(*methodArgs)))
                 {
                     char *msg = (char*) malloc(sizeof(char)*256);

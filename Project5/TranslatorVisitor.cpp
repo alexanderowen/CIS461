@@ -89,8 +89,9 @@ void TranslatorVisitor::visitProgram(Program *p)
     printLocalVariables(typeMap, p->st, f);
     for (list<Statement *>::const_iterator it = p->statements->begin(); it != p->statements->end(); ++it)
     {
+        fprintf(f, "\t");
         (*it)->accept(this);
-        fprintf(f, "\n");
+        fprintf(f, ";\n");
     }
     fprintf(f, "\n}");
 }
@@ -243,19 +244,19 @@ void TranslatorVisitor::visitFormalArg(FormalArg *fa)
 void TranslatorVisitor::visitMethod(Method *m)
 {
     inMethod = true;
+    methodPrinted.clear();
     m->ident->accept(this); // print return type first
     auto q = typeMap.find(className);
     fprintf(f, " %s_method_%s(%s thing", className, m->id, q->second.c_str());
 
-    list<string> printed;
     for (list<FormalArg *>::const_iterator it = m->fargs->begin(); it != m->fargs->end(); ++it)
     {
         fprintf(f, ", ");
         (*it)->accept(this);
-        printed.push_back((*it)->id);
+        methodPrinted.push_back((*it)->id);
     }
     fprintf(f, ") {\n");
-    printLocalVariables(typeMap, m->st, f, &printed);
+    printLocalVariables(typeMap, m->st, f, &methodPrinted);
     for (list<Statement *>::const_iterator it = m->stmts->begin(); it != m->stmts->end(); ++it)
     {
         fprintf(f, "\t");
@@ -304,19 +305,26 @@ void TranslatorVisitor::visitAssignmentStatement(AssignmentStatement *a)
     */
     a->lexpr->accept(this);
     fprintf(f, " = ");
-    a->ident->accept(this);
+    //a->ident->accept(this); //TODO: Don't ignore ident???
+
 
     a->rexpr->accept(this);
     fprintf(f, ";");
 }
 
+void TranslatorVisitor::visitReturnStatement(ReturnStatement *r)
+{
+    fprintf(f, "return ");
+    r->rexpr->accept(this);
+    fprintf(f, ";");
+}
 
 void TranslatorVisitor::visitIfClause(IfClause *i)
 {
     fprintf(f, "if ((");
     i->rexpr->accept(this);
     fprintf(f, ")->value) {\n"); // may need to remove
-    printLocalVariables(typeMap, i->st, f);
+    printLocalVariables(typeMap, i->st, f, &methodPrinted);
     /*
     for (unordered_map<string, VariableSym*>::iterator it = i->st->vMap.begin(); it != i->st->vMap.end(); ++it) 
     {
@@ -330,7 +338,9 @@ void TranslatorVisitor::visitIfClause(IfClause *i)
     */
     for (list<Statement *>::const_iterator it = i->stmts->begin(); it != i->stmts->end(); ++it)
     {
+        fprintf(f, "\t");
         (*it)->accept(this);
+        fprintf(f, "\n");
     }
     fprintf(f, "\n}\n");
 }
@@ -340,10 +350,12 @@ void TranslatorVisitor::visitElifClause(ElifClause *e)
     fprintf(f, "else if (");
     e->rexpr->accept(this);
     fprintf(f, ") {\n");
-    printLocalVariables(typeMap, e->st, f);
+    printLocalVariables(typeMap, e->st, f, &methodPrinted);
     for (list<Statement *>::const_iterator it = e->stmts->begin(); it != e->stmts->end(); ++it)
     {
+        fprintf(f, "\t");
         (*it)->accept(this);
+        fprintf(f, "\n");
     }
     fprintf(f, "\n}\n");
 }
@@ -351,10 +363,12 @@ void TranslatorVisitor::visitElifClause(ElifClause *e)
 void TranslatorVisitor::visitTrueElseOption(TrueElseOption *e)
 {
     fprintf(f, "else {\n");
-    printLocalVariables(typeMap, e->st, f);
+    printLocalVariables(typeMap, e->st, f, &methodPrinted);
     for (list<Statement *>::const_iterator it = e->stmts->begin(); it != e->stmts->end(); ++it)
     {
+        fprintf(f, "\t");
         (*it)->accept(this);
+        fprintf(f, "\n");
     }
     fprintf(f, "\n}\n");
 }
@@ -522,7 +536,7 @@ void TranslatorVisitor::visitDotRExpr(DotRExpr *d)
         fprintf(f, ", ");
         (*it)->accept(this);
     }
-    fprintf(f, ");");
+    fprintf(f, ")");
 }    
 
 

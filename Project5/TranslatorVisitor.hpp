@@ -22,6 +22,7 @@ class TranslatorVisitor : public Visitor
         SymbolTable *st;
 
         list<string> printed;
+        list<string> methodPrinted;
 
         char *className;
         unordered_map<string, string> classMethods;
@@ -54,6 +55,7 @@ class TranslatorVisitor : public Visitor
         void visitFalseIdentOption(FalseIdentOption *);
 
         void visitAssignmentStatement(AssignmentStatement *);
+        void visitReturnStatement(ReturnStatement *);
 
         void visitIfClause(IfClause *);
         void visitElifClause(ElifClause *);
