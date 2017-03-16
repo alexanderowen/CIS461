@@ -405,7 +405,7 @@ void TypeCheckVisitor::visitProgram(Program *p)
     }
     p->st = st;
     st = origin;
-    fprintf(stderr, "size of st->vMap = '%lu'\n", p->st->vMap.size());
+    //fprintf(stderr, "size of st->vMap = '%lu'\n", p->st->vMap.size());
 }
 
 void TypeCheckVisitor::visitBinaryOperatorNode(BinaryOperatorNode *b)
@@ -633,11 +633,19 @@ void TypeCheckVisitor::visitIfBlock(IfBlock *i)
         elif_sts.push_back(st);
     }
 
-    st = new SymbolTable(origin);
-    sts.push_back(st);
-    i->_else->accept(this);
-    //i->_else->st = st;
-    SymbolTable *else_st = st;
+    SymbolTable *else_st;
+    TrueElseOption *tso = dynamic_cast<TrueElseOption*>(i->_else);
+    if (tso != NULL)
+    {
+        st = new SymbolTable(origin);
+        sts.push_back(st);
+        i->_else->accept(this);
+        else_st = st;
+    } 
+    else 
+    {
+        else_st = if_st;
+    }
 
     st = sts.front()->intersection(sts, tt);
 

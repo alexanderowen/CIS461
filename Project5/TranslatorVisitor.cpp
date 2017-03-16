@@ -14,7 +14,7 @@
 
 void printLocalVariables(unordered_map<string, string> typeMap, SymbolTable *st, FILE *f)
 {
-    fprintf(stderr, "Printing out local vars\n");
+    //fprintf(stderr, "Printing out local vars\n");
     for (unordered_map<string, VariableSym*>::iterator it = st->vMap.begin(); it != st->vMap.end(); ++it) 
     {
         //fprintf(f, "Variable in if: %s\n", (*it).first.c_str());
@@ -203,6 +203,7 @@ void TranslatorVisitor::getMethodNames(TypeNode *tn)
 
 void TranslatorVisitor::visitClassBody(ClassBody *cb)
 {
+    printLocalVariables(typeMap, cb->st, f);
     fprintf(f, "\tobj_%s thing = malloc(sizeof(struct obj_%s_struct));\n", className, className);
     fprintf(f, "\tthing->clazz = the_class_%s;\n", className);
     for (list<Statement *>::const_iterator it = cb->stmts->begin(); it != cb->stmts->end(); ++it)
@@ -236,6 +237,7 @@ void TranslatorVisitor::visitMethod(Method *m)
         (*it)->accept(this);
     }
     fprintf(f, ") {\n");
+    printLocalVariables(typeMap, m->st, f);
     for (list<Statement *>::const_iterator it = m->stmts->begin(); it != m->stmts->end(); ++it)
     {
         (*it)->accept(this);
@@ -342,6 +344,7 @@ void TranslatorVisitor::visitWhileStatement(WhileStatement *w)
     fprintf(f, "while (");
     w->rexpr->accept(this);
     fprintf(f, "->value) {\n"); //since rexpr is of type boolean, must access value
+    printLocalVariables(typeMap, w->st, f);
     for (list<Statement *>::const_iterator it = w->stmts->begin(); it != w->stmts->end(); ++it)
     {
         (*it)->accept(this);
