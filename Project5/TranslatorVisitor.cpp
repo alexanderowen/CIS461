@@ -352,6 +352,21 @@ void TranslatorVisitor::visitWhileStatement(WhileStatement *w)
     fprintf(f, "\n}\n");
 }
 
+void TranslatorVisitor::visitConstructorRExpr(ConstructorRExpr *c)
+{
+    fprintf(f, "new_%s(", c->id);
+    //for (list<RExpr *>::const_iterator it = c->args->begin(); it != c->args->end(); ++it)
+    for (list<RExpr *>::const_iterator it = c->args->begin(); it != c->args->end(); )
+    {
+        (*it)->accept(this);
+        if (it++ != c->args->end())
+        {
+            fprintf(f, ", ");
+        }
+    }
+    fprintf(f, ");");
+}
+
 void TranslatorVisitor::visitIntNode(IntNode *i)
 {
     fprintf(f, "int_literal(%d)", i->value);

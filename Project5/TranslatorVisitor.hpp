@@ -59,6 +59,8 @@ class TranslatorVisitor : public Visitor
 
         void visitWhileStatement(WhileStatement *);
 
+        void visitConstructorRExpr(ConstructorRExpr *);
+
         void visitIntNode(IntNode *);
         void visitStringNode(StringNode *);
         void visitNotNode(NotNode *);
