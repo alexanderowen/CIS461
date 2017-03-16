@@ -15,10 +15,12 @@
 void printLocalVariables(unordered_map<string, string> typeMap, SymbolTable *st, FILE *f, list<string> *printed = NULL)
 {
     //fprintf(stderr, "Printing out local vars\n");
+    //fprintf(stderr, "SymbolTable size = '%lu'\n", st->vMap.size());
     bool unique = true;
     for (unordered_map<string, VariableSym*>::iterator it = st->vMap.begin(); it != st->vMap.end(); ++it) 
     {
         //fprintf(f, "Variable in if: %s\n", (*it).first.c_str());
+        fprintf(stderr, "Checking if need to print '%s'\n", (*it).first.c_str());
         auto q = typeMap.find((*it).second->type);
         if (q != typeMap.end())
         {
@@ -86,6 +88,8 @@ void TranslatorVisitor::visitProgram(Program *p)
         (*it)->accept(this);
     }
     fprintf(f, "int main() {\n");
+    fprintf(stderr, "Address of p->st in Translator = '%p'\n", p->st);
+    //fprintf(stderr, "Size of p->st->vMap in Translator = '%lu'\n", p->st->vMap.size());
     printLocalVariables(typeMap, p->st, f);
     for (list<Statement *>::const_iterator it = p->statements->begin(); it != p->statements->end(); ++it)
     {
@@ -261,7 +265,7 @@ void TranslatorVisitor::visitMethod(Method *m)
     {
         fprintf(f, "\t");
         (*it)->accept(this);
-        fprintf(f, "\n");
+        fprintf(f, ";\n");
     }
     FalseIdentOption *fi = dynamic_cast<FalseIdentOption*>(m->ident);
     if (fi != NULL)
@@ -340,7 +344,7 @@ void TranslatorVisitor::visitIfClause(IfClause *i)
     {
         fprintf(f, "\t");
         (*it)->accept(this);
-        fprintf(f, "\n");
+        fprintf(f, ";\n");
     }
     fprintf(f, "\n}\n");
 }
@@ -355,7 +359,7 @@ void TranslatorVisitor::visitElifClause(ElifClause *e)
     {
         fprintf(f, "\t");
         (*it)->accept(this);
-        fprintf(f, "\n");
+        fprintf(f, ";\n");
     }
     fprintf(f, "\n}\n");
 }
@@ -368,7 +372,7 @@ void TranslatorVisitor::visitTrueElseOption(TrueElseOption *e)
     {
         fprintf(f, "\t");
         (*it)->accept(this);
-        fprintf(f, "\n");
+        fprintf(f, ";\n");
     }
     fprintf(f, "\n}\n");
 }

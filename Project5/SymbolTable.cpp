@@ -68,6 +68,19 @@ SymbolTable *SymbolTable::intersection(list<SymbolTable*> sts, TypeTree *tt)
     return total;    
 }
 
+void SymbolTable::merge(SymbolTable *_st)
+{
+    for (unordered_map<string, VariableSym*>::const_iterator key = _st->vMap.begin(); key != _st->vMap.end(); ++key)
+    {
+        VariableSym *v = this->lookupVariableNoParent((char*)key->first.c_str());
+        if (v == NULL)
+        {
+            VariableSym *newVar = new VariableSym(strdup(key->first.c_str()), key->second->type);
+            this->addVariable(strdup(key->first.c_str()), newVar);
+        }
+    }
+}
+
 SymbolTable *SymbolTable::remove(SymbolTable *st1, SymbolTable *st2)
 {
     SymbolTable *total = new SymbolTable(st1->parent); //using st1 as the base
@@ -116,9 +129,13 @@ VariableSym *SymbolTable::lookupVariableNoParent(char *name)
 
 void SymbolTable::addVariable(char *name, VariableSym *value)
 {
+    fprintf(stderr, "Adding '%s' of type '%s' to SymTab\n", name, value->type);
     string key = name;
-    vMap.insert({key, value});
-    free(name);
+    bool ok = vMap.insert({key, value}).second;
+    //fprintf(stderr, "The insertion was '%d'\n", ok);
+    //fprintf(stderr, "Size of vMap = '%lu'\n", vMap.size());
+    fprintf(stderr, "Address of this Symtab = '%p'\n", this);
+    //free(name);
 }
 
 void SymbolTable::removeVariable(VariableSym *vs)
