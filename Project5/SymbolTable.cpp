@@ -129,12 +129,13 @@ VariableSym *SymbolTable::lookupVariableNoParent(char *name)
 
 void SymbolTable::addVariable(char *name, VariableSym *value)
 {
-    fprintf(stderr, "Adding '%s' of type '%s' to SymTab\n", name, value->type);
+    //fprintf(stderr, "Adding '%s' of type '%s' to SymTab\n", name, value->type);
     string key = name;
-    bool ok = vMap.insert({key, value}).second;
+    vMap.insert({key, value});
+    //bool ok = vMap.insert({key, value}).second;
     //fprintf(stderr, "The insertion was '%d'\n", ok);
     //fprintf(stderr, "Size of vMap = '%lu'\n", vMap.size());
-    fprintf(stderr, "Address of this Symtab = '%p'\n", this);
+    //fprintf(stderr, "Address of this Symtab = '%p'\n", this);
     //free(name);
 }
 

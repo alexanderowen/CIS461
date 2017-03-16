@@ -399,17 +399,17 @@ void TypeCheckVisitor::visitProgram(Program *p)
     }
     SymbolTable *origin = st;
     st = new SymbolTable(origin);
-    fprintf(stderr, "Address of origin = '%p'\n", origin);
-    fprintf(stderr, "Address of new = '%p'\n", st);
+    //fprintf(stderr, "Address of origin = '%p'\n", origin);
+    //fprintf(stderr, "Address of new = '%p'\n", st);
 
-    fprintf(stderr, "Type checking 'main' code\n");
+    //fprintf(stderr, "Type checking 'main' code\n");
     for (list<Statement *>::const_iterator it = p->statements->begin(); it != p->statements->end(); ++it)
     {
         (*it)->accept(this);
     }
-    fprintf(stderr, "Address of st after statements = '%p'\n", st);
+    //fprintf(stderr, "Address of st after statements = '%p'\n", st);
     p->st = st;
-    fprintf(stderr, "Address of p->st in TypeCheck = '%p'\n", p->st);
+    //fprintf(stderr, "Address of p->st in TypeCheck = '%p'\n", p->st);
     //fprintf(stderr, "Size of p->st->vMap in TypeCheck = '%lu'\n", p->st->vMap.size());
     st = origin;
     //fprintf(stderr, "size of st->vMap = '%lu'\n", p->st->vMap.size());

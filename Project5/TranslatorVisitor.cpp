@@ -2,6 +2,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 
+#include "util.h"
 #include "visitor.h"
 #include "TranslatorVisitor.hpp"
 
@@ -20,7 +21,7 @@ void printLocalVariables(unordered_map<string, string> typeMap, SymbolTable *st,
     for (unordered_map<string, VariableSym*>::iterator it = st->vMap.begin(); it != st->vMap.end(); ++it) 
     {
         //fprintf(f, "Variable in if: %s\n", (*it).first.c_str());
-        fprintf(stderr, "Checking if need to print '%s'\n", (*it).first.c_str());
+        //fprintf(stderr, "Checking if need to print '%s'\n", (*it).first.c_str());
         auto q = typeMap.find((*it).second->type);
         if (q != typeMap.end())
         {
@@ -88,7 +89,7 @@ void TranslatorVisitor::visitProgram(Program *p)
         (*it)->accept(this);
     }
     fprintf(f, "int main() {\n");
-    fprintf(stderr, "Address of p->st in Translator = '%p'\n", p->st);
+    //fprintf(stderr, "Address of p->st in Translator = '%p'\n", p->st);
     //fprintf(stderr, "Size of p->st->vMap in Translator = '%lu'\n", p->st->vMap.size());
     printLocalVariables(typeMap, p->st, f);
     for (list<Statement *>::const_iterator it = p->statements->begin(); it != p->statements->end(); ++it)
@@ -160,9 +161,8 @@ void TranslatorVisitor::visitClassSignature(ClassSignature *cs)
 
     fprintf(f, ");\n");
 
-    // TODO: Resolve printing the methods
     printMethodSignatures(tn);    
-    getMethodNames(tn); //set the instance variable
+    getMethodNames(tn); //set the instance variable 'methodNames'
     fprintf(f, "\n};\n\n");
     
     fprintf(f, "obj_%s new_%s(", cs->id, cs->id);
@@ -184,11 +184,17 @@ void TranslatorVisitor::visitClassSignature(ClassSignature *cs)
 
 void TranslatorVisitor::printMethodSignatures(TypeNode *tn)
 {
+    list<char*> displayed;
     while (tn != NULL)
     {
         for (list<MethodNode*>::const_iterator it = tn->methods.begin(); it != tn->methods.end(); ++it)
         {
             MethodNode *m = (*it);
+            if (withinList(&displayed, m->id)) // we've already printed it
+            {
+                continue;
+            }
+            displayed.push_back(m->id);
             auto ret = typeMap.find(m->returnType);
             auto methName = typeMap.find(tn->name);
             fprintf(f, "\t%s (*%s) (%s", ret->second.c_str(), m->id, methName->second.c_str());
