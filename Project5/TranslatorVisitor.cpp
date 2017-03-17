@@ -230,15 +230,15 @@ void TranslatorVisitor::getMethodNames(TypeNode *tn)
 void TranslatorVisitor::visitClassBody(ClassBody *cb)
 {
     printLocalVariables(typeMap, cb->st, f, &printed);
-    fprintf(f, "\tobj_%s thing = malloc(sizeof(struct obj_%s_struct));\n", className, className);
-    fprintf(f, "\tthing->clazz = the_class_%s;\n", className);
+    fprintf(f, "\tobj_%s this = malloc(sizeof(struct obj_%s_struct));\n", className, className);
+    fprintf(f, "\tthis->clazz = the_class_%s;\n", className);
     for (list<Statement *>::const_iterator it = cb->stmts->begin(); it != cb->stmts->end(); ++it)
     {
         fprintf(f, "\t");
         (*it)->accept(this);
         fprintf(f, "\n");
     }
-    fprintf(f, "\treturn thing;\n}\n"); 
+    fprintf(f, "\treturn this;\n}\n"); 
     for (list<Method *>::const_iterator it = cb->meths->begin(); it != cb->meths->end(); ++it)
     {
         (*it)->accept(this);
@@ -257,7 +257,7 @@ void TranslatorVisitor::visitMethod(Method *m)
     methodPrinted.clear();
     m->ident->accept(this); // print return type first
     auto q = typeMap.find(className);
-    fprintf(f, " %s_method_%s(%s thing", className, m->id, q->second.c_str());
+    fprintf(f, " %s_method_%s(%s this", className, m->id, q->second.c_str());
 
     for (list<FormalArg *>::const_iterator it = m->fargs->begin(); it != m->fargs->end(); ++it)
     {
@@ -277,6 +277,14 @@ void TranslatorVisitor::visitMethod(Method *m)
     if (fi != NULL)
     {
         fprintf(f, "\t return nothing;");
+    }
+    TrueIdentOption *ti = dynamic_cast<TrueIdentOption*>(m->ident);
+    if (ti != NULL)
+    {
+        if (strcmp(ti->id, (char*)"Nothing") == 0)
+        {
+            fprintf(f, "\t return nothing;");
+        }
     }
     fprintf(f, "\n}\n");
     inMethod = false;
@@ -532,7 +540,7 @@ void TranslatorVisitor::visitIdentNode(IdentNode *i)
 
 void TranslatorVisitor::visitObjectFieldLExpr(ObjectFieldLExpr *o)
 {
-    fprintf(f, "thing->%s", o->id); //TODO: Only correct within the constructor
+    fprintf(f, "this->%s", o->id); //TODO: Only correct within the constructor
 
 }
 

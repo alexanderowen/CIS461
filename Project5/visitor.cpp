@@ -535,7 +535,7 @@ void TypeCheckVisitor::visitAssignmentStatement(AssignmentStatement *a)
         {
             if (strcmp(ident->id, (char*)"this") == 0)
             {
-                fprintf(stderr, "Adding variable node. Adding '%s' of type '%s' to type '%s'\n", ofl->id, getType(a->rexpr), className);
+                //fprintf(stderr, "Adding variable node. Adding '%s' of type '%s' to type '%s'\n", ofl->id, getType(a->rexpr), className);
                 VariableNode *v = new VariableNode(strdup(ofl->id), strdup(getType(a->rexpr)));
                 tt->addVarToType(strdup(className), v);
             }
