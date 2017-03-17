@@ -146,6 +146,9 @@ class TypeCheckVisitor : public Visitor
         char *className;
         char *supertype;
 
+        bool inWhile;
+        bool mustRepeat;
+
         SymbolTable *beyondConstructorScope;
 
         IdentNode *isIdent(RExpr *r);

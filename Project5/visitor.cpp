@@ -360,6 +360,8 @@ TypeCheckVisitor::TypeCheckVisitor()
     inClass = false;
     className = NULL;
     supertype = NULL;
+
+    mustRepeat = false;
 }
 TypeCheckVisitor::TypeCheckVisitor(TypeTree *t)
 {
@@ -509,9 +511,23 @@ void TypeCheckVisitor::visitAssignmentStatement(AssignmentStatement *a)
         else if (defined != NULL) // If this variable has already been defined, perform LCA
         {
             //fprintf(stderr, "Variable has been defined. Performed LCA.\n");
+            //int changed = strcmp(defined->type, getType(a->rexpr)) != 0 && getType(a->rexpr) != NULL;
+            bool changed = false;
             type = tt->LCA(defined->type, getType(a->rexpr));    
+            if (type == NULL)
+            {
+                type = defined->type;
+            } 
+            else if (strcmp(defined->type, getType(a->rexpr)) != 0)
+            {
+                changed = true;
+            }
             //fprintf(stderr, "Determined LCA to be '%s'", type);
             st->removeVariable(defined); //remove old value 
+            if (inWhile && changed && strcmp(type, (char*)"Obj") != 0) //the type changed and we're in a while loop
+            {
+                mustRepeat = true;
+            }
         }
         else if (tio != NULL)
         {
@@ -730,6 +746,7 @@ void TypeCheckVisitor::visitTrueElseOption(TrueElseOption *e)
 
 void TypeCheckVisitor::visitWhileStatement(WhileStatement *w)
 {
+    inWhile = true;
     char *type = getType(w->rexpr);
     if (type != NULL && strcmp(type, (char*)"Boolean") != 0)
     {
@@ -743,10 +760,16 @@ void TypeCheckVisitor::visitWhileStatement(WhileStatement *w)
     for (list<Statement *>::const_iterator it = w->stmts->begin(); it != w->stmts->end(); ++it)
     {
         (*it)->accept(this);
+        while (mustRepeat)
+        {
+            mustRepeat = false;
+            (*it)->accept(this);
+        }
     }
     w->st = st;
     //delete st;
     st = origin;
+    inWhile = false;
 }
 
 void TypeCheckVisitor::visitMethod(Method *m)
