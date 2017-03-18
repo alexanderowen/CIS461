@@ -1,4 +1,6 @@
 # Quack compiler  
+Author: Alexander Owen (no partner)  
+Course: CIS 461, Winter 2017  
 ## Execution  
 Executable Quack compiler is named `quack`  
 Run with `./quack path/to/file`  
