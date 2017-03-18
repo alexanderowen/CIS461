@@ -1,11 +1,13 @@
 /* shortcircuit.qk
  *
- * Demonstrates Quack's short circuit evaluation for 'and'
+ * Demonstrates Quack's short circuit evaluation for 'and' and 'or'
  * Once the first value of the 'and' statement is determined to be false, 
  * it does not execute the second part of the 'and' statement. 
  * 
  * Output:
- * "Called f"
+ * Called tf.f()
+ * Called tf.t()
+ * Good! Make it inside if statement
  */ 
 
 class tf() {
@@ -20,6 +22,10 @@ class tf() {
 }
 
 value = tf();
-if (value.f() and value.t()) {
+if (value.f() and value.t()) { // call f(), but not t()
     "Error! Should not be inside if statement\n".PRINT();
+}
+
+if (value.t() or value.f()) { // call t(), but not f()
+    "Good! Make it inside if statement\n".PRINT();
 }

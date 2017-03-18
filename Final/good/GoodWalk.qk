@@ -3,6 +3,11 @@
  * Demonstrates the correctness of the typechecker regarding
  * loops that climb up the class hierarchy. 
  *
+ * Output:
+ * Returning type C3 from C4.foo()
+ * Returning type C2 from C3.foo()
+ * Returning type C1 from C2.foo()
+ * Returning type C1 from C1.foo()
  * 
  */
 

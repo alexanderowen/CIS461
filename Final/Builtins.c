@@ -268,7 +268,7 @@ obj_Int new_Int(  ) {
 
 /* Int:STR */
 obj_String Int_method_STR(obj_Int this) {
-    fprintf(stderr, "Hello, this is Int.STR\n");
+    //fprintf(stderr, "Hello, this is Int.STR\n");
   char *rep;
   asprintf(&rep, "%d", this->value);
   return str_literal(rep); 
