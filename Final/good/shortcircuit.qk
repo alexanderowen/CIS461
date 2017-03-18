@@ -1,0 +1,25 @@
+/* shortcircuit.qk
+ *
+ * Demonstrates Quack's short circuit evaluation for 'and'
+ * Once the first value of the 'and' statement is determined to be false, 
+ * it does not execute the second part of the 'and' statement. 
+ * 
+ * Output:
+ * "Called f"
+ */ 
+
+class tf() {
+    def t() : Boolean {
+        "Called tf.t()\n".PRINT();
+        return true;
+    }
+    def f() : Boolean {
+        "Called tf.f()\n".PRINT();
+        return false;
+    }
+}
+
+value = tf();
+if (value.f() and value.t()) {
+    "Error! Should not be inside if statement\n".PRINT();
+}

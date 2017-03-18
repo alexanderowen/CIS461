@@ -1,0 +1,4 @@
+*.o
+a.out
+pgm
+q.c
